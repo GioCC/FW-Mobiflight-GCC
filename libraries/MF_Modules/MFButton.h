@@ -37,7 +37,7 @@ class MFButton
 {
 public:
     static void attachHandler(byte eventId, buttonEvent newHandler);
-    static void setBitStore(InBitStore *status, InBitStore *updated, byte maxOBPin);
+    static void setBitStore(bitStore<byte> *status, bitStore<byte> *updated, byte maxOBPin);
 
     MFButton(uint8_t pin = 1, String name = "Button");
     void update();
@@ -46,10 +46,10 @@ public:
     uint8_t       _pin;
 
 private:
-    static buttonEvent  _handler[2];
-    static InBitStore   *_InBits;
-    static InBitStore   *_InBitsUpdate;
-    static byte         _MaxOnboardPin;
+    static buttonEvent      _handler[2];
+    static bitStore<byte>   *_InBits;
+    static bitStore<byte>   *_InBitsUpdate;
+    static byte             _MaxOnboardPin;
 
     //bool          _state; // now superceded by lookup into _bits
     //long          _last;

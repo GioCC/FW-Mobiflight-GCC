@@ -7,7 +7,7 @@
 		<Option compiler="avr-gcc" />
 		<Build>
 			<Target title="Simulator - Debug">
-				<Option output="build/ArdSimX_v122_sim.exe" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_sim.exe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="GCC" />
@@ -29,7 +29,7 @@
 				</Environment>
 			</Target>
 			<Target title="Simulator - Release">
-				<Option output="build/ArdSimX_v122_sim.exe" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_sim.exe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="GCC" />
@@ -51,7 +51,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Uno">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -88,7 +88,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Leonardo">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -127,7 +127,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Esplora">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -166,7 +166,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Micro">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -205,7 +205,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Duemilanove (328)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -242,7 +242,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Duemilanove (168)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -279,7 +279,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Nano (328)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -316,7 +316,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Nano (168)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -353,7 +353,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Mini (328)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -390,7 +390,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Mini (168)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -427,7 +427,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Pro Mini (328)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -464,7 +464,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Pro Mini (168)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -501,16 +501,16 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Mega 2560/ADK">
-				<Option output="build/Mobiflight_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-x c++" />
 					<Add option="-mmcu=$(MCU)" />
 					<Add option="-DF_CPU=16000000L" />
 					<Add option="-D__AVR_ATmega2560__" />
-					<Add option="-O2" />
 					<Add directory="$(ARDUINO_DIR)/hardware/arduino/cores/arduino" />
 					<Add directory="$(ARDUINO_DIR)/libraries" />
 					<Add directory="$(ARDUINO_DIR)/hardware/arduino/variants/mega" />
@@ -538,7 +538,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Mega 1280">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -575,7 +575,7 @@
 				</Environment>
 			</Target>
 			<Target title="Arduino Mega 8">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />
@@ -612,7 +612,7 @@
 				</Environment>
 			</Target>
 			<Target title="Microduino Core+ (644P)">
-				<Option output="build/ArdSimX_v122_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
 				<Option object_output="build" />
 				<Option type="1" />
 				<Option compiler="avrgcc" />

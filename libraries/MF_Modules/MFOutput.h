@@ -24,16 +24,16 @@
 class MFOutput
 {
 public:
-    static void setBitStore(OutBitStore *storage, byte maxOBPin);
+    static void setBitStore(bitStore<byte> *storage, byte maxOBPin);
 
     MFOutput(uint8_t pin = 1);
     void set(bool state);
     void powerSavingMode(bool state);
 
 private:
-    static OutBitStore *_OutBits;
-    static byte         _MaxOnboardPin;
-    uint8_t             _pin;
+    static bitStore<byte>   *_OutBits;
+    static byte             _MaxOnboardPin;
+    uint8_t                 _pin;
     //bool          _state; // now superceded by lookup into _bits
 };
 #endif

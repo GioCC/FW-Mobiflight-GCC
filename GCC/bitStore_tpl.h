@@ -23,25 +23,24 @@
 #define idxP(n)        ((n)&0x07)
 #define idxM(n)        (1<<idxP(n))
 
-template<typename Tadr>
+template<typename Tadr, Tadr BITSIZE> class bitStore;
+
+template<typename Tadr, Tadr BITSIZE>
 class bitStore
 {
 protected:
 
-        uint8_t *_store;
-        Tadr    BITSIZE;
-        Tadr    BYTESIZE;   // Precalculated and stored for access speed
+        uint8_t _store[roundUp(BITSIZE)];
 
 public:
-        bitStore(uint8_t *store, Tadr bsize): _store(store), BITSIZE(bsize) { BYTESIZE = sizeBytes(bsize);}
+        bitStore() {}
+
 
         //uint8_t     *base(void)                     { return _store; }
         // Return pointer to bank containing bit <adr>
         uint8_t     *pbank(Tadr adr)                { return (adr<BITSIZE ? &(_store[idxB(adr)]) : NULL); }
         // Return index of bank containing bit <adr>
-        static Tadr bitBank(Tadr adr)               { return roundUp(adr); }
-        // which is the same of the total size in byte required to contain <bitsize> bits
-        static Tadr sizeBytes(Tadr bitsize)          { return roundUp(bitsize); }
+        Tadr        bitBank(Tadr adr)               { return roundUp(adr); }
 
         // Bit access methods
         // Addresses for bits are [0...BITSIZE-1]
@@ -52,10 +51,10 @@ public:
 
         // Bank access methods
         // Addresses for banks are [0...(BITSIZE/8)-1] (division rounded to upper integer)
-        int8_t      getB(Tadr Badr)                 { return (Badr<BYTESIZE ? _store[Badr] : 0); }
-        void        setB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] |= Bval; }; }
-        void        clrB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] &= ~Bval; }; }
-        void        putB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] = Bval; }; }
+        int8_t      getB(Tadr Badr)                 { return (Badr<roundUp(BITSIZE) ? _store[Badr] : 0); }
+        void        setB(Tadr Badr, int8_t Bval)    { if(Badr<roundUp(BITSIZE)) { _store[Badr] |= Bval; }; }
+        void        clrB(Tadr Badr, int8_t Bval)    { if(Badr<roundUp(BITSIZE)) { _store[Badr] &= ~Bval; }; }
+        void        putB(Tadr Badr, int8_t Bval)    { if(Badr<roundUp(BITSIZE)) { _store[Badr] = Bval; }; }
 
 };
 

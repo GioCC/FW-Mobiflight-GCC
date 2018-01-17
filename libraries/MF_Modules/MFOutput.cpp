@@ -4,8 +4,8 @@
 
 #include "MFOutput.h"
 
-OutBitStore  *MFOutput::_OutBits;
-byte         MFOutput::_MaxOnboardPin;
+bitStore<byte>  *MFOutput::_OutBits;
+byte            MFOutput::_MaxOnboardPin;
 
 MFOutput::MFOutput(uint8_t pin)
 {
@@ -35,7 +35,7 @@ void MFOutput::powerSavingMode(bool active)
   }
 }
 
-void MFOutput::setBitStore(OutBitStore *storage, byte maxOBPin)
+void MFOutput::setBitStore(bitStore<byte> *storage, byte maxOBPin)
 {
     MFOutput::_OutBits        = storage;
     MFOutput::_MaxOnboardPin  = maxOBPin;
