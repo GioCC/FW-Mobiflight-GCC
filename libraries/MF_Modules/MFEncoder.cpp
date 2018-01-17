@@ -4,6 +4,9 @@
 
 #include "MFEncoder.h"
 
+// Static handler pointers
+encoderEvent    MFEncoder::_handler[4];
+
 MFEncoder::MFEncoder() : _encoder() {
   _initialized = false;
 }
@@ -42,17 +45,17 @@ void MFEncoder::update()
   long absDelta = abs(delta);
   if (absDelta < 2) {
     // slow turn detected
-    if (dir==1 && _handlerList[encLeft]!= NULL) {
-        (*_handlerList[encLeft])(encLeft, _pin1, _name);
-    } else if(_handlerList[encRight]!= NULL) {
-        (*_handlerList[encRight])(encRight, _pin2, _name);
+    if (dir==1 && _handler[encLeft]!= NULL) {
+        (*_handler[encLeft])(encLeft, _pin1, _name);
+    } else if(_handler[encRight]!= NULL) {
+        (*_handler[encRight])(encRight, _pin2, _name);
     }
   } else {
     // fast turn detected
-    if (dir==1 && _handlerList[encLeftFast]!= NULL) {
-        (*_handlerList[encLeftFast])(encLeftFast,  _pin1, _name);
-    } else if(_handlerList[encRightFast]!= NULL) {
-        (*_handlerList[encRightFast])(encRightFast, _pin2, _name);
+    if (dir==1 && _handler[encLeftFast]!= NULL) {
+        (*_handler[encLeftFast])(encLeftFast,  _pin1, _name);
+    } else if(_handler[encRightFast]!= NULL) {
+        (*_handler[encRightFast])(encRightFast, _pin2, _name);
     }
   }
   
@@ -67,5 +70,5 @@ void MFEncoder::update()
 
 void MFEncoder::attachHandler(byte eventId, encoderEvent newHandler)
 {
-  _handlerList[eventId] = newHandler;
+  MFEncoder::_handler[eventId] = newHandler;
 }

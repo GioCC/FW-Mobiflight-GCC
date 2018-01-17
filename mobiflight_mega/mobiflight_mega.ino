@@ -156,6 +156,7 @@ byte outputsRegistered = 0;
 
 MFButton buttons[MAX_BUTTONS];
 byte buttonsRegistered = 0;
+long lastButtonUpdate  = 0;
 
 MFSegments ledSegments[MAX_LEDSEGMENTS];
 byte ledSegmentsRegistered = 0;
@@ -397,9 +398,12 @@ void AddButton(uint8_t pin, String name)
   if (isPinRegistered(pin)) return;
   
   buttons[buttonsRegistered] = MFButton(pin, name);
-  buttons[buttonsRegistered].attachHandler(btnOnRelease, handlerOnRelease);
-  buttons[buttonsRegistered].attachHandler(btnOnPress, handlerOnRelease);
-
+  if(buttonsRegistered == 0) {
+    //buttons[buttonsRegistered].attachHandler(btnOnRelease, handlerOnRelease);
+    //buttons[buttonsRegistered].attachHandler(btnOnPress, handlerOnRelease);
+    MFButton::attachHandler(btnOnRelease, handlerOnRelease);
+    MFButton::attachHandler(btnOnPress, handlerOnRelease);
+  }
   registerPin(pin, kTypeButton);
   buttonsRegistered++;
 #ifdef DEBUG  
@@ -425,11 +429,12 @@ void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
   
   encoders[encodersRegistered] = MFEncoder();
   encoders[encodersRegistered].attach(pin1, pin2, name);
+  if(encodersRegistered == 0) {
   encoders[encodersRegistered].attachHandler(encLeft, handlerOnEncoder);
   encoders[encodersRegistered].attachHandler(encLeftFast, handlerOnEncoder);
   encoders[encodersRegistered].attachHandler(encRight, handlerOnEncoder);
   encoders[encodersRegistered].attachHandler(encRightFast, handlerOnEncoder);
-
+  }
   registerPin(pin1, kTypeEncoder); registerPin(pin2, kTypeEncoder);    
   encodersRegistered++;
 #ifdef DEBUG  
@@ -848,9 +853,13 @@ void updateServos()
 
 void readButtons()
 {
+  long now = millis();
+  if (now-lastButtonUpdate > 10) {
+    lastButtonUpdate = now;
   for(int i=0; i!=buttonsRegistered; i++) {
     buttons[i].update();
   }  
+  }
 }
 
 void readEncoder() 

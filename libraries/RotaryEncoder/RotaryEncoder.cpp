@@ -52,7 +52,7 @@ void RotaryEncoder::initialize(int pin1, int pin2) {
 } // RotaryEncoder()
 
 
-void RotaryEncoder::setMinMax(int min, int max) {
+void RotaryEncoder::setMinMax(long min, long max) {
 	_minValue = min;
 	_maxValue = max;
 }

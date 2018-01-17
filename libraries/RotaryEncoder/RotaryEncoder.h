@@ -45,7 +45,7 @@ public:
   // ----- Constructor -----
   void initialize(int pin1, int pin2);
   
-  void setMinMax(int min, int max);
+  void setMinMax(long min, long max);
   
   // retrieve the current position
   int  getPosition();

@@ -4,22 +4,25 @@
 
 #include "MFButton.h"
 
+// Static handler pointers and vars
+buttonEvent  MFButton::_handler[2];
 MFButton::MFButton(uint8_t pin, String name)
 {   
   _pin  = pin;
   _name = name;
+  //_last = millis();
   _state = 1;
-  _last = millis();
+
   pinMode(_pin, INPUT);     // set pin to input
   digitalWrite(_pin, HIGH); // turn on pullup resistors
 }
 
 void MFButton::update()
 {
-    long now = millis();
-    if (now-_last <= 10) return;
+    //long now = millis();
+    //if (now-_last <= 10) return;
     byte newState = digitalRead(_pin);
-    _last = now;
+    //_last = now;
     if (newState!=_state) {     
       _state = newState;
       trigger();      
@@ -28,14 +31,14 @@ void MFButton::update()
 
 void MFButton::trigger()
 {
-      if (_state==LOW && _handlerList[btnOnPress]!= NULL) {
-        (*_handlerList[btnOnPress])(btnOnPress, _pin, _name);
+      if (_state==LOW && _handler[btnOnPress]!= NULL) {
+        (*_handler[btnOnPress])(btnOnPress, _pin, _name);
       }
-      else if (_handlerList[btnOnRelease] != NULL)
-        (*_handlerList[btnOnRelease])(btnOnRelease, _pin, _name);
+      else if (_handler[btnOnRelease] != NULL)
+        (*_handler[btnOnRelease])(btnOnRelease, _pin, _name);
 }
 
 void MFButton::attachHandler(byte eventId, buttonEvent newHandler)
 {
-  _handlerList[eventId] = newHandler;
+  MFButton::_handler[eventId] = newHandler;
 }

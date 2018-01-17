@@ -34,16 +34,17 @@ enum
 class MFButton
 {
 public:
+    static void attachHandler(byte eventId, buttonEvent newHandler);
+
     MFButton(uint8_t pin = 1, String name = "Button");
     void update();
     void trigger();
-    void attachHandler(byte eventId, buttonEvent newHandler);    
     String        _name;
     uint8_t       _pin;
     
 private:
+    static buttonEvent  _handler[2];
     bool          _state;
-    long          _last;
-    buttonEvent   _handlerList[2];    
+    //long          _last;
 };
 #endif 
