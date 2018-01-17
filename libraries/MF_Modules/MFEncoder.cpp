@@ -13,35 +13,35 @@ MFEncoder::MFEncoder() : _encoder() {
 
 void MFEncoder::attach(uint8_t pin1, uint8_t pin2, String name)
 {
-  _pos   = 0;  
+  _pos   = 0;
   _name  = name;
   _pin1  = pin1;
   _pin2  = pin2;
-  
+
   _encoder.initialize(pin1,pin2);
   _encoder.setMinMax(MF_ENC_MIN,MF_ENC_MAX);
   _encoder.setPosition(_pos);
-  
+
   _initialized = true;
 }
 
 void MFEncoder::update()
 {
   if (!_initialized) return;
-  
+
   //_encoder.update();
   _encoder.tick();
   long pos = _encoder.getPosition();
-  
+
   if (pos == _pos) {
-    // nothing happened 
+    // nothing happened
     return;
   }
-  
+
   long delta = pos - _pos;
   long dir = 1;
-  if (delta<0) dir = -1;  
-  
+  if (delta<0) dir = -1;
+
   long absDelta = abs(delta);
   if (absDelta < 2) {
     // slow turn detected
@@ -58,12 +58,12 @@ void MFEncoder::update()
         (*_handler[encRightFast])(encRightFast, _pin2, _name);
     }
   }
-  
+
   // clamp values
-  if ( (dir > 0 && (pos + delta*2) > MF_ENC_MAX) || (dir < 0 && (pos - delta*2) < MF_ENC_MIN)) 
-  { 
-    _encoder.setPosition(0); 
-    pos = 0; 
+  if ( (dir > 0 && (pos + delta*2) > MF_ENC_MAX) || (dir < 0 && (pos - delta*2) < MF_ENC_MIN))
+  {
+    _encoder.setPosition(0);
+    pos = 0;
   }
   _pos = pos;
 }

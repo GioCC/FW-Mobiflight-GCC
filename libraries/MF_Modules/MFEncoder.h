@@ -47,15 +47,15 @@ public:
     MFEncoder();
     void attach(uint8_t pin1, uint8_t pin2, String name = "Encoder");
     void update();
-    
+
 private:
     static encoderEvent       _handler[4];
 
-    uint8_t                   _pin1;              
+    uint8_t                   _pin1;
     uint8_t                   _pin2;
     bool                      _initialized;
     RotaryEncoder 		      _encoder;
     String                    _name;
     long                      _pos;
 };
-#endif 
+#endif

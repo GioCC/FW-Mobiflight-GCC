@@ -46,8 +46,9 @@ char foo;
 #define STEPPER_ACCEL 900
 
 #if MODULETYPE == MTYPE_MICRO
-#define MAX_OUTPUTS     10
-#define MAX_BUTTONS     10
+#define MAX_ONB_PIN     10    // beyond this limit, I/Os are no longer onboard pins
+#define MAX_OUTPUTS     10 // ? Find correct value
+#define MAX_BUTTONS     10 // ? Find correct value
 #define MAX_LEDSEGMENTS 1
 #define MAX_ENCODERS    4
 #define MAX_STEPPERS    4
@@ -56,8 +57,9 @@ char foo;
 #endif
 
 #if MODULETYPE == MTYPE_UNO
-#define MAX_OUTPUTS     8
-#define MAX_BUTTONS     8
+#define MAX_ONB_PIN     8     // beyond this limit, I/Os are no longer onboard pins
+#define MAX_OUTPUTS     8 // ? Find correct value
+#define MAX_BUTTONS     8 // ? Find correct value
 #define MAX_LEDSEGMENTS 1
 #define MAX_ENCODERS    2
 #define MAX_STEPPERS    2
@@ -66,8 +68,9 @@ char foo;
 #endif
 
 #if MODULETYPE == MTYPE_MEGA
-#define MAX_OUTPUTS     40
-#define MAX_BUTTONS     50
+#define MAX_ONB_PIN     40    // beyond this limit, I/Os are no longer onboard pins
+#define MAX_OUTPUTS     80 //40
+#define MAX_BUTTONS     80 //50
 #define MAX_LEDSEGMENTS 4
 #define MAX_ENCODERS    20
 #define MAX_STEPPERS    10
@@ -92,6 +95,7 @@ char foo;
 #include <MFOutput.h>
 #include <LiquidCrystal_I2C.h>
 #include <MFLCDDisplay.h>
+#include <bitStore.h>   //GCC
 
 const byte MEM_OFFSET_NAME   = 0;
 const byte MEM_LEN_NAME      = 48;
@@ -173,6 +177,13 @@ byte servosRegistered = 0;
 MFLCDDisplay lcd_I2C[MAX_MFLCD_I2C];
 byte lcd_12cRegistered = 0;
 
+//typedef bitStore<byte, MAX_BUTTONS> InBitStore;
+//typedef bitStore<byte, MAX_OUTPUTS> OutBitStore;
+
+InBitStore    InStatus;      //GCC
+InBitStore    InStatusUpd;   //GCC
+OutBitStore   OutStatus;     //GCC
+
 enum
 {
   kTypeNotSet,        // 0 
@@ -253,6 +264,8 @@ void OnResetBoard() {
   configBuffer[0]='\0';  
   //readBuffer[0]='\0'; 
   generateSerial(false); 
+  MFButton::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
+  MFOutput::setBitStore(&OutStatus, MAX_ONB_PIN);
   clearRegisteredPins();
   lastCommand = millis();  
   loadConfig();
@@ -403,6 +416,7 @@ void AddButton(uint8_t pin, String name)
     //buttons[buttonsRegistered].attachHandler(btnOnPress, handlerOnRelease);
     MFButton::attachHandler(btnOnRelease, handlerOnRelease);
     MFButton::attachHandler(btnOnPress, handlerOnRelease);
+    // BitStore is set during initial setup
   }
   registerPin(pin, kTypeButton);
   buttonsRegistered++;

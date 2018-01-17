@@ -668,6 +668,8 @@
 			<Add directory="lib_std/Servo" />
 			<Add directory="GCC" />
 		</Compiler>
+		<Unit filename="GCC/bitStore.cpp" />
+		<Unit filename="GCC/bitStore.h" />
 		<Unit filename="lib_std/Servo/Servo.cpp" />
 		<Unit filename="lib_std/Servo/Servo.h" />
 		<Unit filename="lib_std/Servo/ServoTimers.h" />

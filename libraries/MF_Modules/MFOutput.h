@@ -17,17 +17,23 @@
 #include <wiring.h>
 #endif
 
+#include <bitStore.h>
+
 /////////////////////////////////////////////////////////////////////
 /// \class MFOutput MFOutput.h <MFOutput.h>
 class MFOutput
 {
 public:
+    static void setBitStore(OutBitStore *storage, byte maxOBPin);
+
     MFOutput(uint8_t pin = 1);
     void set(bool state);
     void powerSavingMode(bool state);
-    
+
 private:
-    uint8_t       _pin;
-    bool          _state;
+    static OutBitStore *_OutBits;
+    static byte         _MaxOnboardPin;
+    uint8_t             _pin;
+    //bool          _state; // now superceded by lookup into _bits
 };
-#endif 
+#endif

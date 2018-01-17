@@ -26,7 +26,7 @@ const int8_t KNOBDIR[] = {
 // ----- Initialization and Default Values -----
 
 void RotaryEncoder::initialize(int pin1, int pin2) {
-  
+
   // Remember Hardware Setup
   _pin1.initialize(pin1, 5);
   _pin2.initialize(pin2, 5);
@@ -44,10 +44,10 @@ void RotaryEncoder::initialize(int pin1, int pin2) {
   // start with position 0;
   _position = 0;
   _positionExt = 0;
-  
+
   _minValue = 0;
   _maxValue = 1000;
-  
+
   tps.initialize();
 } // RotaryEncoder()
 
@@ -64,7 +64,7 @@ int  RotaryEncoder::getPosition() {
 
 void RotaryEncoder::setPosition(int newPosition) {
   // only adjust the external part of the position.
-  
+
   _position = ((newPosition<<2) | (_position & 0x03));
   _positionExt = newPosition;
 
@@ -78,17 +78,17 @@ void RotaryEncoder::tick(void)
   int sig2 = _pin2.isDown();
   int8_t thisState = sig1 | (sig2 << 1);
   tps.update(false);
-  
+
   if (_oldState != thisState) {
 	int _speed = calcSpeed();
 	_position += KNOBDIR[thisState | (_oldState<<2)] * _speed;
-	
+
     if (thisState == LATCHSTATE) {
 	  tps.update(true);
-	  
+
       _positionExt = (_position >> 2);
 	}
-    
+
     _oldState = thisState;
   }// if
 } // tick()

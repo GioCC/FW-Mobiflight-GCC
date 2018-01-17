@@ -17,6 +17,8 @@
 #include <wiring.h>
 #endif
 
+#include <bitStore.h>
+
 extern "C"
 {
   // callback functions always follow the signature: void cmd(void);
@@ -35,16 +37,21 @@ class MFButton
 {
 public:
     static void attachHandler(byte eventId, buttonEvent newHandler);
+    static void setBitStore(InBitStore *status, InBitStore *updated, byte maxOBPin);
 
     MFButton(uint8_t pin = 1, String name = "Button");
     void update();
     void trigger();
     String        _name;
     uint8_t       _pin;
-    
+
 private:
     static buttonEvent  _handler[2];
-    bool          _state;
+    static InBitStore   *_InBits;
+    static InBitStore   *_InBitsUpdate;
+    static byte         _MaxOnboardPin;
+
+    //bool          _state; // now superceded by lookup into _bits
     //long          _last;
 };
-#endif 
+#endif
