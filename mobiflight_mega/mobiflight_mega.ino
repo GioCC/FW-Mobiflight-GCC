@@ -8,6 +8,17 @@ char foo;
   #include <Arduino.h>
 #endif
 
+///NOTE GCC - restore for orig MF
+// Remove .h import:
+#include "mobiflight.h"
+// Restore default args in these headers:
+//void AddOutput(uint8_t pin = 1, String name = "Output")
+//void AddButton(uint8_t pin = 1, String name = "Button")
+//void AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
+//void AddLcdDisplay (uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
+
+///END NOTE
+
 //#define DEBUG 0
 #define MTYPE_MEGA 1
 #define MTYPE_MICRO 2
@@ -356,11 +367,11 @@ void clearRegisteredPins() {
 }
 
 //// OUTPUT /////
-void AddOutput(uint8_t pin = 1, String name = "Output")
+///void AddOutput(uint8_t pin = 1, String name = "Output")
+void AddOutput(uint8_t pin, String name)
 {
   if (outputsRegistered == MAX_OUTPUTS) return;
   if (isPinRegistered(pin)) return;
-  
   outputs[outputsRegistered] = MFOutput(pin);
   registerPin(pin, kTypeOutput);
   outputsRegistered++;
@@ -379,10 +390,10 @@ void ClearOutputs()
 }
 
 //// BUTTONS /////
-void AddButton(uint8_t pin = 1, String name = "Button")
+///void AddButton(uint8_t pin = 1, String name = "Button")
+void AddButton(uint8_t pin, String name)
 {  
   if (buttonsRegistered == MAX_BUTTONS) return;
-  
   if (isPinRegistered(pin)) return;
   
   buttons[buttonsRegistered] = MFButton(pin, name);
@@ -406,7 +417,8 @@ void ClearButtons()
 }
 
 //// ENCODERS /////
-void AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
+///void AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
+void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
 {  
   if (encodersRegistered == MAX_ENCODERS) return;
   if (isPinRegistered(pin1) || isPinRegistered(pin2)) return;
@@ -537,7 +549,8 @@ void ClearServos()
 }
 
 //// LCD Display /////
-void AddLcdDisplay (uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
+///void AddLcdDisplay (uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
+void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, String name)
 {  
   if (lcd_12cRegistered == MAX_MFLCD_I2C) return;
   lcd_I2C[lcd_12cRegistered].attach(address, cols, lines);

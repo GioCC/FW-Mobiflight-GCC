@@ -1,0 +1,39 @@
+Mobiflight Arduino - Mega
+Changes for I/O Banks
+
+1. Memory/speed optimizations:
+
+- MFButton/MFEncoder (and other input devices): make handler pointers static, 
+  since they're all equal anyway, to spare memory (particularly for AddButton).
+  Or just remove it altogether (there's just one callback for any Button action, 
+  and one for any encoder action).
+
+- The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects, 
+  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and  accessible both bit-wise and bank- (byte-)wise.
+  Each MFInput/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFInput::_bitStore).
+  
+- replace the standard digitalWrite()/digitalRead() with fast versions
+  
+2. Modifications to add new modular I/O blocks:
+
+- New 'kTypeIOBlock_XXX', XXX -> 163, 595, DM13, MCPS, MCP0... 
+
+- New 'AddIOBlock_XXX', each with its own:
+    -- specific HW driver params (e.g. pins, I/O banks per unit, hw adr, hw pin direction...) 
+    -- config (n. chained units, assignment to position in IO bank buffer )
+
+- Items from the IOBlock_XXX list will be refreshed (hw poll) during cyclic scan, and their data read/written from/to 
+  the IO bank buffer
+
+- When processing kTypeIOBlock_XXX, beside AddIOBlock_XXX, perform a series of "AddButton" and/or "AddOutput" for each I/O;
+  the associated "virtual" pin number will start from i.e. 64 to set them apart from on-board inputs.
+  This way, I/Os in external modules will be configured exactly like ordinary HW I/Os.
+  ('pin' variables remain uint8_t: max (256-64)=192 inputs + 192 outputs)
+
+- Inside AddButton, either of these:
+    -- use a new class 'MFBankInput' (mostly similar to MFButton) [preferred]
+    -- use MFButton, but modify it for a different behaviour if pin>=64 (read from IO bank buffer)
+  Same for AddOutput/MFOutput.
+
+- Inside AddButton/AddOutput, do not registerPin() (or neutralize registerPin() if pin<64)
+
