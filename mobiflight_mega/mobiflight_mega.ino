@@ -71,7 +71,7 @@ char foo;
 #define MAX_OUTPUTS     80 //40
 #define MAX_BUTTONS     80 //50
 #define MAX_LEDSEGMENTS 4
-#define MAX_ENCODERS    20
+#define MAX_ENCODERS    10 //20
 #define MAX_STEPPERS    10
 #define MAX_MFSERVOS    10
 #define MAX_MFLCD_I2C   2
@@ -184,6 +184,7 @@ bitStore<byte>  InStatus(   inStatusBuf,    bitStore<byte>::sizeBytes(MAX_BUTTON
 bitStore<byte>  InStatusUpd(inStatusUpdBuf, bitStore<byte>::sizeBytes(MAX_BUTTONS));
 bitStore<byte>  OutStatus(  outStatusBuf,   bitStore<byte>::sizeBytes(MAX_OUTPUTS));
 
+
 enum
 {
   kTypeNotSet,        // 0
@@ -194,6 +195,7 @@ enum
   kTypeStepper,       // 5
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
+  kTypeVirtInOut,     // 8
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
@@ -358,7 +360,7 @@ void loop()
 }
 
 bool isPinRegistered(byte pin) {
-  return pinsRegistered[pin] != kTypeNotSet;
+  return (pin < MODULE_MAX_PINS ? (pinsRegistered[pin] != kTypeNotSet) : kTypeNotSet);
 }
 
 bool isPinRegisteredForType(byte pin, byte type) {
@@ -366,7 +368,7 @@ bool isPinRegisteredForType(byte pin, byte type) {
 }
 
 void registerPin(byte pin, byte type) {
-  pinsRegistered[pin] = type;
+  if(pin < MODULE_MAX_PINS) pinsRegistered[pin] = type;
 }
 
 void clearRegisteredPins(byte type) {

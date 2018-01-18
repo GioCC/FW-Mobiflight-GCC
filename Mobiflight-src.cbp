@@ -793,6 +793,8 @@
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFCore.cpp">
+			<Option compile="0" />
+			<Option link="0" />
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
@@ -868,6 +870,8 @@
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
 		<Unit filename="libraries/RotaryEncoderAcelleration/RotaryEncoderAcelleration.cpp">
+			<Option compile="0" />
+			<Option link="0" />
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />

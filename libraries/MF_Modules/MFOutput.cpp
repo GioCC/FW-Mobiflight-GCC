@@ -7,6 +7,12 @@
 bitStore<byte>  *MFOutput::_OutBits;
 byte            MFOutput::_MaxOnboardPin;
 
+void MFOutput::setBitStore(bitStore<byte> *storage, byte maxOBPin)
+{
+    MFOutput::_OutBits        = storage;
+    MFOutput::_MaxOnboardPin  = maxOBPin;
+}
+
 MFOutput::MFOutput(uint8_t pin)
 {
 
@@ -35,8 +41,3 @@ void MFOutput::powerSavingMode(bool active)
   }
 }
 
-void MFOutput::setBitStore(bitStore<byte> *storage, byte maxOBPin)
-{
-    MFOutput::_OutBits        = storage;
-    MFOutput::_MaxOnboardPin  = maxOBPin;
-}

@@ -37,7 +37,7 @@ class MFButton
 {
 public:
     static void attachHandler(byte eventId, buttonEvent newHandler);
-    static void setBitStore(bitStore<byte> *status, bitStore<byte> *updated, byte maxOBPin);
+    static void setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin);
 
     MFButton(uint8_t pin = 1, String name = "Button");
     void update();

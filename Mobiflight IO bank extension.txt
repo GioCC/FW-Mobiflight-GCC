@@ -3,37 +3,70 @@ Changes for I/O Banks
 
 1. Memory/speed optimizations:
 
-- MFButton/MFEncoder (and other input devices): make handler pointers static, 
-  since they're all equal anyway, to spare memory (particularly for AddButton).
-  Or just remove it altogether (there's just one callback for any Button action, 
-  and one for any encoder action).
+X Handler pointers
+    MFButton/MFEncoder (and other input devices): make handler pointers static, since they're all equal anyway, to spare memory (particularly for AddButton). Or just remove it altogether (there's just one callback for any Button action, and one for any encoder action).
 
-- The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects, 
-  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and  accessible both bit-wise and bank- (byte-)wise.
-  Each MFInput/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFInput::_bitStore).
-  
 - replace the standard digitalWrite()/digitalRead() with fast versions
   
+X use of bitStores
+    The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects,  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and accessible both bit-wise and bank- (byte-)wise. 
+    Each MFButton/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFButton::_bitStore).
+
+- Reduce memory used by Encoders
+    Each encoder uses a huge amount of memory, particularly through MFEncoder <- RotaryEncoder <- TicksPerSecond; this latter has lots of 'long's.
+    Currently, each encoder takes about 80 bytes(!). 10 Encoders already take 10% of MCU memory!
+    X First thing, limit the number of encoders to a reasonable value (from original 20 to max 10).
+    - One beneficial measure could be using a single, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
+        This should be possible with the reasonable limitation that no more that one encoder will be activated at any time.
+        Beside the class static tps reference (modif. class RotaryEncoder), an argument should be added to TicksPerSecond.update() for the index of the encoder (or generically: object) that ticks. Whenever a tick comes from an object different from the previous one, the tps counters are reset.
+
+- Reduce memory used by MFButton names.
+    Currently a name is kept in a String; a String object occupies 6 bytes PLUS the actual string data (that goes in the heap, with further overhead).
+    Possible solutions:
+    - change the String for a char[] as member of MFButton. With just a few more bytes than the 6 already occupied by the String object, we already have the space also for data (and allocated compile-time). Drawback: fixed, and somehow short, length for names and space wasted for shorter names.
+    - Store the string data (nul-term) contiguously in a large char[] buffer (eg 'textStore'), which takes the place of the heap; MFButtons contain the char* to the text start. Two bytes only instead of 6 per MFButton; no heap allocation; required memory known at compile-time. 
+        
 2. Modifications to add new modular I/O blocks:
+
+- Virtual pins
+    Pins >= MODULE_MAX_PINS are Virtual pins, as opposed to "true" onboard pins.
+    Define a macro isPinVirtual(p) (p >= MODULE_MAX_PINS) ('pin' variables remain uint8_t: theor. max (256-MODULE_MAX_PINS[=58 for Mega2560])>= 198 inputs + 198 outputs)
+
+X Neutralize registerPin() if pin# is of a virtual pin. 
+  
+- pinsRegistered[] values (1)
+    Change pinsRegistered[i] to a bitStore. Turns out that it's not important to know what a pin is assigned to (there is a reference in the owning object anyway): isPinRegisteredForType() is never used.
+    The only situation in which a difference is made is clearRegisteredPins(type); it is actually useless in practice, because it is called just in one place and repeatedly for ALL types (might as well use clearRegisteredPins(void)).
+    In order to keed the differentiation, however, clearRegisteredPins(type) can be implemented differently by scanning the registry of objects of the desired type and clearing the pinsRegistered value of their pins.
+
+- pinsRegistered[] values (2)
+    (for virtual pins, isPinRegistered() currently returns always kTypeNotSet);
+    the same virtual pin # can be shared between different pin types (eg: "true" pin #3 can only be EITHER an input or an output; but pin #115 can be assigned BOTH to virtual input #115 AND virtual output #115).
+    For this reason, for virtual I/Os there a need to allow multiple assignments for the same v-pin.
+    A second bitStore could be used (meaningful for v-pins only), where the first records v-pin assignments as inputs (beside all true-pin assignments), and the second records v-pin assignments as outputs.
+  
+- Only True pins for peripherals
+    Allow pins used for Encoders, displays etc. to be TRUE pins only (just add limit check to args, which should be in place anyway).
+    In principle, virtual pins could be used for peripherals, but it is unknown if performance is sufficient; besides, there should be a way to resolve assignment conflicts (since virtual pins are currently always unassigned). [probably better forget this one.]
+
+X AddButton/AddOutput ext for virtual pins
+    Inside AddButton, either of these:
+        - use a new class 'MFBankInput' (mostly similar to MFButton) [preferred]
+        X use MFButton, but modify it for a different behaviour if pin is virtual
+    Same for AddOutput/MFOutput.
 
 - New 'kTypeIOBlock_XXX', XXX -> 163, 595, DM13, MCPS, MCP0... 
 
-- New 'AddIOBlock_XXX', each with its own:
-    -- specific HW driver params (e.g. pins, I/O banks per unit, hw adr, hw pin direction...) 
-    -- config (n. chained units, assignment to position in IO bank buffer )
+- New 'AddIOBlock_XXX()', each with its own:
+    - specific HW driver params (e.g. pins, I/O banks per unit, hw adr, hw pin direction...) 
+    - config (n. chained units, assignment to position in IO bank buffer )
 
-- Items from the IOBlock_XXX list will be refreshed (hw poll) during cyclic scan, and their data read/written from/to 
-  the IO bank buffer
+- IOBlock_XXX creation
+    When processing kTypeIOBlock_XXX, beside AddIOBlock_XXX, perform a series of "AddButton" and/or "AddOutput" for each I/O with "virtual" pin numbers.
+    This way, I/Os in external modules will be configured exactly like ordinary HW I/Os.
 
-- When processing kTypeIOBlock_XXX, beside AddIOBlock_XXX, perform a series of "AddButton" and/or "AddOutput" for each I/O;
-  the associated "virtual" pin number will start from i.e. 64 to set them apart from on-board inputs.
-  This way, I/Os in external modules will be configured exactly like ordinary HW I/Os.
-  ('pin' variables remain uint8_t: max (256-64)=192 inputs + 192 outputs)
+- IOBlock polling
+    Items from the IOBlock_XXX list will be refreshed (hw poll) during cyclic scan, and their data read/written from/to the IO bank buffer
 
-- Inside AddButton, either of these:
-    -- use a new class 'MFBankInput' (mostly similar to MFButton) [preferred]
-    -- use MFButton, but modify it for a different behaviour if pin>=64 (read from IO bank buffer)
-  Same for AddOutput/MFOutput.
 
-- Inside AddButton/AddOutput, do not registerPin() (or neutralize registerPin() if pin<64)
 

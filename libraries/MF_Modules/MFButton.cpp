@@ -5,10 +5,22 @@
 #include "MFButton.h"
 
 // Static handler pointers and vars
-buttonEvent     MFButton::_handler[2];
+buttonEvent      MFButton::_handler[2];
 bitStore<byte>  *MFButton::_InBits;
 bitStore<byte>  *MFButton::_InBitsUpdate;
-byte            MFButton::_MaxOnboardPin;
+byte             MFButton::_MaxOnboardPin;
+
+void MFButton::attachHandler(byte eventId, buttonEvent newHandler)
+{
+    MFButton::_handler[eventId] = newHandler;
+}
+
+void MFButton::setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin)
+{
+    MFButton::_InBits         = status;
+    MFButton::_InBitsUpdate   = upd_status;
+    MFButton::_MaxOnboardPin  = maxOBPin;
+}
 
 MFButton::MFButton(uint8_t pin, String name)
 {
@@ -42,17 +54,5 @@ void MFButton::trigger()
       }
       else if (_handler[btnOnRelease] != NULL)
         (*_handler[btnOnRelease])(btnOnRelease, _pin, _name);
-}
-
-void MFButton::attachHandler(byte eventId, buttonEvent newHandler)
-{
-    MFButton::_handler[eventId] = newHandler;
-}
-
-void MFButton::setBitStore(bitStore<byte> *status, bitStore<byte> *updated, byte maxOBPin)
-{
-    MFButton::_InBits         = status;
-    MFButton::_InBitsUpdate   = updated;
-    MFButton::_MaxOnboardPin  = maxOBPin;
 }
 

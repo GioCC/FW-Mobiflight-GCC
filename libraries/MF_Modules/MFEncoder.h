@@ -54,7 +54,7 @@ private:
     uint8_t                   _pin1;
     uint8_t                   _pin2;
     bool                      _initialized;
-    RotaryEncoder 		      _encoder;
+    RotaryEncoder 		        _encoder;
     String                    _name;
     long                      _pos;
 };

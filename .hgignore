@@ -1,3 +1,4 @@
 build
 ^.*\.bak$
+cscope.out$
 #_CubeMX/.*\.zip$

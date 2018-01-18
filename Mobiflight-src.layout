@@ -2,39 +2,19 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Arduino Mega 2560/ADK" />
+	<File name="libraries\MF_Modules\MFOutput.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="318" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="mobiflight_mega\mobiflight_mega.ino" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="16936" topLine="576" />
+		</Cursor>
+	</File>
 	<File name="libraries\CmdMessenger\utility\DoEvery.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="283" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="mobiflight_mega\mobiflight.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="93" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="lib_std\Wire\utility\twi.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="932" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="libraries\RotaryEncoder\RotaryEncoder.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1701" topLine="22" />
-		</Cursor>
-	</File>
-	<File name="GCC\bitStore.h" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1006" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="libraries\MF_Modules\MFButton.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1357" topLine="16" />
-		</Cursor>
-	</File>
-	<File name="lib_std\Servo\Servo.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2900" topLine="46" />
 		</Cursor>
 	</File>
 	<File name="libraries\MF_Modules\MFOutput.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -42,59 +22,54 @@
 			<Cursor1 position="836" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="libraries\MF_Modules\MFStepper.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\MF_Modules\MFButton.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="251" topLine="14" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFSegments.cpp" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="273" topLine="3" />
+		</Cursor>
+	</File>
+	<File name="libraries\CmdMessenger\CmdMessenger.h" open="1" top="1" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7406" topLine="156" />
+		</Cursor>
+	</File>
+	<File name="lib_std\Servo\Servo.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2900" topLine="46" />
+		</Cursor>
+	</File>
+	<File name="libraries\AccelStepper\AccelStepper.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="361" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFStepper.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="964" topLine="3" />
 		</Cursor>
 	</File>
-	<File name="libraries\MF_Modules\MFCore.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\Button\Button.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="65" topLine="0" />
+			<Cursor1 position="848" topLine="20" />
 		</Cursor>
 	</File>
-	<File name="libraries\MF_Modules\MFCore.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\RotaryEncoderAcelleration\RotaryEncoderAcelleration.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="259" topLine="0" />
+			<Cursor1 position="1231" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="libraries\Button\Button.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\RotaryEncoderAcelleration\RotaryEncoderAcelleration.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="761" topLine="0" />
+			<Cursor1 position="1348" topLine="40" />
 		</Cursor>
 	</File>
-	<File name="libraries\RotaryEncoder\RotaryEncoder.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\RotaryEncoder\RotaryEncoder.cpp" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1457" topLine="34" />
-		</Cursor>
-	</File>
-	<File name="mobiflight_mega\mobiflight_mega.ino" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="5274" topLine="165" />
-		</Cursor>
-	</File>
-	<File name="GCC\bitStore.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="79" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="libraries\MF_Modules\MFButton.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1306" topLine="15" />
-		</Cursor>
-	</File>
-	<File name="libraries\MF_Modules\MFEncoder.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="516" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="libraries\MF_Modules\MFOutput.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="130" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="libraries\CmdMessenger\CmdMessenger.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4227" topLine="75" />
+			<Cursor1 position="2269" topLine="22" />
 		</Cursor>
 	</File>
 	<File name="lib_std\Wire\Wire.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -102,9 +77,69 @@
 			<Cursor1 position="1303" topLine="39" />
 		</Cursor>
 	</File>
-	<File name="libraries\MF_Modules\MFEncoder.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="libraries\RotaryEncoder\RotaryEncoder.h" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1251" topLine="12" />
+			<Cursor1 position="1677" topLine="31" />
+		</Cursor>
+	</File>
+	<File name="lib_std\Wire\utility\twi.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="932" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="libraries\Button\Button.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="606" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFButton.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1101" topLine="12" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFCore.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="45" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFCore.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="184" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFEncoder.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="218" topLine="4" />
+		</Cursor>
+	</File>
+	<File name="libraries\MF_Modules\MFEncoder.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="544" topLine="17" />
+		</Cursor>
+	</File>
+	<File name="libraries\TicksPerSecond\TicksPerSecond.cpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="682" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="GCC\bitStore.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="79" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="libraries\TicksPerSecond\TicksPerSecond.h" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1362" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="GCC\bitStore.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1006" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="mobiflight_mega\mobiflight.h" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1159" topLine="3" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>
