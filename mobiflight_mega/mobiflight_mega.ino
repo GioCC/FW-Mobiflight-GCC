@@ -77,6 +77,8 @@ char foo;
 #define MAX_MFLCD_I2C   2
 #endif
 
+#define isOnboard(pin) ((pin)<MODULE_MAX_PINS)
+
 #include <EEPROMex.h>
 #include <CmdMessenger.h>  // CmdMessenger
 #include <LedControl.h>    //  need the library
@@ -369,17 +371,17 @@ bool isPinRegisteredForType(byte pin, byte type) {
 }
 
 void registerPin(byte pin, byte type) {
-  if(pin < MODULE_MAX_PINS) pinsRegistered[pin] = type;
+  if(pin<MODULE_MAX_PINS) pinsRegistered[pin] = type;
 }
 
 void clearRegisteredPins(byte type) {
-  for(int i=0; i!=MODULE_MAX_PINS;++i)
+  for(int i=0; i<MODULE_MAX_PINS;++i)
     if (pinsRegistered[i] == type)
       pinsRegistered[i] = kTypeNotSet;
 }
 
 void clearRegisteredPins() {
-  for(int i=0; i!=MODULE_MAX_PINS;++i)
+  for(int i=0; i<MODULE_MAX_PINS;++i)
     pinsRegistered[i] = kTypeNotSet;
 }
 
@@ -442,6 +444,7 @@ void ClearButtons()
 void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
 {
   if (encodersRegistered == MAX_ENCODERS) return;
+  if (!isOnboard(pin1) || !isOnboard(pin2)) return;
   if (isPinRegistered(pin1) || isPinRegistered(pin2)) return;
 
   encoders[encodersRegistered] = MFEncoder();
@@ -476,6 +479,7 @@ void AddLedSegment(int dataPin, int csPin, int clkPin, int numDevices, int brigh
   if (ledSegmentsRegistered == MAX_LEDSEGMENTS) return;
 
   if (isPinRegistered(dataPin) || isPinRegistered(clkPin) || isPinRegistered(csPin)) return;
+  if (!isOnboard(dataPin) || !isOnboard(clkPin) || !isOnboard(csPin)) return;
 
   ledSegments[ledSegmentsRegistered].attach(dataPin,csPin,clkPin,numDevices,brightness); // lc is our object
 
@@ -515,6 +519,7 @@ void AddStepper(int pin1, int pin2, int pin3, int pin4, int btnPin1)
 {
   if (steppersRegistered == MAX_STEPPERS) return;
   if (isPinRegistered(pin1) || isPinRegistered(pin2) || isPinRegistered(pin3) || isPinRegistered(pin4) /* || isPinRegistered(btnPin1) */) {
+  if (!isOnboard(pin1) || !isOnboard(pin2) || !isOnboard(pin3) || !isOnboard(pin4)) return;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,"Conflict with stepper");
 #endif
@@ -551,6 +556,7 @@ void AddServo(int pin)
 {
   if (servosRegistered == MAX_MFSERVOS) return;
   if (isPinRegistered(pin)) return;
+  if (!isOnboard(pin)) return;
 
   servos[servosRegistered].attach(pin, true);
   registerPin(pin, kTypeServo);
