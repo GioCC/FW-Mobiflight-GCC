@@ -671,6 +671,8 @@
 		</Compiler>
 		<Unit filename="GCC/bitStore.cpp" />
 		<Unit filename="GCC/bitStore.h" />
+		<Unit filename="GCC/textStore.cpp" />
+		<Unit filename="GCC/textStore.h" />
 		<Unit filename="lib_std/Servo/Servo.cpp" />
 		<Unit filename="lib_std/Servo/Servo.h" />
 		<Unit filename="lib_std/Servo/ServoTimers.h" />

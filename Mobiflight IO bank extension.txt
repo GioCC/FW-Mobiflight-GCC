@@ -8,16 +8,16 @@ Changes for I/O Banks
 X Handler pointers
     MFButton/MFEncoder (and other input devices): make handler pointers static, since they're all equal anyway, to spare memory (particularly for AddButton). Or just remove it altogether (there's just one callback for any Button action, and one for any encoder action).
 
-X use of bitStores
-    The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects,  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and accessible both bit-wise and bank- (byte-)wise. 
-    Each MFButton/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFButton::_bitStore).
+X use of textStores
+    The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects,  but kept in a packed bit bank buffer, implemented by a new class (e.g. textStore), and accessible both bit-wise and bank- (byte-)wise. 
+    Each MFButton/MFOutput will carry a reference to the textStore through a static pointer in the class (eg MFButton::_textStore).
 
-- Reduce memory used by Encoders
+X Reduce memory used by Encoders
     Each encoder uses a huge amount of memory, particularly through MFEncoder <- RotaryEncoder <- TicksPerSecond; this latter has lots of 'long's.
     Currently, each encoder takes about 80 bytes(!). 10 Encoders already take 10% of MCU memory!
         X First thing, limit the number of encoders to a reasonable value (from original 20 to max 10).
-        - One beneficial measure could be using a single, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
-        This should be possible with the reasonable limitation that no more that one encoder will be activated at any time.
+        X Use a single, shared, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
+        This implies the (reasonable) limitation that no more that one encoder will be activated at any time.
         Beside the class static tps reference (modif. class RotaryEncoder), an argument should be added to TicksPerSecond.update() for the index of the encoder (or generically: object) that ticks. Whenever a tick comes from an object different from the previous one, the tps counters are reset.
 
 - Reduce memory used by MFButton names.
@@ -28,14 +28,14 @@ X use of bitStores
         
 2. Modifications to add new modular I/O blocks:
 
-- Virtual pins
+X Virtual pins
     Pins >= MODULE_MAX_PINS are Virtual pins, as opposed to "true" onboard pins.
     Define a macro isPinVirtual(p) (p >= MODULE_MAX_PINS) ('pin' variables remain uint8_t: theor. max (256-MODULE_MAX_PINS[=58 for Mega2560])>= 198 inputs + 198 outputs)
 
 X Neutralize registerPin() if pin# is of a virtual pin. 
   
 - pinsRegistered[] values (1)
-    Change pinsRegistered[i] to a bitStore. Turns out that it's not important to know what a pin is assigned to (there is a reference in the owning object anyway): isPinRegisteredForType() is never used.
+    Change pinsRegistered[i] to a textStore. Turns out that it's not important to know what a pin is assigned to (there is a reference in the owning object anyway): isPinRegisteredForType() is never used.
     The only situation in which a difference is made is clearRegisteredPins(type); it is actually useless in practice, because it is called just in one place and repeatedly for ALL types (might as well use clearRegisteredPins(void)).
     In order to keed the differentiation, however, clearRegisteredPins(type) can be implemented differently by scanning the registry of objects of the desired type and clearing the pinsRegistered value of their pins.
 
@@ -43,9 +43,9 @@ X Neutralize registerPin() if pin# is of a virtual pin.
     (for virtual pins, isPinRegistered() currently returns always kTypeNotSet);
     the same virtual pin # can be shared between different pin types (eg: "true" pin #3 can only be EITHER an input or an output; but pin #115 can be assigned BOTH to virtual input #115 AND virtual output #115).
     For this reason, for virtual I/Os there a need to allow multiple assignments for the same v-pin.
-    A second bitStore could be used (meaningful for v-pins only), where the first records v-pin assignments as inputs (beside all true-pin assignments), and the second records v-pin assignments as outputs.
+    A second textStore could be used (meaningful for v-pins only), where the first records v-pin assignments as inputs (beside all true-pin assignments), and the second records v-pin assignments as outputs.
   
-- Only True pins for peripherals
+X Only True pins for peripherals
     Allow pins used for Encoders, displays etc. to be TRUE pins only (just add limit check to args, which should be in place anyway).
     In principle, virtual pins could be used for peripherals, but it is unknown if performance is sufficient; besides, there should be a way to resolve assignment conflicts (since virtual pins are currently always unassigned). [probably better forget this one.]
 
