@@ -82,7 +82,8 @@ char foo;
 #include <LedControl.h>    //  need the library
 #include <Button.h>
 #include <TicksPerSecond.h>
-#include <RotaryEncoder.h>
+//#include <RotaryEncoder.h>
+#include <RotaryEncoderShd.h>
 #include <Wire.h>
 #include <MFSegments.h> //  need the library
 #include <MFButton.h>
@@ -360,7 +361,7 @@ void loop()
 }
 
 bool isPinRegistered(byte pin) {
-  return (pin < MODULE_MAX_PINS ? (pinsRegistered[pin] != kTypeNotSet) : kTypeNotSet);
+  return (pin < MODULE_MAX_PINS ? (pinsRegistered[pin] != kTypeNotSet) : 0);
 }
 
 bool isPinRegisteredForType(byte pin, byte type) {

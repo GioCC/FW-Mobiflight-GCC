@@ -20,7 +20,8 @@
 ///#include "../Button/Button.h"
 ///#include "../TicksPerSecond/TicksPerSecond.h"
 ///#include "../RotaryEncoderAcelleration/RotaryEncoderAcelleration.h"
-#include <RotaryEncoder.h>
+///#include <RotaryEncoder.h>
+#include <RotaryEncoderShd.h>
 
 extern "C"
 {
@@ -54,7 +55,7 @@ private:
     uint8_t                   _pin1;
     uint8_t                   _pin2;
     bool                      _initialized;
-    RotaryEncoder 		        _encoder;
+    RotaryEncoderShd          _encoder;
     String                    _name;
     long                      _pos;
 };

@@ -3,11 +3,11 @@ Changes for I/O Banks
 
 1. Memory/speed optimizations:
 
+- replace the standard digitalWrite()/digitalRead() with fast versions
+  
 X Handler pointers
     MFButton/MFEncoder (and other input devices): make handler pointers static, since they're all equal anyway, to spare memory (particularly for AddButton). Or just remove it altogether (there's just one callback for any Button action, and one for any encoder action).
 
-- replace the standard digitalWrite()/digitalRead() with fast versions
-  
 X use of bitStores
     The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects,  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and accessible both bit-wise and bank- (byte-)wise. 
     Each MFButton/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFButton::_bitStore).
@@ -15,8 +15,8 @@ X use of bitStores
 - Reduce memory used by Encoders
     Each encoder uses a huge amount of memory, particularly through MFEncoder <- RotaryEncoder <- TicksPerSecond; this latter has lots of 'long's.
     Currently, each encoder takes about 80 bytes(!). 10 Encoders already take 10% of MCU memory!
-    X First thing, limit the number of encoders to a reasonable value (from original 20 to max 10).
-    - One beneficial measure could be using a single, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
+        X First thing, limit the number of encoders to a reasonable value (from original 20 to max 10).
+        - One beneficial measure could be using a single, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
         This should be possible with the reasonable limitation that no more that one encoder will be activated at any time.
         Beside the class static tps reference (modif. class RotaryEncoder), an argument should be added to TicksPerSecond.update() for the index of the encoder (or generically: object) that ticks. Whenever a tick comes from an object different from the previous one, the tps counters are reset.
 

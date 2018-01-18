@@ -55,6 +55,11 @@ public:
 	void update(void);
 
 	/**
+	 * Returns the pin no. assigned to the button.
+	 */
+	uint8_t getPin(void) {return buttonPin;};
+
+	/**
 	 * Has the button stated changed from isUp to isDown at the last update.
 	 * This is to be used like an OnKeyDown.
 	 */
