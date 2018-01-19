@@ -68,8 +68,8 @@ char foo;
 
 #if MODULETYPE == MTYPE_MEGA
 #define MAX_ONB_PIN     MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins
-#define MAX_OUTPUTS     80 //40
-#define MAX_BUTTONS     80 //50
+#define MAX_OUTPUTS     40 //80
+#define MAX_BUTTONS     50 //80
 #define MAX_LEDSEGMENTS 4
 #define MAX_ENCODERS    10 //20
 #define MAX_STEPPERS    10
@@ -88,7 +88,8 @@ char foo;
 #include <RotaryEncoderShd.h>
 #include <Wire.h>
 #include <MFSegments.h> //  need the library
-#include <MFButton.h>
+//#include <MFButton.h>
+#include <MFButtonT.h>
 #include <MFEncoder.h>
 #include <AccelStepper.h>
 #include <MFStepper.h>
@@ -160,7 +161,8 @@ unsigned long lastCommand;
 MFOutput outputs[MAX_OUTPUTS];
 byte outputsRegistered = 0;
 
-MFButton buttons[MAX_BUTTONS];
+//MFButton buttons[MAX_BUTTONS];
+MFButtonT buttons[MAX_BUTTONS];
 byte buttonsRegistered = 0;
 long lastButtonUpdate  = 0;
 
@@ -269,7 +271,8 @@ void OnResetBoard() {
   configBuffer[0]='\0';
   //readBuffer[0]='\0';
   generateSerial(false);
-  MFButton::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
+  //MFButton::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
+  MFButtonT::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
   MFOutput::setBitStore(&OutStatus, MAX_ONB_PIN);
   clearRegisteredPins();
   lastCommand = millis();
@@ -415,12 +418,16 @@ void AddButton(uint8_t pin, String name)
   if (buttonsRegistered == MAX_BUTTONS) return;
   if (isPinRegistered(pin)) return;
 
-  buttons[buttonsRegistered] = MFButton(pin, name);
+  buttons[buttonsRegistered] = MFButtonT(pin, name); //MFButton(pin, name);
   if(buttonsRegistered == 0) {
     //buttons[buttonsRegistered].attachHandler(btnOnRelease, handlerOnRelease);
     //buttons[buttonsRegistered].attachHandler(btnOnPress, handlerOnRelease);
-    MFButton::attachHandler(btnOnRelease, handlerOnRelease);
-    MFButton::attachHandler(btnOnPress, handlerOnRelease);
+
+    //MFButton::attachHandler(btnOnRelease, handlerOnRelease);
+    //MFButton::attachHandler(btnOnPress, handlerOnRelease);
+    MFButtonT::attachHandler(btnOnRelease, handlerOnRelease);
+    MFButtonT::attachHandler(btnOnPress, handlerOnRelease);
+
     // BitStore is set during initial setup
   }
   registerPin(pin, kTypeButton);

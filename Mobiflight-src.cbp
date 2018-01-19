@@ -5,6 +5,7 @@
 		<Option title="Mobiflight_CBP" />
 		<Option pch_mode="2" />
 		<Option compiler="avr-gcc" />
+		<Option virtualFolders="Docs\;" />
 		<Build>
 			<Target title="Simulator - Debug">
 				<Option output="build/Mobiflight_CBP_sim.exe" prefix_auto="1" extension_auto="0" />
@@ -511,8 +512,8 @@
 					<Add option="-mmcu=$(MCU)" />
 					<Add option="-DF_CPU=16000000L" />
 					<Add option="-D__AVR_ATmega2560__" />
-					<Add directory="$(ARDUINO_DIR)/hardware/arduino/cores/arduino" />
 					<Add directory="$(ARDUINO_DIR)/libraries" />
+					<Add directory="$(ARDUINO_DIR)/hardware/arduino/cores/arduino" />
 					<Add directory="$(ARDUINO_DIR)/hardware/arduino/variants/mega" />
 				</Compiler>
 				<Linker>
@@ -669,10 +670,15 @@
 			<Add directory="lib_std/Servo" />
 			<Add directory="GCC" />
 		</Compiler>
+		<Unit filename="GCC/MFButtonT.cpp" />
+		<Unit filename="GCC/MFButtonT.h" />
 		<Unit filename="GCC/bitStore.cpp" />
 		<Unit filename="GCC/bitStore.h" />
 		<Unit filename="GCC/textStore.cpp" />
 		<Unit filename="GCC/textStore.h" />
+		<Unit filename="Mobiflight IO bank extension.txt">
+			<Option virtualFolder="Docs/" />
+		</Unit>
 		<Unit filename="lib_std/Servo/Servo.cpp" />
 		<Unit filename="lib_std/Servo/Servo.h" />
 		<Unit filename="lib_std/Servo/ServoTimers.h" />
