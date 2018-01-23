@@ -10,8 +10,6 @@
 #define MFStepper_h
 
 #include <stdlib.h>
-#include "../AccelStepper/AccelStepper.h"
-#include "MFButton.h"
 
 #if ARDUINO >= 100
 #include <Arduino.h>
@@ -20,9 +18,14 @@
 #include <wiring.h>
 #endif
 
+#include "../AccelStepper/AccelStepper.h"
+//#include "MFButton.h"
+#include <MFPeripheral.h>
+
 /////////////////////////////////////////////////////////////////////
 /// \class MFStepper MFStepper.h <MFServo.h>
 class MFStepper
+: public MFPeripheral
 {
 public:
     MFStepper(uint8_t pin1 = 1, uint8_t pin2 = 2, uint8_t pin3 = 3, uint8_t pin4 = 4 /*, uint8_t btnPin1 = 5 */);
@@ -34,12 +37,14 @@ public:
     void    setZeroInReset();
     void    setZero();
     //MFButton* getButton();
+    byte    getPins(byte *dst) { for(byte i=0; i<_npins; i++) dst[i]=_pin[i]; return _npins; }
 
 private:
-    bool          _initialized;
+    //bool          _initialized;
     bool          _resetting;
     AccelStepper  _stepper;
     //MFButton      _button;
     long          _targetPos;
+    byte          _pin[4];
 };
-#endif 
+#endif

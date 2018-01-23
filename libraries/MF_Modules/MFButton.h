@@ -43,9 +43,11 @@ public:
     void update();
     void trigger();
     String        _name;
-    uint8_t       _pin;
+
+    byte getPin(void) { return _pin; }
 
 private:
+    uint8_t                 _pin;
     static buttonEvent      _handler[2];
     static bitStore<byte>   *_InBits;
     static bitStore<byte>   *_InBitsUpdate;

@@ -5,8 +5,9 @@
 #include "MFLCDDisplay.h"
 
 MFLCDDisplay::MFLCDDisplay()
+: MFPeripheral(2)
 {
-  _initialized = false;
+  //_initialized = false;
 }
 
 void MFLCDDisplay::display(char *string)
@@ -49,7 +50,7 @@ void MFLCDDisplay::powerSavingMode(bool state)
 
 void MFLCDDisplay::test() {
   if (!_initialized) return;
-  
+
   _lcdDisplay->setCursor(0, (_lines/2)-1);
   for(byte c=0;c!=((_cols-10)/2);c++) {
     _lcdDisplay->print(" ");

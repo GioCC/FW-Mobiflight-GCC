@@ -17,10 +17,12 @@
 #endif
 
 #include "../LedControl/LedControl.h"
+#include <MFPeripheral.h>
 
 /////////////////////////////////////////////////////////////////////
 /// \class MFSegments MFSegments.h <MFSegments.h>
 class MFSegments
+: public MFPeripheral
 {
 public:
     MFSegments();
@@ -30,10 +32,13 @@ public:
     void test();
     void powerSavingMode(bool state);
     void setBrightness(int module, int value);
-    
+
+    byte getPins(byte *dst) { dst[0]=_pin[0]; dst[1]=_pin[1]; dst[2]=_pin[2]; return _npins; }
+
 private:
+    //bool        _initialized;
     LedControl  *_ledControl;
-    bool        _initialized;
     byte        _moduleCount;
+    byte        _pin[3];
 };
-#endif 
+#endif

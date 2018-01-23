@@ -848,6 +848,8 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFPeripheral.cpp" />
+		<Unit filename="libraries/MF_Modules/MFPeripheral.h" />
 		<Unit filename="libraries/MF_Modules/MFSegments.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />

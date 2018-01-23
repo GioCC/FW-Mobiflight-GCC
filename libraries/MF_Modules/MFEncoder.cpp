@@ -7,8 +7,10 @@
 // Static handler pointers
 encoderEvent    MFEncoder::_handler[4];
 
-MFEncoder::MFEncoder() : _encoder() {
-  _initialized = false;
+MFEncoder::MFEncoder()
+: MFPeripheral(2), _encoder()
+{
+  //_initialized = false;
 }
 
 void MFEncoder::attach(uint8_t pin1, uint8_t pin2, String name)

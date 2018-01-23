@@ -43,6 +43,8 @@ public:
         // which is the same of the total size in byte required to contain <bitsize> bits
         static Tadr sizeBytes(Tadr bitsize)          { return roundUp(bitsize); }
 
+        void        clr(void)                       { for(Tadr i=0; i<BYTESIZE; i++) _store[i]=0; }
+
         // Bit access methods
         // Addresses for bits are [0...BITSIZE-1]
         uint8_t     get(Tadr adr)                   { return (adr<BITSIZE ? ((_store[idxB(adr)] & idxM(adr)) ? 1 : 0) : 0); }

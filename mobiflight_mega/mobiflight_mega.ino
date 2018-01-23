@@ -45,7 +45,6 @@ char foo;
 #define STEPPER_ACCEL 900
 
 #if MODULETYPE == MTYPE_MICRO
-#define MAX_ONB_PIN     MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins
 #define MAX_OUTPUTS     10 // ? Find correct value
 #define MAX_BUTTONS     10 // ? Find correct value
 #define MAX_LEDSEGMENTS 1
@@ -56,7 +55,6 @@ char foo;
 #endif
 
 #if MODULETYPE == MTYPE_UNO
-#define MAX_ONB_PIN     MODULE_MAX_PINS     // beyond this limit, I/Os are no longer onboard pins
 #define MAX_OUTPUTS     8 // ? Find correct value
 #define MAX_BUTTONS     8 // ? Find correct value
 #define MAX_LEDSEGMENTS 1
@@ -67,7 +65,6 @@ char foo;
 #endif
 
 #if MODULETYPE == MTYPE_MEGA
-#define MAX_ONB_PIN     MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins
 #define MAX_OUTPUTS     40 //80
 #define MAX_BUTTONS     50 //80
 #define MAX_LEDSEGMENTS 4
@@ -77,7 +74,10 @@ char foo;
 #define MAX_MFLCD_I2C   2
 #endif
 
-#define isOnboard(pin) ((pin)<MODULE_MAX_PINS)
+#define NUM_ONB_PINS    MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins
+#define isOnboard(pin)  ((pin)<MODULE_MAX_PINS)
+#define MAX_LINES       128 //256 // Includes actual+virtual pins
+#define NUM_VLINES      MAX_LINES-MODULE_MAX_PINS // Includes actual+virtual pins
 
 #include <EEPROMex.h>
 #include <CmdMessenger.h>  // CmdMessenger
@@ -152,7 +152,10 @@ int configLength = 0;
 boolean configActivated = false;
 
 bool powerSavingMode = false;
-byte pinsRegistered[MODULE_MAX_PINS];
+//byte pinsRegistered[MODULE_MAX_PINS];
+byte pinRegBuf  [roundUp(MAX_LINES)];
+bitStore<byte>  pinsRegistered(pinRegBuf,roundUp(MAX_LINES));
+
 const unsigned long POWER_SAVING_TIME = 60*15; // in seconds
 
 CmdMessenger cmdMessenger = CmdMessenger(Serial);
@@ -181,13 +184,12 @@ byte servosRegistered = 0;
 MFLCDDisplay lcd_I2C[MAX_MFLCD_I2C];
 byte lcd_12cRegistered = 0;
 
-byte        inStatusBuf[MAX_BUTTONS];
-byte        inStatusUpdBuf[MAX_BUTTONS];
-byte        outStatusBuf[MAX_OUTPUTS];
-
-bitStore<byte>  InStatus(   inStatusBuf,    bitStore<byte>::sizeBytes(MAX_BUTTONS));
-bitStore<byte>  InStatusUpd(inStatusUpdBuf, bitStore<byte>::sizeBytes(MAX_BUTTONS));
-bitStore<byte>  OutStatus(  outStatusBuf,   bitStore<byte>::sizeBytes(MAX_OUTPUTS));
+byte        inStatusBuf   [roundUp(MAX_BUTTONS)];
+byte        inStatusUpdBuf[roundUp(MAX_BUTTONS)];
+byte        outStatusBuf  [roundUp(MAX_OUTPUTS)];
+bitStore<byte>  InStatus   (inStatusBuf,    roundUp(MAX_BUTTONS));
+bitStore<byte>  InStatusUpd(inStatusUpdBuf, roundUp(MAX_BUTTONS));
+bitStore<byte>  OutStatus  (outStatusBuf,   roundUp(MAX_OUTPUTS));
 
 
 enum
@@ -200,7 +202,6 @@ enum
   kTypeStepper,       // 5
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
-  kTypeVirtInOut,     // 8
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
@@ -272,8 +273,8 @@ void OnResetBoard() {
   //readBuffer[0]='\0';
   generateSerial(false);
   //MFButton::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
-  MFButtonT::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
-  MFOutput::setBitStore(&OutStatus, MAX_ONB_PIN);
+  MFButtonT::setBitStore(&InStatus, &InStatusUpd, NUM_ONB_PINS);
+  MFOutput::setBitStore(&OutStatus, NUM_ONB_PINS);
   clearRegisteredPins();
   lastCommand = millis();
   loadConfig();
@@ -366,26 +367,72 @@ void loop()
 }
 
 bool isPinRegistered(byte pin) {
-  return (pin < MODULE_MAX_PINS ? (pinsRegistered[pin] != kTypeNotSet) : 0);
+  return (pin < MAX_LINES ? pinsRegistered.get(pin) : true);
 }
 
-bool isPinRegisteredForType(byte pin, byte type) {
-  return pinsRegistered[pin] == type;
-}
+//bool isPinRegisteredForType(byte pin, byte type) {
+//  return pinsRegistered[pin] == type;
+//}
 
-void registerPin(byte pin, byte type) {
-  if(pin<MODULE_MAX_PINS) pinsRegistered[pin] = type;
-}
-
-void clearRegisteredPins(byte type) {
-  for(int i=0; i<MODULE_MAX_PINS;++i)
-    if (pinsRegistered[i] == type)
-      pinsRegistered[i] = kTypeNotSet;
+void registerPin(byte pin) {
+  if(pin < MAX_LINES) pinsRegistered.set(pin);
 }
 
 void clearRegisteredPins() {
-  for(int i=0; i<MODULE_MAX_PINS;++i)
-    pinsRegistered[i] = kTypeNotSet;
+    pinsRegistered.clr();
+}
+//void clearRegisteredPins(byte type) {
+//  for(int i=0; i<MODULE_MAX_PINS;++i)
+//    if (pinsRegistered[i] == type)
+//      pinsRegistered[i] = kTypeNotSet;
+//}
+
+void clearRegisteredPins(byte type) {
+  byte p[5];
+  byte ne = 0;
+  byte np;
+  MFPeripheral *mfp;
+
+  switch(type) {
+    case kTypeButton:
+        for(byte i=0; i<buttonsRegistered; i++) pinsRegistered.clr(buttons[i].getPin());
+        break;
+    case kTypeOutput:
+        for(byte i=0; i<outputsRegistered; i++) pinsRegistered.clr(outputs[i].getPin());
+        break;
+    case kTypeEncoder:
+        ne = encodersRegistered;
+        mfp = encoders;
+        break;
+    case kTypeLedSegment:
+        ne = ledSegmentsRegistered;
+        mfp = ledSegments;
+        break;
+    case kTypeServo:
+        ne = servosRegistered;
+        mfp = servos;
+        break;
+    case kTypeStepper:
+        // Stepper array is made of pointers, must write its separate code
+        for(byte i=0; i<steppersRegistered; i++) {
+            np = steppers[i]->NPins();
+            steppers[i]->getPins(p);
+            for(byte k=0; k<np; k++) pinsRegistered.clr(p[k]);
+        }
+        ne = 0; // skip std processing
+        break;
+    case kTypeLcdDisplayI2C:  // this does nothing;
+    default:
+    break;
+  }
+  if(ne) {
+      for(byte i=0; i<ne; i++) {
+          np = mfp[i].NPins();
+          mfp[i].getPins(p);
+          for(byte k=0; k<np; k++) pinsRegistered.clr(p[k]);
+      }
+  }
+
 }
 
 //// OUTPUT /////
@@ -395,7 +442,7 @@ void AddOutput(uint8_t pin, String name)
   if (outputsRegistered == MAX_OUTPUTS) return;
   if (isPinRegistered(pin)) return;
   outputs[outputsRegistered] = MFOutput(pin);
-  registerPin(pin, kTypeOutput);
+  registerPin(pin); //, kTypeOutput);
   outputsRegistered++;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus, "Added output " + name);
@@ -430,7 +477,7 @@ void AddButton(uint8_t pin, String name)
 
     // BitStore is set during initial setup
   }
-  registerPin(pin, kTypeButton);
+  registerPin(pin); //, kTypeButton);
   buttonsRegistered++;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus, "Added button " + name);
@@ -462,7 +509,8 @@ void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
   encoders[encodersRegistered].attachHandler(encRight, handlerOnEncoder);
   encoders[encodersRegistered].attachHandler(encRightFast, handlerOnEncoder);
   }
-  registerPin(pin1, kTypeEncoder); registerPin(pin2, kTypeEncoder);
+  registerPin(pin1); //, kTypeEncoder);
+  registerPin(pin2); //, kTypeEncoder);
   encodersRegistered++;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,"Added encoder");
@@ -490,9 +538,9 @@ void AddLedSegment(int dataPin, int csPin, int clkPin, int numDevices, int brigh
 
   ledSegments[ledSegmentsRegistered].attach(dataPin,csPin,clkPin,numDevices,brightness); // lc is our object
 
-  registerPin(dataPin, kTypeLedSegment);
-  registerPin(csPin, kTypeLedSegment);
-  registerPin(clkPin, kTypeLedSegment);
+  registerPin(dataPin); //, kTypeLedSegment);
+  registerPin(csPin);   //, kTypeLedSegment);
+  registerPin(clkPin);  //, kTypeLedSegment);
   ledSegmentsRegistered++;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,"Added Led Segment");
@@ -535,7 +583,10 @@ void AddStepper(int pin1, int pin2, int pin3, int pin4, int btnPin1)
   steppers[steppersRegistered] = new MFStepper(pin1, pin2, pin3, pin4 /*, btnPin1*/ ); // is our object
   steppers[steppersRegistered]->setMaxSpeed(STEPPER_SPEED);
   steppers[steppersRegistered]->setAcceleration(STEPPER_ACCEL);
-  registerPin(pin1, kTypeStepper); registerPin(pin2, kTypeStepper); registerPin(pin3, kTypeStepper); registerPin(pin4, kTypeStepper);
+  registerPin(pin1);  //, kTypeStepper);
+  registerPin(pin2);  //, kTypeStepper);
+  registerPin(pin3);  //, kTypeStepper);
+  registerPin(pin4);  //, kTypeStepper);
   // autoreset is not released yet
   // registerPin(btnPin1, kTypeStepper);
   steppersRegistered++;
@@ -566,7 +617,7 @@ void AddServo(int pin)
   if (!isOnboard(pin)) return;
 
   servos[servosRegistered].attach(pin, true);
-  registerPin(pin, kTypeServo);
+  registerPin(pin);  //, kTypeServo);
   servosRegistered++;
 }
 
@@ -749,7 +800,7 @@ void readConfig(String cfg) {
       break;
 
       case kTypeLcdDisplayI2C:
-        // AddEncoder(uint8_t address = 0x24, uint8_t cols = 16, lines = 2, String name = "Lcd")
+        // AddLcdDisplay(uint8_t address = 0x24, uint8_t cols = 16, lines = 2, String name = "Lcd")
         params[0] = strtok_r(NULL, ".", &p); // address
         params[1] = strtok_r(NULL, ".", &p); // cols
         params[2] = strtok_r(NULL, ".", &p); // lines

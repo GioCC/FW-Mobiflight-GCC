@@ -37,8 +37,8 @@ enum
 class MFButtonT
 {
 public:
-    static void attachHandler(byte eventId, buttonEvent newHandler);
     static void setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin);
+    static void attachHandler(byte eventId, buttonEvent newHandler);
 
     uint8_t       _pin;
     //String        _name;
@@ -46,6 +46,9 @@ public:
     MFButtonT(uint8_t pin = 1, String name = "Button");
     void update();
     void trigger();
+
+    byte getPin(void) { return _pin; }
+
 private:
     static buttonEvent      _handler[2];
     static bitStore<byte>   *_InBits;

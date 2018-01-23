@@ -16,6 +16,8 @@ void MFButtonT::attachHandler(byte eventId, buttonEvent newHandler)
     MFButtonT::_handler[eventId] = newHandler;
 }
 
+// setBitStore() requires <maxOBPin> in order to know whether to use digitalRead
+// or get its value from the bitStore, according to own pin number
 void MFButtonT::setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin)
 {
     MFButtonT::_InBits         = status;

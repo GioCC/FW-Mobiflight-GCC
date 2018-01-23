@@ -3,7 +3,7 @@
 // Copyright (C) 2013-2014
 
 #include "MFStepper.h"
-#include "MFButton.h"
+//#include "MFButton.h"
 /*
 uint8_t MFStepper_stepperCount = 0;
 MFStepper* MFStepper_steppers[10];
@@ -28,8 +28,11 @@ void HandlerOnRelease(byte eventId, uint8_t pin, String name) {
 }
 */
 
-MFStepper::MFStepper(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4 /*, uint8_t btnPin5*/) : _stepper(AccelStepper::FULL4WIRE, pin4, pin2, pin1, pin3) /*, _button(btnPin5, "0") */
+MFStepper::MFStepper(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4 /*, uint8_t btnPin5*/)
+: MFPeripheral(4),
+  _stepper(AccelStepper::FULL4WIRE, pin4, pin2, pin1, pin3) /*, _button(btnPin5, "0") */
 {
+    _pin[0] = pin1; _pin[1] = pin2; _pin[2] = pin3; _pin[3] = pin4;
     _resetting = false;
     /* addStepper(this);
     _button.attachHandler(btnOnPress, HandlerOnRelease);
@@ -70,10 +73,10 @@ void MFStepper::reset()
 {
     // if we are already resetting ignore next reset command
     if (_resetting) return;
-    
+
     // flag that we are resetting
     _resetting = true;
-    
+
     // tell stepper to move counter clockwise for a long while
     _stepper.moveTo(-100000);
 }

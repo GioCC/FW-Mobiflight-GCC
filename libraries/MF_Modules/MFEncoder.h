@@ -22,6 +22,7 @@
 ///#include "../RotaryEncoderAcelleration/RotaryEncoderAcelleration.h"
 ///#include <RotaryEncoder.h>
 #include <RotaryEncoderShd.h>
+#include <MFPeripheral.h>
 
 extern "C"
 {
@@ -42,6 +43,7 @@ enum
 /////////////////////////////////////////////////////////////////////
 /// \class MFEncoder MFEncoder.h <MFEncoder.h>
 class MFEncoder
+: public MFPeripheral
 {
 public:
     static void attachHandler(byte eventId, encoderEvent newHandler);
@@ -49,12 +51,13 @@ public:
     void attach(uint8_t pin1, uint8_t pin2, String name = "Encoder");
     void update();
 
-private:
-    static encoderEvent       _handler[4];
+    byte getPins(byte *dst) { dst[0] = _pin1; dst[1] = _pin2; return _npins; }
 
+private:
+    //bool                      _initialized;
+    static encoderEvent       _handler[4];
     uint8_t                   _pin1;
     uint8_t                   _pin2;
-    bool                      _initialized;
     RotaryEncoderShd          _encoder;
     String                    _name;
     long                      _pos;

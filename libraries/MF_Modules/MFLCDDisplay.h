@@ -18,11 +18,13 @@
 
 //#include "../NewliquidCrystal/LiquidCrystal_I2C.h"
 #include "../LiquidCrystal-I2C/LiquidCrystal_I2C.h"
+#include <MFPeripheral.h>
 
 
 /////////////////////////////////////////////////////////////////////
 /// \class MFLCDDisplay MFLCDDisplay.h <MFLCDDisplay.h>
 class MFLCDDisplay
+: public MFPeripheral
 {
 public:
     MFLCDDisplay();
@@ -31,12 +33,14 @@ public:
     void detach();
     void test();
     void powerSavingMode(bool state);
-    
+
+    byte getPins(byte *dst) { return _npins; }   /// Should return the I2C pins for consistency
+
 private:
     LiquidCrystal_I2C  *_lcdDisplay;
-    bool        _initialized;
-    byte        _address;
-	byte		_cols;
-	byte		_lines;
+    //bool    _initialized;
+    byte    _address;
+    byte		_cols;
+    byte		_lines;
 };
-#endif 
+#endif

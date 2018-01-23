@@ -30,6 +30,8 @@ public:
     void set(bool state);
     void powerSavingMode(bool state);
 
+    byte getPin(void) { return _pin; }
+
 private:
     static bitStore<byte>   *_OutBits;
     static byte             _MaxOnboardPin;

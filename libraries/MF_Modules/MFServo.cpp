@@ -20,42 +20,44 @@ void MFServo::moveTo(int absolute)
 void MFServo::update() {
 	// after reaching final position
 	// detach the servo to prevent continuous noise
-    if (_currentPos == _targetPos) { 
-		// detach(); 
-		return; 
+    if (_currentPos == _targetPos) {
+		// detach();
+		return;
 	}
-	
+
     //if ((millis()-_lastUpdate) < 5) return;
-    
+
     if (_currentPos > _targetPos) _currentPos--;
     else _currentPos++;
-    
+
     _lastUpdate = millis();
     _servo.write(_currentPos);
 }
 
-void MFServo::detach() { 
+void MFServo::detach() {
   if (_initialized) {
-    _servo.detach(); 
-    _initialized = false; 
+    _servo.detach();
+    _initialized = false;
   }
 }
 
 void MFServo::attach(uint8_t pin, bool enable)
 {
-	_initialized = false;
+	//_initialized = false;
 	_targetPos = 0;
 	_currentPos = 0;
 	setExternalRange(0,180);
 	setInternalRange(0,180);
-	_pin = pin;		
+	_pin = pin;
 	_lastUpdate = millis();
 }
 
-MFServo::MFServo() : _servo() {}
+MFServo::MFServo()
+: MFPeripheral(1), _servo()
+{}
 
-MFServo::MFServo(uint8_t pin, bool enable) : _servo()
-{				
+MFServo::MFServo(uint8_t pin, bool enable) : MFPeripheral(1), _servo()
+{
 	attach(pin, enable);
 }
 
