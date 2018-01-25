@@ -666,18 +666,19 @@
 			<Add directory="libraries/RotaryEncoderShd" />
 			<Add directory="libraries/RotaryEncoderAcelleration" />
 			<Add directory="libraries/TicksPerSecond" />
+			<Add directory="libraries/SlowSoftI2CMaster" />
 			<Add directory="lib_std/Wire" />
 			<Add directory="lib_std/Servo" />
 			<Add directory="GCC" />
 		</Compiler>
-		<Unit filename="GCC/MFButtonT.cpp" />
-		<Unit filename="GCC/SIO_io_23017.cpp" />
-		<Unit filename="GCC/SIO_io_23017.h" />
-		<Unit filename="GCC/SIO_io_23S17.cpp" />
-		<Unit filename="GCC/SIO_io_23S17.h" />
+		<Unit filename="GCC/FastArduino.cpp" />
+		<Unit filename="GCC/FastArduino.h" />
 		<Unit filename="GCC/bitStore.cpp" />
 		<Unit filename="GCC/bitStore.h" />
-		<Unit filename="GCC/textStore.cpp" />
+		<Unit filename="GCC/textStore.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="GCC/textStore.h" />
 		<Unit filename="Mobiflight IO bank extension.txt">
 			<Option virtualFolder="Docs/" />
@@ -917,16 +918,10 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
-		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
+		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.cpp" />
+		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.h" />
+		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp" />
+		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.h" />
 		<Unit filename="mobiflight_mega/mobiflight.h" />
 		<Unit filename="mobiflight_mega/mobiflight_mega.ino">
 			<Option compile="1" />

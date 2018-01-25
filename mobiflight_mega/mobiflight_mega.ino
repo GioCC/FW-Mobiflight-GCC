@@ -52,6 +52,9 @@ char foo;
 #define MAX_STEPPERS    4
 #define MAX_MFSERVOS    4
 #define MAX_MFLCD_I2C   2
+// Standard I2C pins
+//#define SDA_STD_PIN  2
+//#define SCL_STD_PIN  3
 #endif
 
 #if MODULETYPE == MTYPE_UNO
@@ -62,6 +65,10 @@ char foo;
 #define MAX_STEPPERS    2
 #define MAX_MFSERVOS    2
 #define MAX_MFLCD_I2C   2
+// Standard I2C pins
+//#define SDA_STD_PIN  A4
+//#define SCL_STD_PIN  A5
+
 #endif
 
 #if MODULETYPE == MTYPE_MEGA
@@ -72,6 +79,9 @@ char foo;
 #define MAX_STEPPERS    10
 #define MAX_MFSERVOS    10
 #define MAX_MFLCD_I2C   2
+// Standard I2C pins
+//#define SDA_STD_PIN  20
+//#define SCL_STD_PIN  21
 #endif
 
 #define NUM_ONB_PINS    MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins

@@ -28,8 +28,8 @@ public:
     virtual byte getPins(byte *dst) =0;
 
 protected:
-    bool    _initialized;
     byte    _npins;
+    bool    _initialized;
 private:
 };
 

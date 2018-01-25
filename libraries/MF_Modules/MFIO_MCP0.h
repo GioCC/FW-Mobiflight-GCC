@@ -18,13 +18,25 @@
 #endif
 
 #include <Wire.h>
+#include <SlowSoftI2CMaster.h>
 #include <MFPeripheral.h>
 #include <MCP23x17.h>
 
+#define MCPSDA  _pin[0]
+#define MCPSCL  _pin[1]
 
-#define SDAMCP  _pin[0]
-#define SCLMCP  _pin[1]
-
+// Standard I2C pins
+//#ifndef SDA_STD_PIN
+// For Mega
+//#define SDA_STD_PIN  20
+//#define SCL_STD_PIN  21
+// For UNO
+//#define SDASTD  A4
+//#define SCLSTD  A5
+// For Micro
+//#define SDASTD  2
+//#define SCLSTD  3
+//#endif
 
 /////////////////////////////////////////////////////////////////////
 /// \class MFIO_MCP0 MFIO_MCP0.h <MFIO_MCP0.h>
@@ -33,15 +45,17 @@ class MFIO_MCP0
 {
 private:
 
-    byte          readB(byte reg);
-    unsigned int  readW(byte reg);
-    void          writeB(byte reg, byte val);
-    void          writeW(byte reg, unsigned int val);
+    SlowSoftI2CMaster   *SWI2C;
+
+    byte          readB(byte adr, byte reg);
+    unsigned int  readW(byte adr, byte reg);
+    void          writeB(byte adr, byte reg, byte val);
+    void          writeW(byte adr, byte reg, unsigned int val);
 
 public:
 
     MFIO_MCP0(byte nUnits, byte addr);
-    void attach(int SDAPin, int SCLPin);
+    void attach(int SDAPin = 0, int SCLPin = 0);    // Any pin =0 means we are using HW I2C
     void detach(void);
 
 };

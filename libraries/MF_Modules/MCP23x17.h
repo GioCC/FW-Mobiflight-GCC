@@ -20,6 +20,7 @@
 #ifndef _MCP23X17_H
 #define _MCP23X17_H
 #include "Arduino.h"
+#include <MFPeripheral.h>
 
 #define MAX_BANKS   (MAX_CHAINED_UNITS*BANKS_PER_UNIT)
 
@@ -77,8 +78,10 @@
 #define MCP_OLATA     (0x14)      // MCP23x17 Output Latch Register
 #define MCP_OLATB     (0x15)      // 1 = Latch High, 0 = Latch Low (default) Reading Returns Latch State, Not Port Value!
 
+#define UNITADR       (_address+(bank>>1))
+
 class MCP23x17
-: public MFPeripheral 
+: public MFPeripheral
 {
 private:
     // Units for SPI (MCPS) are not chained: just like for the I2C version,
@@ -87,18 +90,18 @@ private:
     static const uint8_t    BANKS_PER_UNIT = 2;
     static const byte       num_units = 1;
 
-    byte    _buf[MAX_UNITS*BANKS_PER_UNIT];
+    //byte    data[MAX_UNITS*BANKS_PER_UNIT];
     byte    _DDR[MAX_UNITS*BANKS_PER_UNIT];
 
     /// Device-specific functions:
     /// Generic register R/W functions (byte/word-wise)
     /// These are pure virtual, must be defined by specialized classes.
 
-    virtual byte          readB(byte reg) =0;
-    virtual unsigned int  readW(byte reg) =0;
-    virtual void          writeB(byte reg, byte val) =0;
-    virtual void          writeW(byte reg, unsigned int val) =0;
-    
+    virtual byte          readB(byte adr, byte reg) =0;
+    virtual unsigned int  readW(byte adr, byte reg) =0;
+    virtual void          writeB(byte adr, byte reg, byte val) =0;
+    virtual void          writeW(byte adr, byte reg, unsigned int val) =0;
+
 protected:
 
 #ifdef USE_BITSTORE
@@ -108,10 +111,8 @@ protected:
 
     byte    _nUnits;
     byte    _address;
-    byte    _currUnit;
-
     byte    _pin[4];
-        
+
 public:
 
     MCP23x17(byte nUnits=1, byte addr=0);
@@ -120,57 +121,73 @@ public:
 #ifdef USE_BITSTORE
     void    bind(bitStore<byte> *store, byte slot);
 #endif
-    byte    getPins(byte *dst) { for(byte i=0; i<_npins; i++) dst[i] = pins()[i]; return _npins; }
-    byte    getSize(void)      { return _moduleCount; }
+
+    byte    getPins(byte *dst) { for(byte i=0; i<_npins; i++) dst[i] = _pin[i]; return _npins; }
+    byte    getSize(void)      { return _nUnits * 2; }
     void    test();
-    void    powerSavingMode(bool state) {}   // Not currently implemented
+    void    powerSavingMode(bool state) { state++;}   // Not currently implemented
 
-    // I/O setup functions (byte-wise)
-    void    setIODirs(byte bank, byte val);     { _currUnit = bank>>1; writeB(MCP_IODIRA   + ((bank-1)&0x01), val); }
-    void    setIOInts(byte bank, byte val);     { _currUnit = bank>>1; writeB(MCP_GPINTENA + ((bank-1)&0x01), val); }
-    void    setPullups(byte bank, byte val);    { _currUnit = bank>>1; writeB(MCP_GPPUA    + ((bank-1)&0x01), val); }
-    byte    getIOInts(byte bank)                { return getInts(bank); }
+    /// I/O setup functions
+    /// <bank>  = 0..n
+    /// IO dirs: 1=input, 0=output
+    void    setIODirs(byte bank, byte val)      { writeB(UNITADR, MCP_IODIRA  +(bank&0x01), _DDR[bank]=val); }
+    void    setIOPullups(byte bank, byte val)   { writeB(UNITADR, MCP_GPPUA   +(bank&0x01), val); }
 
-    // I/O oriented direct R/W functions (byte/word-wise)
-    byte          readIOB(byte bank)            { _currUnit = bank>>1; return readB(MCP_GPIOA + ((bank-1)&0x01)); }
-    unsigned int  readIOW(void)                 { _currUnit = bank>>1; return readW(MCP_GPIOA); }
-    void          writeIOB(byte bank, byte val) { _currUnit = bank>>1; writeB(MCP_GPIOA + ((bank-1)&0x01), val); }
-    void          writeIOW(unsigned int val)    { _currUnit = bank>>1; writeW(MCP_GPIOA, val); }
+    /// Interrupt setup/access functions
+    void    setIOInts(byte bank, byte val)      { writeB(UNITADR, MCP_GPINTENA+(bank&0x01), val); }
+    byte    getIOInts(byte bank, byte *IOstatus = NULL);
+    // Return IO vector at last IRQ. DOES reset flags (actually, it _must_ be called in order to reset flags).
+    byte    getIOStatusAtInt(byte bank)         { return readB(UNITADR, MCP_INTCAPA + (bank&0x01)); }
 
-    void    update(byte *ins = NULL, byte *outs = NULL);
+    /// Direct R/W functions (byte/word-wise)
+    //  (do not affect the buffer)
+    // <bank> is 0..n
+    // <unit> is 0..n
+    byte          readIOB(byte bank)            { return readB(UNITADR, MCP_GPIOA+(bank&0x01)); }
+    unsigned int  readIOW(byte unit)            { return readW((_address+(unit*2)), MCP_GPIOA); }
+    void          writeIOB(byte bank, byte val) { writeB(UNITADR, MCP_GPIOA+(bank&0x01), val); }
+    void          writeIOW(byte unit, unsigned int val)
+                                                { writeW((_address+(unit*2)), MCP_GPIOA, val); }
+
+    /// Buffered R/W functions (word-wise)
+    // <unit> is 0..n (0xFF=all)
+    void    update(byte *ins = NULL, byte *outs = NULL, byte unit = 0xFF);
 
     /// Setup Int outputs
     /// Configure the INT outputs. The configuration is common to both port A and B.
+    /// <bank> = 0..n
     /// mode|0x01 -> Join:        0[default]=each port has its pin, 1=INTA and INTB pins are internally OR'ed
     /// mode|0x02 -> Polarity:    0[default]=Active low, 1=Active high
     /// mode|0x04 -> Open drain:  0[default]=Push-pull, 1=Open drain (overrides polarity)
     /// Use constants: INTPIN_SEP/_JOIN, INTPIN_ACTLOW/_ACTHI, INTPIN_HILO/_ODRN
-    void setupIntOut(byte mode);
+    void setupIntOut(byte bank, byte mode);
 
     /// Set IRQ enable and mode for single pin
-    /// val is on/off
+    /// <bank>  = 0..n
+    /// <pinno> = 0..7
+    /// <val>   = on/off
     /// mode|0x01 -> Trigger    0[default]=both edges, 1=rising or falling edge only according to Direction
     /// mode|0x02 -> Direction  0[default]=Int on rising edge, 1=Int on falling edge
     /// mode=0xFF (default) means mode is not changed (change only enable status)
     /// Use constants: INTMODE_CHG/_CMP, INTMODE_RISE/_FALL, INTMODE_NOCHG
-    void enablePinInt(byte pinno, byte val, byte mode = INTMODE_NOCHG);
+    void enablePinInt(byte bank, byte pinno, byte val, byte mode = INTMODE_NOCHG);
 
     /// Set IRQ enable for whole bank.
-    /// <bank> = 1..2, 0 for both.
+    /// <bank> = 0..n
     /// <mode> is defined as for the single pin function, and - if not 0xFF - it is applied
     /// to ALL pins equally (regardless if their enable is on or off).
     /// If some pins require different modes, the single pin function must be used.
-    void enableIOInts(byte bank, byte vec, byte mode = INTMODE_NOCHG);
+    void enableBankInt(byte bank, byte vec, byte mode = INTMODE_NOCHG);
 
     /// Return IRQ flag status for single pin. Does NOT reset flag.
-    byte pinInt(byte pinno);
+    /// <bank>  = 0..n
+    /// <pinno> = 0..7
+    byte getPinInt(byte bank, byte pinno);
 
     /// Return IRQ flag vectors.
     /// If reset=1 (default), resets INT flags, otherwise leaves them unaltered.
-    byte getInts(byte bank, byte reset=1);
-
-    /// Return IO vector at last IRQ. DOES reset flags (actually, it _must_ be called in order to reset flags).
-    byte getIntIOs(byte bank)   { return readB(MCP_INTCAPA + ((bank-1)&0x01)); }
+    /// <bank>  = 0..n
+    byte getBankInt(byte bank, byte reset=1);
 
 };
 

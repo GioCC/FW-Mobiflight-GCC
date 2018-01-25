@@ -29,15 +29,15 @@
 #endif
 
 // Calibrate pulse delay for stability
-#define DELAYMCPS_US   10
+#define DELAYMCPS_US   2
 
 #include <MFPeripheral.h>
 #include <MCP23x17.h>
 
-#define DTIMCP  _pin[0]
-#define DTOMCP  _pin[1]
-#define SELMCP  _pin[2]
-#define CLKMCP  _pin[3]
+#define MCPDTI  _pin[0]
+#define MCPDTO  _pin[1]
+#define MCPSEL  _pin[2]
+#define MCPCLK  _pin[3]
 
 /////////////////////////////////////////////////////////////////////
 /// \class MFIO_MCPS MFIO_MCPS.h <MFIO_MCPS.h>
@@ -49,10 +49,10 @@ private:
     void          _sendb(byte val);   // for slaved use, does not touch _cs
     byte          _readb(void);       // for slaved use, does not touch _cs
 
-    byte          readB(byte reg);
-    unsigned int  readW(byte reg);
-    void          writeB(byte reg, byte val);
-    void          writeW(byte reg, unsigned int val);
+    byte          readB(byte adr, byte reg);
+    unsigned int  readW(byte adr, byte reg);
+    void          writeB(byte adr, byte reg, byte val);
+    void          writeW(byte adr, byte reg, unsigned int val);
 
 public:
     MFIO_MCPS(byte nUnits, byte addr);
