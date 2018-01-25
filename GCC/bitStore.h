@@ -36,12 +36,9 @@ public:
         bitStore(uint8_t *store, Tadr bsize): _store(store), BITSIZE(bsize) { BYTESIZE = sizeBytes(bsize);}
 
         //uint8_t     *base(void)                     { return _store; }
-        // Return pointer to bank containing bit <adr>
-        uint8_t     *pbank(Tadr adr)                { return (adr<BITSIZE ? &(_store[idxB(adr)]) : NULL); }
-        // Return index of bank containing bit <adr>
-        static Tadr bitBank(Tadr adr)               { return roundUp(adr); }
+
         // which is the same of the total size in byte required to contain <bitsize> bits
-        static Tadr sizeBytes(Tadr bitsize)          { return roundUp(bitsize); }
+        static Tadr sizeBytes(Tadr bitsize)         { return roundUp(bitsize); }
 
         void        clr(void)                       { for(Tadr i=0; i<BYTESIZE; i++) _store[i]=0; }
 
@@ -53,11 +50,20 @@ public:
         void        put(Tadr adr, uint8_t val)      { if(adr<BITSIZE) { if(val) set(adr); else clr(adr); }; }
 
         // Bank access methods
+
         // Addresses for banks are [0...(BITSIZE/8)-1] (division rounded to upper integer)
         int8_t      getB(Tadr Badr)                 { return (Badr<BYTESIZE ? _store[Badr] : 0); }
         void        setB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] |= Bval; }; }
         void        clrB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] &= ~Bval; }; }
         void        putB(Tadr Badr, int8_t Bval)    { if(Badr<BYTESIZE) { _store[Badr] = Bval; }; }
+        // Return index of bank containing bit <adr>
+        static Tadr bankIdxOfBit(Tadr adr)          { return roundUp(adr); }
+
+        // Direct bank access
+        // Return pointer to bank containing bit <adr>
+        uint8_t     *bankOfBit(Tadr adr)            { return (adr<BITSIZE ? &(_store[idxB(adr)]) : NULL); }
+        // Return pointer to n-th bank containing bit <adr>
+        uint8_t     *bank(uint8_t Badr)             { return &(_store[Badr]); }
 
 };
 

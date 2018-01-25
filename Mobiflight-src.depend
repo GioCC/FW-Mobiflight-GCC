@@ -129,10 +129,10 @@
 	<inttypes.h>
 	<Print.h>
 
-1516218892 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfbutton.cpp
+1516639029 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfbutton.cpp
 	"MFButton.h"
 
-1516228356 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfbutton.h
+1516637294 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfbutton.h
 	<stdlib.h>
 	<Arduino.h>
 	<WProgram.h>
@@ -156,15 +156,16 @@
 	<WProgram.h>
 	<wiring.h>
 
-1516134825 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfencoder.cpp
+1516636822 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfencoder.cpp
 	"MFEncoder.h"
 
-1516268622 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfencoder.h
+1516718885 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfencoder.h
 	<stdlib.h>
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
 	<RotaryEncoderShd.h>
+	<MFPeripheral.h>
 
 1516134945 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\rotaryencoder\rotaryencoder.h
 	"Arduino.h"
@@ -174,56 +175,58 @@
 1516266225 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\tickspersecond\tickspersecond.h
 	<avr/interrupt.h>
 
-1515601523 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mflcddisplay.cpp
+1516636630 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mflcddisplay.cpp
 	"MFLCDDisplay.h"
 
-1515601523 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mflcddisplay.h
+1516637752 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mflcddisplay.h
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
 	"../LiquidCrystal-I2C/LiquidCrystal_I2C.h"
+	<MFPeripheral.h>
 
 1515601523 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfmain.cpp
 
-1516218892 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfoutput.cpp
+1516639029 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfoutput.cpp
 	"MFOutput.h"
 
-1516182150 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfoutput.h
+1516636889 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfoutput.h
 	<stdlib.h>
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
 	<bitStore.h>
 
-1515601523 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.cpp
+1516636630 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.cpp
 	"MFSegments.h"
 
-1515601523 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.h
+1516637752 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.h
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
 	"../LedControl/LedControl.h"
+	<MFPeripheral.h>
 
-1515601523 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfservo.cpp
+1516636822 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfservo.cpp
 	"MFServo.h"
 
-1515601523 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfservo.h
+1516637752 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfservo.h
 	<stdlib.h>
-	<Servo.h>
 	<Arduino.h>
 	<WProgram.h>
+	<Servo.h>
+	<MFPeripheral.h>
 
-1515601523 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfstepper.cpp
+1516636308 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfstepper.cpp
 	"MFStepper.h"
-	"MFButton.h"
 
-1515601523 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfstepper.h
+1516637752 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfstepper.h
 	<stdlib.h>
-	"../AccelStepper/AccelStepper.h"
-	"MFButton.h"
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
+	"../AccelStepper/AccelStepper.h"
+	<MFPeripheral.h>
 
 1516134945 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\rotaryencoder\rotaryencoder.cpp
 	"Arduino.h"
@@ -248,7 +251,7 @@
 	<inttypes.h>
 	"Stream.h"
 
-1516365603 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight_mega.ino
+1516719838 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight_mega.ino
 	<WProgram.h>
 	<Arduino.h>
 	"mobiflight.h"
@@ -260,7 +263,7 @@
 	<RotaryEncoderShd.h>
 	<Wire.h>
 	<MFSegments.h>
-	<MFButton.h>
+	<MFButtonT.h>
 	<MFEncoder.h>
 	<AccelStepper.h>
 	<MFStepper.h>
@@ -271,7 +274,7 @@
 	<MFLCDDisplay.h>
 	<bitStore.h>
 
-1516135943 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight.h
+1516632828 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight.h
 
 1482336942 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\lib_std\wire\utility\twi.c
 	<math.h>
@@ -319,7 +322,7 @@
 
 1482336970 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\lib_std\servo\servotimers.h
 
-1516182406 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\bitstore.h
+1516718117 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\bitstore.h
 	<Arduino.h>
 
 1516103980 source:d:\temp\mobiflight-src\gcc\bitstore.cpp
@@ -887,10 +890,10 @@
 1516103980 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\bitstore.cpp
 	"bitStore.h"
 
-1516358183 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\mfbuttont.cpp
+1516639029 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\mfbuttont.cpp
 	"MFButtonT.h"
 
-1516357009 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\mfbuttont.h
+1516638973 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\gcc\mfbuttont.h
 	<stdlib.h>
 	<Arduino.h>
 	<WProgram.h>
@@ -921,4 +924,21 @@
 
 1516637218 source:d:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfperipheral.cpp
 	"MFPeripheral.h"
+
+1516637185 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfperipheral.h
+	<Arduino.h>
+	<WProgram.h>
+
+1516637218 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfperipheral.cpp
+	"MFPeripheral.h"
+
+1516742534 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfinput165.cpp
+	"MFInput165.h"
+
+1516742525 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfinput165.h
+	<Arduino.h>
+	<WProgram.h>
+	<wiring.h>
+	<MFPeripheral.h>
+	<bitStore.h>
 

@@ -671,7 +671,10 @@
 			<Add directory="GCC" />
 		</Compiler>
 		<Unit filename="GCC/MFButtonT.cpp" />
-		<Unit filename="GCC/MFButtonT.h" />
+		<Unit filename="GCC/SIO_io_23017.cpp" />
+		<Unit filename="GCC/SIO_io_23017.h" />
+		<Unit filename="GCC/SIO_io_23S17.cpp" />
+		<Unit filename="GCC/SIO_io_23S17.h" />
 		<Unit filename="GCC/bitStore.cpp" />
 		<Unit filename="GCC/bitStore.h" />
 		<Unit filename="GCC/textStore.cpp" />
@@ -801,6 +804,8 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFButtonT.cpp" />
+		<Unit filename="libraries/MF_Modules/MFButtonT.h" />
 		<Unit filename="libraries/MF_Modules/MFCore.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -823,6 +828,10 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFInput165.cpp" />
+		<Unit filename="libraries/MF_Modules/MFInput165.h" />
+		<Unit filename="libraries/MF_Modules/MFInputMtx.cpp" />
+		<Unit filename="libraries/MF_Modules/MFInputMtx.h" />
 		<Unit filename="libraries/MF_Modules/MFLCDDisplay.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
@@ -848,6 +857,8 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFOutput595.cpp" />
+		<Unit filename="libraries/MF_Modules/MFOutput595.h" />
 		<Unit filename="libraries/MF_Modules/MFPeripheral.cpp" />
 		<Unit filename="libraries/MF_Modules/MFPeripheral.h" />
 		<Unit filename="libraries/MF_Modules/MFSegments.cpp">

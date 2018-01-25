@@ -202,6 +202,14 @@ enum
   kTypeStepper,       // 5
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
+  // New IO bank peripherals (GCC 2018-01):
+  kTypeInput163,      // 8
+  kTypeOutput565,     // 9
+  kTypeOutLEDDM13,    // 10
+  kTypeOutLED5940,    // 11
+  kTypeInOutMCPS,     // 12
+  kTypeInOutMCP0,     // 13
+  kTypeInputMtx,      // 14
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
