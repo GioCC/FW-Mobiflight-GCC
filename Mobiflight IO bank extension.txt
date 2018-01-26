@@ -73,16 +73,25 @@ V AddButton/AddOutput ext for virtual pins
         V use MFButton, but modify it for a different behaviour if pin is virtual
     Same for AddOutput/MFOutput.
 
-- New 'kTypeIOBlock_XXX', XXX -> 163, 595, DM13, MCPS, MCP0...
+V New MF-classes for IOBlocks: 
+    V KeyMatrix
+    V HC163
+    V HC/TPIC595
+    V TLC5926/STP16C05/DM13A/SM16126D
+    V MCP23S17
+    V MCP23017 (Wire+SoftI2C)
+    - TM1638 ?
 
-- New 'AddIOBlock_XXX()', each with its own:
+V New 'kType[IOBlockXXX]' constants, XXX -> 163, 595, DM13, MCPS, MCP0...
+
+- New 'Add[IOBlockXXX]()' functions, each with its own:
     - specific HW driver params (e.g. pins, I/O banks per unit, hw adr, hw pin direction...)
     - config (n. chained units, assignment to position in IO bank buffer )
-
-- IOBlock_XXX creation
-    When processing kTypeIOBlock_XXX, beside AddIOBlock_XXX, perform a series of "AddButton" and/or "AddOutput" for each I/O with "virtual" pin numbers.
+    Inside Add[IOBlock_XXX], perform a series of "AddButton" and/or "AddOutput" for each I/O with "virtual" pin numbers.
     This way, I/Os in external modules will be configured exactly like ordinary HW I/Os.
 
+- Processing of IOBlocks in readConfig()
+    
 - IOBlock polling
     Items from the IOBlock_XXX list will be refreshed (hw poll) during cyclic scan, and their data read/written from/to the IO bank buffer
 

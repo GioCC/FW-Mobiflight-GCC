@@ -48,10 +48,16 @@ class MFEncoder
 public:
     static void attachHandler(byte eventId, encoderEvent newHandler);
     MFEncoder();
+    void update(void);
     void attach(uint8_t pin1, uint8_t pin2, String name = "Encoder");
-    void update();
 
-    byte getPins(byte *dst) { dst[0] = _pin1; dst[1] = _pin2; return _npins; }
+    void attach(int *params, char *name) {}    //TODO generic attach()
+    void detach(void) {};
+    void update(byte *send, byte *get)  { update(); }
+    byte getPins(byte *dst)             { dst[0] = _pin1; dst[1] = _pin2; return _npins; }
+
+protected:
+    byte    pins(byte n) { return (n==0 ? _pin1 : (n==1 ? _pin2 : 0xFF)); }
 
 private:
     //bool                      _initialized;

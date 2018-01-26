@@ -25,12 +25,20 @@ class MFPeripheral
 public:
     MFPeripheral(uint8_t npins) : _npins(npins), _initialized(false) { };
     virtual byte NPins(void);
-    virtual byte getPins(byte *dst) =0;
+    virtual byte getPins(byte *dst);
+
+    virtual void attach(int *params, char *name) =0;
+    virtual void detach(void) {};
+    virtual void update(byte *send, byte *get) {};
+    virtual void test(void) {};
+    virtual byte pins(byte i) =0;
 
 protected:
     byte    _npins;
     bool    _initialized;
+
 private:
+    // none
 };
 
 #endif // MFPERIPHERAL_H_INCLUDED

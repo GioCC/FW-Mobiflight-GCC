@@ -29,7 +29,11 @@ class MFStepper
 {
 public:
     MFStepper(uint8_t pin1 = 1, uint8_t pin2 = 2, uint8_t pin3 = 3, uint8_t pin4 = 4 /*, uint8_t btnPin1 = 5 */);
-    void    update();
+    void    update(void);
+
+    void    attach(int *params, char *name) {};
+    void    update(byte *send, byte *get) { update(); }
+
     void    reset();
     void    moveTo(long absolute);
     void    setMaxSpeed(float speed);
@@ -37,7 +41,10 @@ public:
     void    setZeroInReset();
     void    setZero();
     //MFButton* getButton();
-    byte    getPins(byte *dst) { for(byte i=0; i<_npins; i++) dst[i]=_pin[i]; return _npins; }
+
+
+protected:
+    byte    pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }
 
 private:
     //bool          _initialized;

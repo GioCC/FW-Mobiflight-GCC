@@ -48,7 +48,7 @@ void MFInput165::bind(bitStore<byte> *store, byte slot)
 }
 #endif
 
-void MFInput165::read(byte *dest)
+void MFInput165::update(byte *dest)
 {
     if(!_initialized) return;
 #ifdef USE_BITSTORE

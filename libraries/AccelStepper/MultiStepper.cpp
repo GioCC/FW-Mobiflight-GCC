@@ -16,6 +16,7 @@ boolean MultiStepper::addStepper(AccelStepper& stepper)
     if (_num_steppers >= MULTISTEPPER_MAX_STEPPERS)
 	return false; // No room for more
     _steppers[_num_steppers++] = &stepper;
+	return true;
 }
 
 void MultiStepper::moveTo(long absolute[])
@@ -35,7 +36,7 @@ void MultiStepper::moveTo(long absolute[])
 
     if (longestTime > 0.0)
     {
-	// Now work out a new max speed for each stepper so they will all 
+	// Now work out a new max speed for each stepper so they will all
 	// arrived at the same time of longestTime
 	for (i = 0; i < _num_steppers; i++)
 	{
@@ -65,7 +66,7 @@ boolean MultiStepper::run()
 
 // Blocks until all steppers reach their target position and are stopped
 void    MultiStepper::runSpeedToPosition()
-{ 
+{
     while (run())
 	;
 }

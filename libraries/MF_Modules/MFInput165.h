@@ -39,15 +39,20 @@ class MFInput165
 {
 public:
     MFInput165();
-    void attach(int dataPin, int csPin, int clkPin, int moduleCount);
-    void detach();
 #ifdef USE_BITSTORE
     void bind(bitStore<byte> *store, byte slot);
 #endif
-    void read(byte *dest = NULL);
+    void update(byte *dest = NULL);
+    void attach(int dataPin, int csPin, int clkPin, int moduleCount);
 
-    byte getPins(byte *dst) { dst[0]=_pin[0]; dst[1]=_pin[1]; dst[2]=_pin[2]; return _npins; }
-    byte getSize(void)      { return _moduleCount; }
+    void attach(int *params, char *name) {} //TODO generic attach()
+    void detach(void);
+    void update(byte *send, byte *get) { update(get); }
+
+    byte getSize(void)   { return _moduleCount; }
+
+protected:
+    byte pins(byte n) { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
     byte        _moduleCount;

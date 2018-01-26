@@ -24,7 +24,7 @@
 void HPulse(unsigned char);
 
 #ifdef USE_FASTARDUINO
-#warning USE_FASTARDUINO is active - defining corresponding symbols.
+//#warning USE_FASTARDUINO is active - defining corresponding symbols.
 
 void f_FastdigitalWrite(unsigned char , unsigned char );
 int  f_FastdigitalRead(unsigned char);

@@ -30,17 +30,23 @@ public:
     MFLCDDisplay();
     void display(char *string);
     void attach(byte address, byte cols, byte lines);
-    void detach();
-    void test();
+
+    void attach(int *params, char *name) {} //TODO generic attach()
+    void detach(void);
+    void update(byte *send, byte *get)  {}
+    byte getPins(byte *dst)             { return _npins; }   ///TODO Should return the I2C pins for consistency
+
+    void test(void);
     void powerSavingMode(bool state);
 
-    byte getPins(byte *dst) { return _npins; }   /// Should return the I2C pins for consistency
+protected:
+    byte pins(byte n) { return 0xFF; }  ///TODO Should return the I2C pins for consistency
 
 private:
     LiquidCrystal_I2C  *_lcdDisplay;
     //bool    _initialized;
     byte    _address;
-    byte		_cols;
-    byte		_lines;
+    byte	_cols;
+    byte	_lines;
 };
 #endif

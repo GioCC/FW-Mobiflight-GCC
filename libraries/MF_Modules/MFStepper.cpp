@@ -63,7 +63,7 @@ void MFStepper::setZeroInReset()
     }
 }
 
-void MFStepper::update()
+void MFStepper::update(void)
 {
     _stepper.run();
     /* _button.update(); */

@@ -55,7 +55,7 @@ void MFOutput595::send(byte *pattern)
 #ifdef USE_BITSTORE
     if(!pattern && _store) pattern = _store->bank(_base);
 #endif
-    if(!pattern) {
+    if(pattern) {
         register byte dto;
         for(byte i=_moduleCount; i;){
             dto = pattern[--i];

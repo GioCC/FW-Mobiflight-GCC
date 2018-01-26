@@ -26,14 +26,20 @@ class MFSegments
 {
 public:
     MFSegments();
-    void display(byte module, char *string, byte points, byte mask, bool convertPoints = false);
     void attach(int dataPin, int csPin, int clkPin, int moduleCount, int brightness);
-    void detach();
-    void test();
+    void display(byte module, char *string, byte points, byte mask, bool convertPoints = false);
+
+    void attach(int *params, char *name) {} //TODO generic attach()
+    void detach(void);
+    void update(byte *send, byte *get) {}
+
+    void test(void);
     void powerSavingMode(bool state);
+
     void setBrightness(int module, int value);
 
-    byte getPins(byte *dst) { dst[0]=_pin[0]; dst[1]=_pin[1]; dst[2]=_pin[2]; return _npins; }
+protected:
+    byte    pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
     //bool        _initialized;

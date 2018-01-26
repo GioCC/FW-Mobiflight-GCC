@@ -15,7 +15,7 @@ char foo;
 //void AddOutput(uint8_t pin = 1, String name = "Output")
 //void AddButton(uint8_t pin = 1, String name = "Button")
 //void AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
-//void AddLcdDisplay (uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
+//void AddLcdDisplay(uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
 ///END NOTE
 
 //#define DEBUG 0
@@ -52,6 +52,7 @@ char foo;
 #define MAX_STEPPERS    4
 #define MAX_MFSERVOS    4
 #define MAX_MFLCD_I2C   2
+#define MAX_IOBLOCKS    4 // ? Find correct value
 // Standard I2C pins
 //#define SDA_STD_PIN  2
 //#define SCL_STD_PIN  3
@@ -65,6 +66,7 @@ char foo;
 #define MAX_STEPPERS    2
 #define MAX_MFSERVOS    2
 #define MAX_MFLCD_I2C   2
+#define MAX_IOBLOCKS    4 // ? Find correct value
 // Standard I2C pins
 //#define SDA_STD_PIN  A4
 //#define SCL_STD_PIN  A5
@@ -79,6 +81,7 @@ char foo;
 #define MAX_STEPPERS    10
 #define MAX_MFSERVOS    10
 #define MAX_MFLCD_I2C   2
+#define MAX_IOBLOCKS    10 // ? Find correct value
 // Standard I2C pins
 //#define SDA_STD_PIN  20
 //#define SCL_STD_PIN  21
@@ -194,6 +197,9 @@ byte servosRegistered = 0;
 MFLCDDisplay lcd_I2C[MAX_MFLCD_I2C];
 byte lcd_12cRegistered = 0;
 
+MFPeripheral *IOblocks[MAX_IOBLOCKS];
+byte IOBlocksRegistered = 0;
+
 byte        inStatusBuf   [roundUp(MAX_BUTTONS)];
 byte        inStatusUpdBuf[roundUp(MAX_BUTTONS)];
 byte        outStatusBuf  [roundUp(MAX_OUTPUTS)];
@@ -213,13 +219,13 @@ enum
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
   // New IO bank peripherals (GCC 2018-01):
-  kTypeInput163,      // 8
-  kTypeOutput565,     // 9
-  kTypeOutLEDDM13,    // 10
-  kTypeOutLED5940,    // 11
-  kTypeInOutMCPS,     // 12
-  kTypeInOutMCP0,     // 13
-  kTypeInputMtx,      // 14
+  kTypeInputMtx,      // 8
+  kTypeInput165,      // 9
+  kTypeOutput565,     // 10
+  kTypeOutLEDDM13,    // 11
+  kTypeOutLED5940,    // 12
+  kTypeInOutMCPS,     // 13
+  kTypeInOutMCP0,     // 14
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
@@ -440,6 +446,18 @@ void clearRegisteredPins(byte type) {
         ne = 0; // skip std processing
         break;
     case kTypeLcdDisplayI2C:  // this does nothing;
+    break;
+    // Clearing any of the peripheral types clears all peripherals!
+    case kTypeInputMtx:
+    case kTypeInput165:
+    case kTypeOutput565:
+    case kTypeOutLEDDM13:
+    case kTypeOutLED5940:
+    case kTypeInOutMCPS:
+    case kTypeInOutMCP0:
+        ne = IOBlocksRegistered;
+        /// mfp = IOblocks;     //TODO
+    break;
     default:
     break;
   }
@@ -453,8 +471,10 @@ void clearRegisteredPins(byte type) {
 
 }
 
-//// OUTPUT /////
-///void AddOutput(uint8_t pin = 1, String name = "Output")
+///========///
+/// OUTPUT ///
+///========///
+
 void AddOutput(uint8_t pin, String name)
 {
   if (outputsRegistered == MAX_OUTPUTS) return;
@@ -476,8 +496,9 @@ void ClearOutputs()
 #endif
 }
 
-//// BUTTONS /////
-///void AddButton(uint8_t pin = 1, String name = "Button")
+///=========///
+/// BUTTONS ///
+///=========///
 void AddButton(uint8_t pin, String name)
 {
   if (buttonsRegistered == MAX_BUTTONS) return;
@@ -511,8 +532,9 @@ void ClearButtons()
 #endif
 }
 
-//// ENCODERS /////
-///void AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
+///==========///
+/// ENCODERS ///
+///==========///
 void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
 {
   if (encodersRegistered == MAX_ENCODERS) return;
@@ -544,9 +566,10 @@ void ClearEncoders()
 #endif
 }
 
-//// OUTPUTS /////
 
-//// SEGMENTS /////
+///==========///
+/// SEGMENTS ///
+///==========///
 void AddLedSegment(int dataPin, int csPin, int clkPin, int numDevices, int brightness)
 {
   if (ledSegmentsRegistered == MAX_LEDSEGMENTS) return;
@@ -587,7 +610,10 @@ void PowerSaveLedSegment(bool state)
     outputs[i].powerSavingMode(state);
   }
 }
-//// STEPPER ////
+
+///=========///
+/// STEPPER ///
+///=========///
 void AddStepper(int pin1, int pin2, int pin3, int pin4, int btnPin1)
 {
   if (steppersRegistered == MAX_STEPPERS) return;
@@ -627,7 +653,9 @@ void ClearSteppers()
 #endif
 }
 
-//// SERVOS /////
+///========///
+/// SERVOS ///
+///========///
 void AddServo(int pin)
 {
   if (servosRegistered == MAX_MFSERVOS) return;
@@ -652,8 +680,9 @@ void ClearServos()
 #endif
 }
 
-//// LCD Display /////
-///void AddLcdDisplay (uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
+///=============///
+/// LCD Display ///
+///=============///
 void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, String name)
 {
   if (lcd_12cRegistered == MAX_MFLCD_I2C) return;
@@ -666,19 +695,82 @@ void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, String name)
 
 void ClearLcdDisplays()
 {
-  for (int i=0; i!=lcd_12cRegistered; i++)
-  {
+  for (int i=0; i!=lcd_12cRegistered; i++) {
     lcd_I2C[lcd_12cRegistered].detach();
   }
-
   lcd_12cRegistered = 0;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,"Cleared lcdDisplays");
 #endif
 }
 
+///************************************************************************************************
+///=============///
+/// xxx ///
+///=============///
+/*
+void AddXXX (int a, int b, int c, String name)
+{
+  if (XXXRegistered == MAX_XXX) return;
+  XXX[XXXRegistered].attach(a, b, c);
+  XXXRegistered++;
+#ifdef DEBUG
+  cmdMessenger.sendCmd(kStatus,"Added xxx");
+#endif
+}
 
-//// EVENT HANDLER /////
+void ClearXXXs()
+{
+  for (int i=0; i!=XXXRegistered; i++) {
+    XXX[XXXRegistered].detach();
+  }
+
+  XXXRegistered = 0;
+#ifdef DEBUG
+  cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
+#endif
+}
+
+///-------------------------------------------------------------------------------------------------
+kTypeInputMtx
+kTypeInput165
+kTypeOutput565
+kTypeOutLEDDM13
+kTypeOutLED5940
+kTypeInOutMCPS
+kTypeInOutMCP0
+
+///=============///
+/// xxx ///
+///=============///
+void AddXXX(int a, int b, int c, String name)
+{
+  if (XXXRegistered == MAX_XXX) return;
+  XXX[XXXRegistered].attach(a, b, c);
+  XXXRegistered++;
+#ifdef DEBUG
+  cmdMessenger.sendCmd(kStatus,"Added xxx");
+#endif
+}
+
+void ClearXXXs()
+{
+  for (int i=0; i!=XXXRegistered; i++) {
+    XXX[XXXRegistered].detach();
+  }
+
+  XXXRegistered = 0;
+#ifdef DEBUG
+  cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
+#endif
+}
+*/
+///************************************************************************************************
+
+
+///================///
+/// EVENT HANDLERS ///
+///================///
 void handlerOnRelease(byte eventId, uint8_t pin, String name)
 {
   cmdMessenger.sendCmdStart(kButtonChange);
@@ -687,7 +779,6 @@ void handlerOnRelease(byte eventId, uint8_t pin, String name)
   cmdMessenger.sendCmdEnd();
 };
 
-//// EVENT HANDLER /////
 void handlerOnEncoder(byte eventId, uint8_t pin, String name)
 {
   cmdMessenger.sendCmdStart(kEncoderChange);
@@ -757,6 +848,16 @@ void _activateConfig() {
   configActivated = true;
 }
 
+void parse(char **parms, byte nparms, char *p0)
+{
+  char *p = p0;
+  //if(nparms==0) return;
+  for(int8_t i=0; i<(nparms-1); i++) {
+      parms[i] = strtok_r(NULL, ".", &p);
+  }
+  parms[nparms-1] = strtok_r(NULL, ":", &p);
+}
+
 void readConfig(String cfg) {
   char readBuffer[MEM_LEN_CONFIG+1] = "";
   char *p = NULL;
@@ -769,61 +870,72 @@ void readConfig(String cfg) {
   do {
     switch (atoi(command)) {
       case kTypeButton:
-        params[0] = strtok_r(NULL, ".", &p); // pin
-        params[1] = strtok_r(NULL, ":", &p); // name
+        parse(params, 2, p); // pin, name
         AddButton(atoi(params[0]), params[1]);
       break;
 
       case kTypeOutput:
-        params[0] = strtok_r(NULL, ".", &p); // pin
-        params[1] = strtok_r(NULL, ":", &p); // Name
+        parse(params, 2, p); // pin, name
         AddOutput(atoi(params[0]), params[1]);
       break;
 
       case kTypeLedSegment:
-        params[0] = strtok_r(NULL, ".", &p); // pin Data
-        params[1] = strtok_r(NULL, ".", &p); // pin Cs
-        params[2] = strtok_r(NULL, ".", &p); // pin Clk
-        params[3] = strtok_r(NULL, ".", &p); // brightness
-        params[4] = strtok_r(NULL, ".", &p); // numModules
-        params[5] = strtok_r(NULL, ":", &p); // Name
-        // int dataPin, int clkPin, int csPin, int numDevices, int brightness
+        parse(params, 6, p); // pinData, pinCS, pinCLK, brightness, numModules, Name
+        // AddLedSegment(dataPin, clkPin, csPin, numDevices, brightness)
         AddLedSegment(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[4]), atoi(params[3]));
       break;
 
       case kTypeStepper:
-        // AddStepper(int pin1, int pin2, int pin3, int pin4)
-        params[0] = strtok_r(NULL, ".", &p); // pin1
-        params[1] = strtok_r(NULL, ".", &p); // pin2
-        params[2] = strtok_r(NULL, ".", &p); // pin3
-        params[3] = strtok_r(NULL, ".", &p); // pin4
-        params[4] = strtok_r(NULL, ".", &p); // btnPin1
-        params[5] = strtok_r(NULL, ":", &p); // Name
+        parse(params, 6, p); // pin1, pin2, pin3, pin4, btnpin, Name
+        // AddStepper(pin1, pin2, int , pin4)
         AddStepper(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
 
       case kTypeServo:
-        // AddServo(int pin)
-        params[0] = strtok_r(NULL, ".", &p); // pin1
-        params[1] = strtok_r(NULL, ":", &p); // Name
+        parse(params, 2, p); // pin1, Name
+        // AddServo(pin)
         AddServo(atoi(params[0]));
       break;
 
       case kTypeEncoder:
-        // AddEncoder(uint8_t pin1 = 1, uint8_t pin2 = 2, String name = "Encoder")
-        params[0] = strtok_r(NULL, ".", &p); // pin1
-        params[1] = strtok_r(NULL, ".", &p); // pin2
-        params[2] = strtok_r(NULL, ":", &p); // Name
+        parse(params, 3, p); // pin1, pin2, Name
+        // AddEncoder(pin1, pin2, name)
         AddEncoder(atoi(params[0]), atoi(params[1]), params[2]);
       break;
 
       case kTypeLcdDisplayI2C:
-        // AddLcdDisplay(uint8_t address = 0x24, uint8_t cols = 16, lines = 2, String name = "Lcd")
-        params[0] = strtok_r(NULL, ".", &p); // address
-        params[1] = strtok_r(NULL, ".", &p); // cols
-        params[2] = strtok_r(NULL, ".", &p); // lines
-        params[3] = strtok_r(NULL, ":", &p); // Name
+        parse(params, 4, p); // addr, cols, lines, name
+        // AddLcdDisplay(address, cols, lines, name)
         AddLcdDisplay(atoi(params[0]), atoi(params[1]), atoi(params[2]), params[3]);
+      break;
+      // New IO bank peripherals (GCC 2018-01):
+      case kTypeInputMtx:
+        ///parse(params, 4, p); // addr, cols, lines, Name
+        ///AddInputMtx(....);
+      break;
+      case kTypeInput165:
+        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
+        ///AddInput165(....);
+      break;
+      case kTypeOutput565:
+        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
+        ///AddOutput565(....);
+      break;
+      case kTypeOutLEDDM13:
+        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
+        ///AddOutLEDDM13(....);
+      break;
+      case kTypeOutLED5940:
+        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
+        ///AddOutLED5940(....);
+      break;
+      case kTypeInOutMCPS:
+        ///parse(params, 6, p); // pinData, pinCS, pinCLK, addr, numModules, Name
+        ///AddInOutMCPS(....);
+      break;
+      case kTypeInOutMCP0:
+        ///parse(params, 5, p); // pinSDA, pinSCL, addr, numModules, Name
+        ///AddInOutMCP0(....);
       break;
 
       default:

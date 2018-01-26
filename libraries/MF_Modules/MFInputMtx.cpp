@@ -21,6 +21,23 @@ void MFInputMtx::fastModeSwitch(byte pin, byte val)
     if (val) { *out |= msk; } else { *out &= ~msk; }
 }
 
+byte MFInputMtx::getPins(byte *dst)
+{
+    byte _npins = _nrows*_ncols;
+    if(dst){
+        byte i;
+        for(i=0; i<_nrows; i++) dst[i] = _row0 + i;
+        for(i=0; i<_ncols; i++) dst[_nrows+i] = _col0 + i;
+    }
+    return _npins;
+}
+
+byte MFInputMtx::pins(byte n)
+{
+    return (n<_nrows ? _row0+n : (n<_nrows+_ncols ? _nrows+_col0+n : 0xFF));
+}
+
+
 void MFInputMtx::init(void)
 {
     uint16_t msk = 0;
@@ -71,21 +88,21 @@ void MFInputMtx::bind(bitStore<byte> *store, byte slot)
 }
 #endif
 
-void MFInputMtx::scanAll(void)
+void MFInputMtx::scanAll(byte *dst)
 {
     if(!_initialized) return;
     for(byte c=0; c<_ncols; c++) {
-        scanNext(c);
-    } // for c
+        scanNext(c, dst);
+    }
 }
 
 // Matrix switch sampling section
-void MFInputMtx::scanNext(byte init)
+void MFInputMtx::scanNext(byte init, byte *dst)
 {
     byte ivec = 0;
 
     if(!_initialized) return;
-    if(!inputs) return;
+    if(!inputs && !dst)return;
 
     if(init) { _currCol = 0;}
 
@@ -102,7 +119,11 @@ void MFInputMtx::scanNext(byte init)
     if (ivec == _inPrev[_currCol]) {
         if (_inDCnt[_currCol] > 0) {
             if (--_inDCnt[_currCol] == 0) {
-                inputs[_currCol] = ivec;
+                if(dst) {
+                    dst[_currCol] = ivec;
+                } else {
+                    inputs[_currCol] = ivec;
+                }
                 changed = true;     // the caller will reset this, if interested
             }
         }

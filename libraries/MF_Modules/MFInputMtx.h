@@ -49,21 +49,23 @@ class MFInputMtx
 {
 public:
     MFInputMtx();
-    void attach(int dataPin, int csPin, int clkPin, int moduleCount);
-    void detach();
 #ifdef USE_BITSTORE
     void bind(bitStore<byte> *store, byte slot);
-#else
+#endif
+    void attach(int dataPin, int csPin, int clkPin, int moduleCount);
+    void scanNext(byte init = 0, byte *dst = NULL);
+    void scanAll(byte *dst);
+
+    void attach(int *params, char *name) {} //TODO generic attach()
+    void detach(void);
+    void update(byte *send, byte *get) { scanAll(get); }
+    byte getPins(byte *dst);
+
     byte in(byte n)         { return (inputs[n/_nrows] & (0x01<<(n%_nrows))); }
     byte in(byte r, byte c) { return (inputs[c] & (0x01<<r)); }
-#endif
     void init(void);
     void setDebounce(byte steps)   { _deb_steps = steps; }
 
-    void scanNext(byte init = 0);
-    void scanAll(void);
-
-    byte getPins(byte *dst) { /*dst[0]=... TODO; return _npins; */}
     byte getSizeRows(void)  { return _nrows; }
     byte getSizeCols(void)  { return _ncols; }
     byte getSize(void)      { return _nrows*_ncols; }
@@ -82,6 +84,8 @@ protected:
     byte    _col0;
     byte    _nrows;
     byte    _ncols;
+
+    byte    pins(byte n);
 
 private:
 #ifdef USE_BITSTORE
