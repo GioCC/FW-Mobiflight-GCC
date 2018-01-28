@@ -3,15 +3,16 @@
 
 #include "MFPeripheral.h"
 
-byte MFPeripheral::NPins(void)
+byte MFPeripheral::pinCount(void)
 {
-    return _npins;
+    return (_npins&0x7F);
 }
 
 byte MFPeripheral::getPins(byte *dst)
 {
-    if(dst){ for(byte i=0; i<_npins; i++) dst[i]=pins(i); }
-    return _npins;
+    byte n = _npins&0x7F;
+    if(dst){ for(byte i=0; i<n; i++) dst[i]=pins(i); }
+    return n;
 }
 
 // end MFPeripheral.cpp

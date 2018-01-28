@@ -10,7 +10,7 @@ MFInputMtx::MFInputMtx()
 , _store(NULL)
 #endif
 {
-  //_initialized = false;
+  // initialize(false);
 }
 
 void MFInputMtx::fastModeSwitch(byte pin, byte val)
@@ -21,15 +21,15 @@ void MFInputMtx::fastModeSwitch(byte pin, byte val)
     if (val) { *out |= msk; } else { *out &= ~msk; }
 }
 
-byte MFInputMtx::getPins(byte *dst)
+byte MFInputMtx::getPins(byte *dst)   // overrides MPPeripheral::
 {
-    byte _npins = _nrows*_ncols;
+    if(!initialized()) return 0;
     if(dst){
         byte i;
         for(i=0; i<_nrows; i++) dst[i] = _row0 + i;
         for(i=0; i<_ncols; i++) dst[_nrows+i] = _col0 + i;
     }
-    return _npins;
+    return npins();
 }
 
 byte MFInputMtx::pins(byte n)
@@ -41,7 +41,7 @@ byte MFInputMtx::pins(byte n)
 void MFInputMtx::init(void)
 {
     uint16_t msk = 0;
-    if(_initialized) {
+    if(initialized()) {
         for(byte i=_row0; i<_nrows; i++) { pinMode(i, INPUT_PULLUP); }
         for(byte i=_col0; i<_ncols; i++) {
             pinMode(i, INPUT);
@@ -55,17 +55,17 @@ void MFInputMtx::init(void)
 void MFInputMtx::attach(int Row0, int NRows, int Col0, int NCols)
 {
     // We should also check that the pin nr. values are legal!
-    _initialized = true;
-    if(NRows>8 || NCols>8 || NRows<2 || NCols<2) _initialized = false;
+    initialize(true);
+    if(NRows>8 || NCols>8 || NRows<2 || NCols<2) initialize(false);
     // No overlapping ranges!
-    if(Row0<=Col0 && (Row0+NRows > Col0)) _initialized = false;
-    if(Col0<=Row0 && (Col0+NCols > Row0)) _initialized = false;
-    if(_initialized) {
+    if(Row0<=Col0 && (Row0+NRows > Col0)) initialize(false);
+    if(Col0<=Row0 && (Col0+NCols > Row0)) initialize(false);
+    if(initialized()) {
         _row0   = Row0;
         _col0   = Col0;
         _nrows  = NRows;
         _ncols  = NCols;
-        _npins = _nrows + _ncols;
+        npins(_nrows + _ncols);
         changed = 0;
         _deb_steps = DEB_DEFAULT;
         init();
@@ -74,9 +74,10 @@ void MFInputMtx::attach(int Row0, int NRows, int Col0, int NCols)
 
 void MFInputMtx::detach()
 {
-    _nrows = _ncols = _npins = 0;
+    npins(0);
+    _nrows = _ncols = 0;
     _row0  = _col0  = 0xFF;
-    _initialized = false;
+    initialize(false);
 }
 
 #ifdef USE_BITSTORE
@@ -90,7 +91,7 @@ void MFInputMtx::bind(bitStore<byte> *store, byte slot)
 
 void MFInputMtx::scanAll(byte *dst)
 {
-    if(!_initialized) return;
+    if(!initialized()) return;
     for(byte c=0; c<_ncols; c++) {
         scanNext(c, dst);
     }
@@ -101,7 +102,7 @@ void MFInputMtx::scanNext(byte init, byte *dst)
 {
     byte ivec = 0;
 
-    if(!_initialized) return;
+    if(!initialized()) return;
     if(!inputs && !dst)return;
 
     if(init) { _currCol = 0;}

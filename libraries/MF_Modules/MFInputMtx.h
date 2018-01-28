@@ -56,9 +56,9 @@ public:
     void scanNext(byte init = 0, byte *dst = NULL);
     void scanAll(byte *dst);
 
-    void attach(int *params, char *name) {} //TODO generic attach()
+    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
     void detach(void);
-    void update(byte *send, byte *get) { scanAll(get); }
+    void update(byte *send, byte *get)  { scanAll(get); }
     byte getPins(byte *dst);
 
     byte in(byte n)         { return (inputs[n/_nrows] & (0x01<<(n%_nrows))); }

@@ -54,9 +54,11 @@ private:
 
 public:
 
-    MFIO_MCP0(byte nUnits, byte addr);
-    void attach(int SDAPin = 0, int SCLPin = 0);    // Any pin =0 means we are using HW I2C
-    void detach(void);
+    MFIO_MCP0(void);
+    void    attach(byte addr, byte SDAPin = 0xFF, byte SCLPin = 0xFF, byte nUnits=1);    // Any pin =0xFF means we are using HW I2C
+
+    void    attach(byte *pm, char *name) { attach(pm[0], pm[1]); }    // name unused
+    void    detach(void);
 
 };
 #endif  //MFIO_MCP0_H

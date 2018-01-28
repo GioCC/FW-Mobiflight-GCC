@@ -26,11 +26,21 @@ class MFOutput
 public:
     static void setBitStore(bitStore<byte> *storage, byte maxOBPin);
 
-    MFOutput(uint8_t pin = 1);
+    MFOutput(void) {}
+    void attach(uint8_t pin);
     void set(bool state);
     void powerSavingMode(bool state);
-
     byte getPin(void) { return _pin; }
+
+    // Expose the same interface style as MFPeripheral, but without inheriting it (too much overhead and no real need)
+    byte NPins(void)                    { return 1; }
+    void attach(byte *pm, char *name)   { attach(pm[0]); }
+    void detach(void)                   {}
+    void update(byte *send, byte *get)  { set(*send); }
+    byte getPins(byte *dst)             { dst[0]=_pin; return 1; }
+    //void test(void) {};
+protected:
+    byte pins(byte n)    { return (n=0 ? _pin : 0xFF); }
 
 private:
     static bitStore<byte>   *_OutBits;

@@ -15,15 +15,12 @@ void MFOutput::setBitStore(bitStore<byte> *storage, byte maxOBPin)
     MFOutput::_MaxOnboardPin  = maxOBPin;
 }
 
-MFOutput::MFOutput(uint8_t pin)
+void MFOutput::attach(uint8_t pin)
 {
-
   _pin  = pin;
   //_state = false;
   _OutBits->clr(_pin);
-  if(_pin < _MaxOnboardPin) {
-      pinMode(_pin, OUTPUT);    // set pin to input
-  }
+  if(_pin < _MaxOnboardPin) { pinMode(_pin, OUTPUT); }
   set(0);
 }
 

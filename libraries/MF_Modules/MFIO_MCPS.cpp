@@ -5,16 +5,18 @@
 #include "MFIO_MCPS.h"
 
 MFIO_MCPS::
-MFIO_MCPS(byte nUnits, byte addr)
-: MCP23x17(nUnits, addr)
+MFIO_MCPS(void)
+: MCP23x17()
 {
-    _npins = 4;
-    //_initialized = false;
+    npins(4);
+    // initialize(false);
 }
 
 void MFIO_MCPS::
-attach(int dataInPin, int dataOutPin, int csPin, int clkPin)
+attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte nUnits)
 {
+    MCP23x17::init(addr, nUnits);
+
     // We should check that the pin nr. values are legal!
     MCPDTI = dataInPin;
     MCPDTO = dataOutPin;
@@ -26,7 +28,7 @@ attach(int dataInPin, int dataOutPin, int csPin, int clkPin)
     pinMode(MCPDTO, OUTPUT); digitalWrite(MCPDTO, HIGH);
     pinMode(MCPDTI, INPUT_PULLUP);
 
-    _initialized = true;
+    initialize(true);
 }
 
 void MFIO_MCPS::
@@ -36,7 +38,7 @@ detach()
     pinMode(MCPCLK, INPUT_PULLUP);
     pinMode(MCPDTO, INPUT_PULLUP);
     pinMode(MCPDTI, INPUT_PULLUP);
-    _initialized = false;
+    initialize(false);
 }
 
 void MFIO_MCPS::

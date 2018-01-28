@@ -55,8 +55,10 @@ private:
     void          writeW(byte adr, byte reg, unsigned int val);
 
 public:
-    MFIO_MCPS(byte nUnits, byte addr);
-    void    attach(int dataInPin, int dataOutPin, int csPin, int clkPin);
+    MFIO_MCPS(void);
+    void    attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte nUnits=1);
+
+    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5]); }    // name unused
     void    detach();
 
 };

@@ -18,6 +18,7 @@ char foo;
 //void AddLcdDisplay(uint8_t address = 0x24, uint8_t cols = 16, uint8_t lines = 2, String name = "LCD")
 ///END NOTE
 
+#define COMPUTE_OBJ_SIZES
 //#define DEBUG 0
 #define MTYPE_MEGA 1
 #define MTYPE_MICRO 2
@@ -93,25 +94,32 @@ char foo;
 #define NUM_VLINES      MAX_LINES-MODULE_MAX_PINS // Includes actual+virtual pins
 
 #include <EEPROMex.h>
-#include <CmdMessenger.h>  // CmdMessenger
-#include <LedControl.h>    //  need the library
-#include <Button.h>
-#include <TicksPerSecond.h>
-//#include <RotaryEncoder.h>
-#include <RotaryEncoderShd.h>
-#include <Wire.h>
-#include <MFSegments.h> //  need the library
-//#include <MFButton.h>
-#include <MFButtonT.h>
-#include <MFEncoder.h>
-#include <AccelStepper.h>
-#include <MFStepper.h>
-#include <Servo.h>
-#include <MFServo.h>
-#include <MFOutput.h>
-#include <LiquidCrystal_I2C.h>
-#include <MFLCDDisplay.h>
 #include <bitStore.h>   //GCC
+#include <CmdMessenger.h>  // CmdMessenger
+#include <TicksPerSecond.h>
+#include <Wire.h>
+
+#include <MFButtonT.h>        //#include <MFButton.h>
+#include <MFOutput.h>
+//#include <Button.h>
+//#include <RotaryEncoder.h>
+//#include <RotaryEncoderShd.h>
+#include <MFEncoder.h>
+//#include <LedControl.h>     //  need the library
+#include <MFSegments.h>       //  need the library
+//#include <Servo.h>
+#include <MFServo.h>
+//#include <AccelStepper.h>
+#include <MFStepper.h>
+//#include <LiquidCrystal_I2C.h>
+#include <MFLCDDisplay.h>
+#include <MFInputMtx.h>
+#include <MFInput165.h>
+#include <MFOutput595.h>
+#include <MFOutLEDDM13.h>
+//#include <MFOutLED5940.h>
+#include <MFIO_MCPS.h>
+#include <MFIO_MCP0.h>
 
 const byte MEM_OFFSET_NAME   = 0;
 const byte MEM_LEN_NAME      = 48;
@@ -207,6 +215,44 @@ bitStore<byte>  InStatus   (inStatusBuf,    roundUp(MAX_BUTTONS));
 bitStore<byte>  InStatusUpd(inStatusUpdBuf, roundUp(MAX_BUTTONS));
 bitStore<byte>  OutStatus  (outStatusBuf,   roundUp(MAX_OUTPUTS));
 
+#ifdef COMPUTE_OBJ_SIZES
+const byte OBJ_SIZE[] = {
+  sizeof(MFButtonT),
+  sizeof(MFOutput),
+  sizeof(MFEncoder),
+  sizeof(MFSegments),
+  sizeof(MFServo),
+  sizeof(MFStepper),
+  sizeof(MFLCDDisplay),
+  sizeof(MFInputMtx),
+  sizeof(MFInput165),
+  sizeof(MFOutput595),
+  sizeof(MFOutLEDDM13),
+  0, //sizeof MFOutLED5940,
+  sizeof(MFIO_MCPS),
+  sizeof(MFIO_MCP0),
+  sizeof(MFPeripheral),
+};
+
+//struct {
+MFButtonT     SAMPLE_but;
+MFOutput      SAMPLE_out;
+MFEncoder     SAMPLE_enc;
+MFSegments    SAMPLE_seg;
+MF_LedControl    SAMPLE_LedCtrl(1,2,3,4);
+MFServo       SAMPLE_srv;
+MFStepper     SAMPLE_stp;
+MFLCDDisplay  SAMPLE_LCD;
+MFInputMtx    SAMPLE_inMtx;
+MFInput165    SAMPLE_in165;
+MFOutput595   SAMPLE_out595;
+MFOutLEDDM13  SAMPLE_LEDDM13;
+//MFOutLED5940;
+MFIO_MCPS     SAMPLE_MCPS;
+MFIO_MCP0     SAMPLE_MCP0;
+//MFPeripheral  MFPer;
+//} OBJ_SAMPLE;
+#endif // COMPUTE_OBJ_SIZES
 
 enum
 {
@@ -221,7 +267,7 @@ enum
   // New IO bank peripherals (GCC 2018-01):
   kTypeInputMtx,      // 8
   kTypeInput165,      // 9
-  kTypeOutput565,     // 10
+  kTypeOutput595,     // 10
   kTypeOutLEDDM13,    // 11
   kTypeOutLED5940,    // 12
   kTypeInOutMCPS,     // 13
@@ -312,6 +358,11 @@ void setup()
   attachCommandCallbacks();
   OnResetBoard();
   cmdMessenger.printLfCr();
+#ifdef COMPUTE_OBJ_SIZES
+  // Just required so the compiler doesn't dismiss OBJ_SIZE because unused
+  if(OBJ_SIZE[0])
+    cmdMessenger.printLfCr();
+#endif // COMPUTE_OBJ_SIZES
 }
 
 void generateSerial(bool force)
@@ -439,7 +490,7 @@ void clearRegisteredPins(byte type) {
     case kTypeStepper:
         // Stepper array is made of pointers, must write its separate code
         for(byte i=0; i<steppersRegistered; i++) {
-            np = steppers[i]->NPins();
+            np = steppers[i]->pinCount();
             steppers[i]->getPins(p);
             for(byte k=0; k<np; k++) pinsRegistered.clr(p[k]);
         }
@@ -450,7 +501,7 @@ void clearRegisteredPins(byte type) {
     // Clearing any of the peripheral types clears all peripherals!
     case kTypeInputMtx:
     case kTypeInput165:
-    case kTypeOutput565:
+    case kTypeOutput595:
     case kTypeOutLEDDM13:
     case kTypeOutLED5940:
     case kTypeInOutMCPS:
@@ -463,13 +514,113 @@ void clearRegisteredPins(byte type) {
   }
   if(ne) {
       for(byte i=0; i<ne; i++) {
-          np = mfp[i].NPins();
+          np = mfp[i].pinCount();
           mfp[i].getPins(p);
           for(byte k=0; k<np; k++) pinsRegistered.clr(p[k]);
       }
   }
 
 }
+
+///************************************************************************************************
+// Registration macro
+
+// Object array version:
+#define Mregister(x, xNRegd, MAX_x, pinList, nPins, Name) \
+{ \
+    byte j;\
+    if (xNRegd < MAX_x) {\
+        for(j=0; j<nPins; j++) if(isPinRegistered(pinList[j])) break; \
+        if(j == nPins) {\
+            x[xNRegd].attach(pinList, Name); \
+            for(j=0; j<nPins; j++) registerPin(pinList[j]); \
+            xNRegd++; \
+        }\
+    } \
+}
+
+#define Munreg(x, xNRegd) \
+{ \
+    for (byte j=0; j<xNRegd; j++) { \
+        x[xNRegd].detach(); \
+    } \
+    xNRegd = 0; \
+}
+/*
+// custom section following: e.g.
+if(xNRegd == 1) {
+    MFButtonT::attachHandler(btnOnRelease, handlerOnRelease);
+    MFButtonT::attachHandler(btnOnPress, handlerOnRelease);
+}
+// end custom section
+*/
+
+// Object POINTER array version:
+// (see http://forum.arduino.cc/index.php?topic=376860.msg2598440#msg2598440)
+
+#define MregisterPtr(x, xNRegd, MAX_x, pinList, nPins, Name) \
+{ \
+    byte j;\
+    if (xNRegd < MAX_x) {\
+        for(j=0; j<nPins; j++) if(isPinRegistered(pinList[j])) break; \
+        if(j == nPins) {\
+            x[xNRegd] = new typeof(*x[0]); \
+            x[xNRegd]->attach(pinList, Name); \
+            for(j=0; j<nPins; j++) registerPin(pinList[j]); \
+            xNRegd++; \
+        }\
+    } \
+}
+
+#define MunregPtr(x, xNRegd) \
+{ \
+    for (byte j=0; j<xNRegd; j++) { \
+        x[xNRegd]->detach(); \
+        delete x[xNRegd]; x[xNRegd] = NULL;\
+    } \
+    xNRegd = 0; \
+}
+
+///=============///
+/// XXX ///
+///=============///
+/*
+void AddXXX (int a, int b, int c, String name)
+{
+    char    *pinList[?];    // define (common) at upper level
+    byte    nPins;          // define (common) at upper level
+
+    npins = 0;
+    pinList[nPins++] = a;
+    pinList[nPins++] = b;
+    pinList[nPins++] = c;
+    Mregister(XXX, XXXNRegd, MAX_XXX, pinList, nPins, name.toCharArray());
+    // .... custom ops ....
+#ifdef DEBUG
+    cmdMessenger.sendCmd(kStatus,"Added xxx");
+#endif
+}
+
+void ClearXXXs()
+{
+    Munreg(XXX, XXXNRegd);
+#ifdef DEBUG
+    cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
+#endif
+}
+
+///-------------------------------------------------------------------------------------------------
+
+XXX are:
+kTypeInputMtx
+kTypeInput165
+kTypeOutput595
+kTypeOutLEDDM13
+kTypeOutLED5940
+kTypeInOutMCPS
+kTypeInOutMCP0
+*/
+///************************************************************************************************
 
 ///========///
 /// OUTPUT ///
@@ -479,7 +630,8 @@ void AddOutput(uint8_t pin, String name)
 {
   if (outputsRegistered == MAX_OUTPUTS) return;
   if (isPinRegistered(pin)) return;
-  outputs[outputsRegistered] = MFOutput(pin);
+  //outputs[outputsRegistered] = MFOutput(pin);
+  outputs[outputsRegistered].attach(pin);
   registerPin(pin); //, kTypeOutput);
   outputsRegistered++;
 #ifdef DEBUG
@@ -504,17 +656,13 @@ void AddButton(uint8_t pin, String name)
   if (buttonsRegistered == MAX_BUTTONS) return;
   if (isPinRegistered(pin)) return;
 
-  buttons[buttonsRegistered] = MFButtonT(pin, name); //MFButton(pin, name);
+  //buttons[buttonsRegistered] = MFButtonT(pin, name);
+  buttons[buttonsRegistered].attach(pin);
   if(buttonsRegistered == 0) {
-    //buttons[buttonsRegistered].attachHandler(btnOnRelease, handlerOnRelease);
-    //buttons[buttonsRegistered].attachHandler(btnOnPress, handlerOnRelease);
-
-    //MFButton::attachHandler(btnOnRelease, handlerOnRelease);
-    //MFButton::attachHandler(btnOnPress, handlerOnRelease);
-    MFButtonT::attachHandler(btnOnRelease, handlerOnRelease);
-    MFButtonT::attachHandler(btnOnPress, handlerOnRelease);
-
-    // BitStore is set during initial setup
+      MFButtonT::attachHandler(handlerOnButton);
+      //MFButtonT::attachHandler(btnOnRelease, handlerOnRelease);
+      //MFButtonT::attachHandler(btnOnPress, handlerOnRelease);
+      // BitStore is set during initial setup
   }
   registerPin(pin); //, kTypeButton);
   buttonsRegistered++;
@@ -542,12 +690,13 @@ void AddEncoder(uint8_t pin1, uint8_t pin2, String name)
   if (isPinRegistered(pin1) || isPinRegistered(pin2)) return;
 
   encoders[encodersRegistered] = MFEncoder();
-  encoders[encodersRegistered].attach(pin1, pin2, name);
+  encoders[encodersRegistered].attach(pin1, pin2, encodersRegistered+1);
   if(encodersRegistered == 0) {
-  encoders[encodersRegistered].attachHandler(encLeft, handlerOnEncoder);
-  encoders[encodersRegistered].attachHandler(encLeftFast, handlerOnEncoder);
-  encoders[encodersRegistered].attachHandler(encRight, handlerOnEncoder);
-  encoders[encodersRegistered].attachHandler(encRightFast, handlerOnEncoder);
+      encoders[encodersRegistered].attachHandler(handlerOnEncoder);
+      //encoders[encodersRegistered].attachHandler(encLeft, handlerOnEncoder);
+      //encoders[encodersRegistered].attachHandler(encLeftFast, handlerOnEncoder);
+      //encoders[encodersRegistered].attachHandler(encRight, handlerOnEncoder);
+      //encoders[encodersRegistered].attachHandler(encRightFast, handlerOnEncoder);
   }
   registerPin(pin1); //, kTypeEncoder);
   registerPin(pin2); //, kTypeEncoder);
@@ -624,6 +773,12 @@ void AddStepper(int pin1, int pin2, int pin3, int pin4, int btnPin1)
 #endif
     return;
   }
+
+  byte      pList[4];
+  char      *nm;
+
+  //MregisterPtr(steppers, steppersRegistered, MAX_STEPPERS, pList, 4, nm);
+
   steppers[steppersRegistered] = new MFStepper(pin1, pin2, pin3, pin4 /*, btnPin1*/ ); // is our object
   steppers[steppersRegistered]->setMaxSpeed(STEPPER_SPEED);
   steppers[steppersRegistered]->setAcceleration(STEPPER_ACCEL);
@@ -705,73 +860,12 @@ void ClearLcdDisplays()
 }
 
 ///************************************************************************************************
-///=============///
-/// xxx ///
-///=============///
-/*
-void AddXXX (int a, int b, int c, String name)
-{
-  if (XXXRegistered == MAX_XXX) return;
-  XXX[XXXRegistered].attach(a, b, c);
-  XXXRegistered++;
-#ifdef DEBUG
-  cmdMessenger.sendCmd(kStatus,"Added xxx");
-#endif
-}
-
-void ClearXXXs()
-{
-  for (int i=0; i!=XXXRegistered; i++) {
-    XXX[XXXRegistered].detach();
-  }
-
-  XXXRegistered = 0;
-#ifdef DEBUG
-  cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
-#endif
-}
-
-///-------------------------------------------------------------------------------------------------
-kTypeInputMtx
-kTypeInput165
-kTypeOutput565
-kTypeOutLEDDM13
-kTypeOutLED5940
-kTypeInOutMCPS
-kTypeInOutMCP0
-
-///=============///
-/// xxx ///
-///=============///
-void AddXXX(int a, int b, int c, String name)
-{
-  if (XXXRegistered == MAX_XXX) return;
-  XXX[XXXRegistered].attach(a, b, c);
-  XXXRegistered++;
-#ifdef DEBUG
-  cmdMessenger.sendCmd(kStatus,"Added xxx");
-#endif
-}
-
-void ClearXXXs()
-{
-  for (int i=0; i!=XXXRegistered; i++) {
-    XXX[XXXRegistered].detach();
-  }
-
-  XXXRegistered = 0;
-#ifdef DEBUG
-  cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
-#endif
-}
-*/
-///************************************************************************************************
 
 
 ///================///
 /// EVENT HANDLERS ///
 ///================///
-void handlerOnRelease(byte eventId, uint8_t pin, String name)
+void handlerOnButton(byte eventId, uint8_t pin, const char *name)  //String name)
 {
   cmdMessenger.sendCmdStart(kButtonChange);
   cmdMessenger.sendCmdArg(name);
@@ -779,7 +873,7 @@ void handlerOnRelease(byte eventId, uint8_t pin, String name)
   cmdMessenger.sendCmdEnd();
 };
 
-void handlerOnEncoder(byte eventId, uint8_t pin, String name)
+void handlerOnEncoder(byte eventId, uint8_t pin, const char *name)  //String name)
 {
   cmdMessenger.sendCmdStart(kEncoderChange);
   cmdMessenger.sendCmdArg(name);
@@ -917,9 +1011,9 @@ void readConfig(String cfg) {
         ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
         ///AddInput165(....);
       break;
-      case kTypeOutput565:
+      case kTypeOutput595:
         ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
-        ///AddOutput565(....);
+        ///AddOutput595(....);
       break;
       case kTypeOutLEDDM13:
         ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name

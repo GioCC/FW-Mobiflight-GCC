@@ -16,7 +16,7 @@
 #include <wiring.h>
 #endif
 
-#include "../LedControl/LedControl.h"
+#include <MF_LedControl.h>
 #include <MFPeripheral.h>
 
 /////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ public:
     void attach(int dataPin, int csPin, int clkPin, int moduleCount, int brightness);
     void display(byte module, char *string, byte points, byte mask, bool convertPoints = false);
 
-    void attach(int *params, char *name) {} //TODO generic attach()
+    void attach(byte *pm, char *name)  { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
     void detach(void);
     void update(byte *send, byte *get) {}
 
@@ -39,12 +39,12 @@ public:
     void setBrightness(int module, int value);
 
 protected:
-    byte    pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
+    byte pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
-    //bool        _initialized;
-    LedControl  *_ledControl;
-    byte        _moduleCount;
-    byte        _pin[3];
+    MF_LedControl *_ledControl;
+    byte          *_digitBuf;
+    byte          _moduleCount;
+    byte          _pin[3];
 };
 #endif

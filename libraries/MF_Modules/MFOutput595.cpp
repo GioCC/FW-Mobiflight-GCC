@@ -10,7 +10,7 @@ MFOutput595::MFOutput595()
 , _store(NULL)
 #endif
 {
-  //_initialized = false;
+  // initialize(false);
 }
 
 void MFOutput595::attach(int dataPin, int csPin, int clkPin, int moduleCount)
@@ -30,7 +30,7 @@ void MFOutput595::attach(int dataPin, int csPin, int clkPin, int moduleCount)
     digitalWrite(DTA595, LOW);
 
     _moduleCount = moduleCount;
-    _initialized = true;
+    initialize(true);
 }
 
 void MFOutput595::detach()
@@ -38,7 +38,7 @@ void MFOutput595::detach()
     pinMode(LAT595, INPUT_PULLUP);
     pinMode(CLK595, INPUT_PULLUP);
     pinMode(DTA595, INPUT_PULLUP);
-    _initialized = false;
+    initialize(false);
 }
 
 #ifdef USE_BITSTORE
@@ -51,7 +51,7 @@ void MFOutput595::bind(bitStore<byte> *store, byte slot)
 
 void MFOutput595::send(byte *pattern)
 {
-    if(!_initialized) return;
+    if(!initialized()) return;
 #ifdef USE_BITSTORE
     if(!pattern && _store) pattern = _store->bank(_base);
 #endif
@@ -77,12 +77,11 @@ void MFOutput595::send(byte *pattern)
 
 void MFOutput595::test(void)
 {
-    if (!_initialized) return;
+    if (!initialized()) return;
 
     byte _delay = 10;
     byte module = 0;
     byte dout = 0;
-    byte mask = 0xff;
     byte buf[_moduleCount];
 
     for (module=0; module<_moduleCount; module++) {

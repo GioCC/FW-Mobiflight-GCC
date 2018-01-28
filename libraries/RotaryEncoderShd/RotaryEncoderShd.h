@@ -22,7 +22,7 @@
 
 #include "Arduino.h"
 #include <TicksPerSecond.h>
-#include <Button.h>
+//#include <Button.h>
 
 
 #define LATCHSTATE 3
@@ -48,42 +48,48 @@
  */
 #define TICKS_AT_MAX_SPEED_FOR_FULL_SPAN 30
 
+#define LINE_DEBOUNCE_MS   5
+
 class RotaryEncoderShd
 {
 public:
-  // ----- Constructor -----
-  void initialize(int pin1, int pin2);
+  RotaryEncoderShd(void) {}
 
-  void setMinMax(long min, long max);
+  void  initialize(byte pin1, byte pin2);
+
+  void  setMinMax(long min, long max);
 
   // retrieve the current position
-  int  getPosition();
+  int   getPosition();
 
   // adjust the current position
-  void setPosition(int newPosition);
+  void  setPosition(int newPosition);
 
   // call this function every some milliseconds or by using an interrupt for handling state changes of the rotary encoder.
-  void tick(void);
+  void  tick(void);
+
+  byte  pin(byte n) { return (n==1 ? _pin1 : (n==2 ? _pin2 : 0xFF)); }
 
 private:
-  Button  _pin1, _pin2; // Arduino pins used for the encoder.
 
-  int8_t  _oldState;
-
-  int     _position;     // Internal position (4 times _positionExt)
-  int     _positionExt;  // External position
+  byte    _pin1, _pin2;   // Arduino pins used for the encoder.
+  byte    _state;
+  unsigned long lastToggleTime;
+  int     _position;      // Internal position (4 times _positionExt)
+  int     _positionExt;   // External position
 
   long    _minValue;
   long    _maxValue;
 
-  uint8_t _id;
+  //uint8_t _id;
+#define _id   _pin1   // Use pin no. as ID (this implies no shared pins!)
 
   // Define a shared TicksPerSecond object for all RotaryEncoders
   // This means that only one encoder at a time can be activated!
   static TicksPerSecond   _tps;
 
-  long calcSpeed(void);   // calcSpeed made private (if the TPS is shared, result won't be correct)
-
+  long  calcSpeed(void);   // calcSpeed made private (if the TPS is shared, result won't be correct)
+  void  updatePins(void);
 };
 
 #endif // ROTARY_ENC_SHD_H

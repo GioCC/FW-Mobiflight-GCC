@@ -5,15 +5,26 @@
 #include "MFButtonT.h"
 
 // Static handler pointers and vars
-buttonEvent      MFButtonT::_handler[2];
+buttonEvent      MFButtonT::_handler;
 bitStore<byte>  *MFButtonT::_InBits;
 bitStore<byte>  *MFButtonT::_InBitsUpdate;
 byte             MFButtonT::_MaxOnboardPin;
-String           MFButtonT::nameStr("12345"); // Pre-allocate, assuring 5+1 chars width
+//String           MFButtonT::_nameStr("12345"); // Pre-allocate, assuring 5+1 chars width
 
-void MFButtonT::attachHandler(byte eventId, buttonEvent newHandler)
+void MFButtonT::attach(uint8_t pin)
 {
-    MFButtonT::_handler[eventId] = newHandler;
+  _pin  = pin;
+  _InBits->set(_pin);
+  if(_pin < _MaxOnboardPin) {
+    pinMode(_pin, INPUT);     // set pin to input
+    digitalWrite(_pin, HIGH); // turn on pullup resistors
+  }
+}
+
+void MFButtonT::attachHandler(/*byte eventId, */ buttonEvent newHandler)
+{
+    //MFButtonT::_handler[eventId] = newHandler;
+    MFButtonT::_handler = newHandler;
 }
 
 // setBitStore() requires <maxOBPin> in order to know whether to use digitalRead
@@ -23,19 +34,6 @@ void MFButtonT::setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, 
     MFButtonT::_InBits         = status;
     MFButtonT::_InBitsUpdate   = upd_status;
     MFButtonT::_MaxOnboardPin  = maxOBPin;
-}
-
-MFButtonT::MFButtonT(uint8_t pin, String name)
-{
-  _pin  = pin;
-  //_name = name;
-  //_last = millis();
-  //_state = 1;
-  _InBits->set(_pin);
-  if(_pin < _MaxOnboardPin) {
-    pinMode(_pin, INPUT);     // set pin to input
-    digitalWrite(_pin, HIGH); // turn on pullup resistors
-  }
 }
 
 void MFButtonT::update()
@@ -53,16 +51,18 @@ void MFButtonT::update()
 void MFButtonT::trigger()
 {
       char pt[5];
-      char *pc = pt;
-      *pc++ = 'F';
-      if(_pin < 100) *pc++ = '0';
-      if(_pin < 10)  *pc++ = '0';
-      itoa(_pin, pc, 10);
-      nameStr = pt;
+      *pt = 'B';
+      fast_itoa(&pt[1], _pin);
+      //_nameStr = pt;
+
+      if (_handler) {(*_handler)((_InBits->get(_pin)==LOW ? btnOnPress : btnOnRelease), _pin, pt); } //_nameStr); }
+
+      /*
       if (_InBits->get(_pin)==LOW && _handler[btnOnPress]!= NULL) {
-        (*_handler[btnOnPress])(btnOnPress, _pin, nameStr);
+        (*_handler[btnOnPress])(btnOnPress, _pin, _nameStr);
       }
       else if (_handler[btnOnRelease] != NULL)
-        (*_handler[btnOnRelease])(btnOnRelease, _pin, nameStr);
+        (*_handler[btnOnRelease])(btnOnRelease, _pin, _nameStr);
+      */
 }
 

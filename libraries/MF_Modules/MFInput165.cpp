@@ -10,7 +10,7 @@ MFInput165::MFInput165()
 , _store(NULL)
 #endif
 {
-  //_initialized = false;
+  // initialize(false);
 }
 
 void MFInput165::attach(int dataPin, int csPin, int clkPin, int moduleCount)
@@ -29,7 +29,7 @@ void MFInput165::attach(int dataPin, int csPin, int clkPin, int moduleCount)
     digitalWrite(LAT165, HIGH);
 
     _moduleCount = moduleCount;
-    _initialized = true;
+    initialize(true);
 }
 
 void MFInput165::detach()
@@ -37,7 +37,7 @@ void MFInput165::detach()
     pinMode(LAT165, INPUT_PULLUP);
     pinMode(CLK165, INPUT_PULLUP);
     pinMode(DTA165, INPUT_PULLUP);
-    _initialized = false;
+    initialize(false);
 }
 
 #ifdef USE_BITSTORE
@@ -50,7 +50,7 @@ void MFInput165::bind(bitStore<byte> *store, byte slot)
 
 void MFInput165::update(byte *dest)
 {
-    if(!_initialized) return;
+    if(!initialized()) return;
 #ifdef USE_BITSTORE
     if(!dest && _store) dest = _store->bank(_base);
 #endif

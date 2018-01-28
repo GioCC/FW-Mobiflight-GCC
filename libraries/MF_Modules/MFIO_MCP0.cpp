@@ -5,35 +5,44 @@
 #include "MFIO_MCP0.h"
 
 MFIO_MCP0::
-MFIO_MCP0(byte nUnits, byte addr)
-: MCP23x17(nUnits, addr)
+MFIO_MCP0(void)
+: MCP23x17()
 {
-    //_initialized = false;
-    _npins = 2;
+    // initialize(false);
+    npins(2);
 }
 
 void MFIO_MCP0::
-attach(int SDAPin, int SCLPin)
+attach(byte addr, byte SDAPin, byte SCLPin, byte nUnits)    // Any pin =0xFF means we are using HW I2C
 {
-    if(SCLPin && SDAPin) {
+    MCP23x17::init(addr, nUnits);
+    if(SCLPin!=0xFF && SDAPin!=0xFF) {
         if(SCLPin == SDAPin) return;
         // Not using standard I2C pins:
         // setup a non-std I2C SW library instead of <Wire>
+        MCPSDA = SDAPin;
+        MCPSCL = SCLPin;
         SWI2C = new SlowSoftI2CMaster(SDAPin, SCLPin, true);
         SWI2C->i2c_init();
     } else {
+        MCPSDA = 0xFF;
+        MCPSCL = 0xFF;
         SWI2C = NULL;
         // Either pin value =0 means we are using HW I2C
         //TODO Check that no I2C transfer is pending, if I2C is shared
         Wire.begin();
     }
-    _initialized = true;
+    initialize(true);
 }
 
 void MFIO_MCP0::
 detach()
 {
-    _initialized = false;
+    if(MCPSDA!=0xFF && MCPSCL!=0xFF) {
+        pinMode(MCPSDA, INPUT_PULLUP);
+        pinMode(MCPSCL, INPUT_PULLUP);
+    }
+    initialize(false);
 }
 
 // Generic register R/W functions (byte/word-wise)

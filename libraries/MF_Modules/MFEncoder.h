@@ -21,12 +21,13 @@
 ///#include "../TicksPerSecond/TicksPerSecond.h"
 ///#include "../RotaryEncoderAcelleration/RotaryEncoderAcelleration.h"
 ///#include <RotaryEncoder.h>
+#include <MFUtility.h>
 #include <RotaryEncoderShd.h>
 #include <MFPeripheral.h>
 
 extern "C"
 {
-  typedef void (*encoderEvent) (byte, uint8_t, const String);
+  typedef void (*encoderEvent) (byte, uint8_t, const char *); //String);
 };
 
 #define MF_ENC_MIN -2147483647
@@ -46,26 +47,28 @@ class MFEncoder
 : public MFPeripheral
 {
 public:
-    static void attachHandler(byte eventId, encoderEvent newHandler);
-    MFEncoder();
+    MFEncoder(void);
+    //static void attachHandler(byte eventId, encoderEvent newHandler);
+    static void attachHandler(encoderEvent newHandler);
     void update(void);
-    void attach(uint8_t pin1, uint8_t pin2, String name = "Encoder");
+    void attach(byte pin1, byte pin2, byte encno); //String name = "Encoder");
 
-    void attach(int *params, char *name) {}    //TODO generic attach()
+    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2]); } //name); }
     void detach(void) {};
     void update(byte *send, byte *get)  { update(); }
-    byte getPins(byte *dst)             { dst[0] = _pin1; dst[1] = _pin2; return _npins; }
+    byte getPins(byte *dst)             { dst[0] = _encoder.pin(1); dst[1] = _encoder.pin(2); return npins(); }
 
 protected:
-    byte    pins(byte n) { return (n==0 ? _pin1 : (n==1 ? _pin2 : 0xFF)); }
+    byte    pins(byte n) { return _encoder.pin(n+1); }
 
 private:
-    //bool                      _initialized;
-    static encoderEvent       _handler[4];
-    uint8_t                   _pin1;
-    uint8_t                   _pin2;
+    static encoderEvent       _handler; //[4];
+    //uint8_t                   _pin1;  // contained in _encoder
+    //uint8_t                   _pin2;  // contained in _encoder
     RotaryEncoderShd          _encoder;
-    String                    _name;
+    //String                    _name;
+    char                      _name[2];
+
     long                      _pos;
 };
 #endif

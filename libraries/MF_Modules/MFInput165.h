@@ -45,7 +45,7 @@ public:
     void update(byte *dest = NULL);
     void attach(int dataPin, int csPin, int clkPin, int moduleCount);
 
-    void attach(int *params, char *name) {} //TODO generic attach()
+    void attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
     void detach(void);
     void update(byte *send, byte *get) { update(get); }
 
@@ -55,8 +55,8 @@ protected:
     byte pins(byte n) { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
-    byte        _moduleCount;
-    byte        _pin[3];
+    byte    _moduleCount;
+    byte    _pin[3];
 
 #ifdef USE_BITSTORE
     bitStore<byte>  *_store;

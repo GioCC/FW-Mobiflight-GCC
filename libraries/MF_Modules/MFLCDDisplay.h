@@ -31,10 +31,10 @@ public:
     void display(char *string);
     void attach(byte address, byte cols, byte lines);
 
-    void attach(int *params, char *name) {} //TODO generic attach()
+    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2]); }    // name unused
     void detach(void);
     void update(byte *send, byte *get)  {}
-    byte getPins(byte *dst)             { return _npins; }   ///TODO Should return the I2C pins for consistency
+    byte getPins(byte *dst)             { /* copy pin nos into dst */ return npins(); }   ///TODO Should return the I2C pins for consistency
 
     void test(void);
     void powerSavingMode(bool state);
@@ -44,8 +44,7 @@ protected:
 
 private:
     LiquidCrystal_I2C  *_lcdDisplay;
-    //bool    _initialized;
-    byte    _address;
+    byte  _address;
     byte	_cols;
     byte	_lines;
 };

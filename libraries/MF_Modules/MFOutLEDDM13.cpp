@@ -10,7 +10,7 @@ MFOutLEDDM13::MFOutLEDDM13()
 , _store(NULL)
 #endif
 {
-  //_initialized = false;
+  // initialize(false);
 }
 
 void MFOutLEDDM13::attach(int dataPin, int csPin, int clkPin, int oenPin, int moduleCount)
@@ -28,7 +28,7 @@ void MFOutLEDDM13::attach(int dataPin, int csPin, int clkPin, int oenPin, int mo
     if(oenPin > 0) { pinMode(OENDM13, OUTPUT); digitalWrite(OENDM13, LOW); }
 
     _moduleCount = moduleCount;
-    _initialized = true;
+    initialize(true);
 }
 
 void MFOutLEDDM13::detach(void)
@@ -37,7 +37,7 @@ void MFOutLEDDM13::detach(void)
     pinMode(CLKDM13, INPUT_PULLUP);
     pinMode(DTADM13, INPUT_PULLUP);
     if(OENDM13!=0xFF) pinMode(OENDM13, INPUT_PULLUP);
-    _initialized = false;
+    initialize(false);
 }
 
 #ifdef USE_BITSTORE
@@ -50,7 +50,7 @@ void MFOutLEDDM13::bind(bitStore<byte> *store, byte slot)
 
 void MFOutLEDDM13::send(byte *pattern)
 {
-    if(!_initialized) return;
+    if(!initialized()) return;
 #ifdef USE_BITSTORE
     if(!pattern && _store) pattern = _store->bank(_base);
 #endif
@@ -76,7 +76,7 @@ void MFOutLEDDM13::send(byte *pattern)
 
 void MFOutLEDDM13::test(void)
 {
-    if (!_initialized) return;
+    if (!initialized()) return;
 
     byte _delay = 10;
     byte buf[_moduleCount*2];

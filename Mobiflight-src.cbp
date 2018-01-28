@@ -660,7 +660,7 @@
 			<Add directory="libraries/CmdMessenger" />
 			<Add directory="libraries/CmdMessenger/utility" />
 			<Add directory="libraries/EEPROMEx" />
-			<Add directory="libraries/LedControl" />
+			<Add directory="libraries/MF_LedControl" />
 			<Add directory="libraries/LiquidCrystal-I2C" />
 			<Add directory="libraries/MF_Modules" />
 			<Add directory="libraries/RotaryEncoder" />
@@ -774,16 +774,6 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
-		<Unit filename="libraries/LedControl/LedControl.cpp">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/LedControl/LedControl.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
 		<Unit filename="libraries/LiquidCrystal-I2C/LiquidCrystal_I2C.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
@@ -794,17 +784,11 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_LedControl/MF_LedControl.cpp" />
+		<Unit filename="libraries/MF_LedControl/MF_LedControl.h" />
+		<Unit filename="libraries/MF_Modules/MCP23x17.cpp" />
+		<Unit filename="libraries/MF_Modules/MCP23x17.h" />
 		<Unit filename="libraries/MF_Modules/MFBoardMega.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/MF_Modules/MFButton.cpp">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/MF_Modules/MFButton.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
@@ -833,6 +817,10 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFIO_MCP0.cpp" />
+		<Unit filename="libraries/MF_Modules/MFIO_MCP0.h" />
+		<Unit filename="libraries/MF_Modules/MFIO_MCPS.cpp" />
+		<Unit filename="libraries/MF_Modules/MFIO_MCPS.h" />
 		<Unit filename="libraries/MF_Modules/MFInput165.cpp" />
 		<Unit filename="libraries/MF_Modules/MFInput165.h" />
 		<Unit filename="libraries/MF_Modules/MFInputMtx.cpp" />
@@ -912,18 +900,6 @@
 		</Unit>
 		<Unit filename="libraries/RotaryEncoderShd/RotaryEncoderShd.cpp" />
 		<Unit filename="libraries/RotaryEncoderShd/RotaryEncoderShd.h" />
-		<Unit filename="libraries/RotaryEncoder/RotaryEncoder.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/RotaryEncoder/RotaryEncoder.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
 		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.cpp" />
 		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.h" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp" />

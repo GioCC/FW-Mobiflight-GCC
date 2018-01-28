@@ -103,7 +103,6 @@ private:
     virtual void          writeW(byte adr, byte reg, unsigned int val) =0;
 
 protected:
-
 #ifdef USE_BITSTORE
     bitStore<byte>  *_store;
     byte            _base;
@@ -113,19 +112,25 @@ protected:
     byte    _address;
     byte    _pin[4];
 
+    byte    pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
+
 public:
 
-    MCP23x17(byte nUnits=1, byte addr=0);
+    MCP23x17(void);
     //~MCP23x17();
-
 #ifdef USE_BITSTORE
     void    bind(bitStore<byte> *store, byte slot);
 #endif
+    void    init(byte addr=0, byte nUnits=1);
 
-    byte    getPins(byte *dst) { for(byte i=0; i<_npins; i++) dst[i] = _pin[i]; return _npins; }
-    byte    getSize(void)      { return _nUnits * 2; }
-    void    test();
+    // These must be implemented by MFIO_MCPS and MFIO_MCP0//
+    // void    attach(byte *pm, char *name) { .... }
+    // void    detach(void) { .... };
+    void    update(byte *snd, byte *get) { refresh(snd, get); }
+    void    test()  {};
     void    powerSavingMode(bool state) { state++;}   // Not currently implemented
+
+    byte    getSize(void)      { return _nUnits * 2; }
 
     /// I/O setup functions
     /// <bank>  = 0..n
@@ -151,7 +156,7 @@ public:
 
     /// Buffered R/W functions (word-wise)
     // <unit> is 0..n (0xFF=all)
-    void    update(byte *ins = NULL, byte *outs = NULL, byte unit = 0xFF);
+    void refresh(byte *ins = NULL, byte *outs = NULL, byte unit = 0xFF);
 
     /// Setup Int outputs
     /// Configure the INT outputs. The configuration is common to both port A and B.

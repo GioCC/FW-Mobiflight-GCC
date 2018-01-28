@@ -7,12 +7,12 @@
 MFLCDDisplay::MFLCDDisplay()
 : MFPeripheral(2)
 {
-  //_initialized = false;
+  // initialize(false);
 }
 
 void MFLCDDisplay::display(char *string)
 {
-  if (!_initialized) return;
+  if (!initialized()) return;
   char readBuffer[21] = "";
   for(byte l=0;l!=_lines;l++) {
     _lcdDisplay->setCursor(0, l);
@@ -27,7 +27,7 @@ void MFLCDDisplay::attach(byte address, byte cols, byte lines)
   _cols = cols;
   _lines = lines;
   _lcdDisplay = new LiquidCrystal_I2C( (uint8_t)address, (uint8_t)cols, (uint8_t)lines );
-  _initialized = true;
+  initialize(true);
   _lcdDisplay->begin();
   _lcdDisplay->backlight();
   test();
@@ -35,9 +35,9 @@ void MFLCDDisplay::attach(byte address, byte cols, byte lines)
 
 void MFLCDDisplay::detach()
 {
-  if (!_initialized) return;
+  if (!initialized()) return;
   delete _lcdDisplay;
-  _initialized = false;
+  initialize(false);
 }
 
 void MFLCDDisplay::powerSavingMode(bool state)
@@ -49,7 +49,7 @@ void MFLCDDisplay::powerSavingMode(bool state)
 }
 
 void MFLCDDisplay::test() {
-  if (!_initialized) return;
+  if (!initialized()) return;
 
   _lcdDisplay->setCursor(0, (_lines/2)-1);
   for(byte c=0;c!=((_cols-10)/2);c++) {

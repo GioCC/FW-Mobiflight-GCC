@@ -20,11 +20,15 @@
 
 #include "MCP23x17.h"
 
-MCP23x17::MCP23x17(byte nUnits, byte addr)
+MCP23x17::MCP23x17(void)
 :MFPeripheral(0)
 #ifdef USE_BITSTORE
 , _store(NULL)
 #endif
+{}
+
+void MCP23x17::
+init(byte addr, byte nUnits)
 {
     _nUnits  = nUnits;
     _address = addr & 0x07;
@@ -40,8 +44,9 @@ bind(bitStore<byte> *store, byte slot)
 #endif
 
 void MCP23x17::
-update(byte *ins, byte *outs, byte unit)
+refresh(byte *ins, byte *outs, byte unit)
 {
+    if(!initialized()) return;
     byte          idx = 0;
     unsigned int    d = 0;
 #ifdef USE_BITSTORE

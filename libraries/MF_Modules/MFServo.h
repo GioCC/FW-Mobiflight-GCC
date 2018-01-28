@@ -25,28 +25,27 @@ class MFServo
 : public MFPeripheral
 {
 public:
-    MFServo();
+    MFServo(void);
     MFServo(uint8_t pin, bool enable = true);
     void attach(uint8_t pin = 1, bool enable = true);
     void update(void);
 
-    void attach(int *params, char *name) {}; //TODO generic attach()
+    void attach(byte *pm, char *name)  { attach(pm[0], pm[1]); }    // name unused
     void detach(void);
     void update(byte *send, byte *get) { update(); }
 
-    byte getPins(byte *dst) { if(dst){dst[0] = _pin;} return _npins; }
+    byte getPins(byte *dst) { if(dst){dst[0] = _pin;} return npins(); }
 
-	void setExternalRange(int min, int max);
-	void setInternalRange(int min, int max);
+    void setExternalRange(int min, int max);
+    void setInternalRange(int min, int max);
     void moveTo(int absolute);
 
 protected:
     byte    pins(byte n)    { return (n==0 ? _pin : 0xFF); }
 
 private:
-    //bool    _initialized;
     uint8_t _pin;
-    int		_mapRange[4];
+    int		  _mapRange[4];
     Servo   _servo;
     long    _targetPos;
     long    _currentPos;

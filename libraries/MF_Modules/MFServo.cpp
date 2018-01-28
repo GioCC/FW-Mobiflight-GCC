@@ -10,21 +10,21 @@ void MFServo::moveTo(int absolute)
     if (_targetPos != newValue)
     {
 			_targetPos = newValue;
-			if (!_initialized) {
+			if (!initialized()) {
 			  _servo.attach(_pin);
-				_initialized = true;
+			 initialize(true);
 			}
     }
 }
 
 void MFServo::update() {
-	// after reaching final position
-	// detach the servo to prevent continuous noise
+    // after reaching final position
+    // detach the servo to prevent continuous noise
     if (_currentPos == _targetPos) {
-		// detach();
-		return;
-	}
-
+        // servo.detach();
+        return;
+    }
+    if (!initialized()) return;
     //if ((millis()-_lastUpdate) < 5) return;
 
     if (_currentPos > _targetPos) _currentPos--;
@@ -35,15 +35,15 @@ void MFServo::update() {
 }
 
 void MFServo::detach() {
-  if (_initialized) {
+  if (initialized()) {
     _servo.detach();
-    _initialized = false;
+    initialize(false);
   }
 }
 
 void MFServo::attach(uint8_t pin, bool enable)
 {
-	//_initialized = false;
+	// initialize(false);
 	_targetPos = 0;
 	_currentPos = 0;
 	setExternalRange(0,180);

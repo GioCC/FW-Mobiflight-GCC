@@ -19,11 +19,12 @@
 #endif
 
 #include <bitStore.h>
+#include <MFUtility.h>
 
 extern "C"
 {
   // callback functions always follow the signature: void cmd(void);
-  typedef void (*buttonEvent) (byte, uint8_t, const String);
+  typedef void (*buttonEvent) (byte, uint8_t, const char *); //String);
 };
 
 enum
@@ -38,26 +39,31 @@ class MFButtonT
 {
 public:
     static void setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin);
-    static void attachHandler(byte eventId, buttonEvent newHandler);
+    static void attachHandler(buttonEvent newHandler);
 
     uint8_t       _pin;
     //String        _name;
 
-    MFButtonT(uint8_t pin = 1, String name = "Button");
-    void update();
-    void trigger();
+    MFButtonT(void) {}
+    void attach(uint8_t pin = 1);
+    byte getPin(void)                { return _pin; }
+    void trigger(void);
+    void update(void);
 
-    byte getPin(void) { return _pin; }
+    // Expose the same interface style as MFPeripheral, but without inheriting it (too much overhead and no real need)
+    byte NPins(void)                    { return 1; }
+    void attach(byte *pm, char *name)   { attach(pm[0]); }
+    void detach(void)                   {}
+    void update(byte *send, byte *get)  { update(); }
+    byte getPins(byte *dst)             { dst[0]=_pin; return 1; }
+    //void test(void) {};
+protected:
+    byte pins(byte n)    { return (n=0 ? _pin : 0xFF); }
 
 private:
-    static buttonEvent      _handler[2];
+    static buttonEvent      _handler;
     static bitStore<byte>   *_InBits;
     static bitStore<byte>   *_InBitsUpdate;
     static byte             _MaxOnboardPin;
-
-    //bool          _state; // now superceded by lookup into _bits
-    //long          _last;
-
-    static String nameStr;
 };
 #endif

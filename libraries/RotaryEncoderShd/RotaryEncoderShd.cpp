@@ -36,86 +36,78 @@ TicksPerSecond   RotaryEncoderShd::_tps;
 
 // ----- Initialization and Default Values -----
 
-void RotaryEncoderShd::initialize(int pin1, int pin2) {
+void RotaryEncoderShd::initialize(byte pin1, byte pin2) {
 
-  // Remember Hardware Setup
-  _pin1.initialize(pin1, 5);
-  _pin2.initialize(pin2, 5);
+    // Setup the input pins
+    _pin1 = pin1;
+    _pin2 = pin2;
+    pinMode(_pin1, INPUT_PULLUP);
+    pinMode(_pin2, INPUT_PULLUP);
+    // when not started in motion, the current state of the encoder should be 3
+    _state = 3;
 
-  _id = pin1;   // Use pin no. as ID (this implies no shared pins!)
-  /*
-  // Setup the input pins
-  pinMode(pin1, INPUT);
-  digitalWrite(pin1, HIGH);   // turn on pullup resistor
+    // start with position 0;
+    _position = 0;
+    _positionExt = 0;
 
-  pinMode(pin2, INPUT);
-  digitalWrite(pin2, HIGH);   // turn on pullup resistor
-*/
-  // when not started in motion, the current state of the encoder should be 3
-  _oldState = 3;
+    _minValue = 0;
+    _maxValue = 1000;
 
-  // start with position 0;
-  _position = 0;
-  _positionExt = 0;
-
-  _minValue = 0;
-  _maxValue = 1000;
-
-  _tps.initialize();  // Shared TPS is reset whenever a new encoder is initialized
+    _tps.initialize();  // Shared TPS is reset whenever a new encoder is initialized
 }
 
 
 void RotaryEncoderShd::setMinMax(long min, long max) {
-	_minValue = min;
-	_maxValue = max;
+    _minValue = min;
+    _maxValue = max;
 }
 
 
 int  RotaryEncoderShd::getPosition() {
-  return _positionExt;
+    return _positionExt;
 }
 
 void RotaryEncoderShd::setPosition(int newPosition) {
-  // only adjust the external part of the position.
-
-  _position = ((newPosition<<2) | (_position & 0x03));
-  _positionExt = newPosition;
-
+    // only adjust the external part of the position.
+    _position = ((newPosition<<2) | (_position & 0x03));
+    _positionExt = newPosition;
 }
 
 void RotaryEncoderShd::tick(void)
 {
-  _pin1.update(); // toggle
-  _pin2.update(); // direction
-  int sig1 = _pin1.isDown();
-  int sig2 = _pin2.isDown();
-  int8_t thisState = sig1 | (sig2 << 1);
-  _tps.update(_id, false);
+    _tps.update(_id, false);
 
-  if (_oldState != thisState) {
-	int _speed = calcSpeed();
-	_position += KNOBDIR[thisState | (_oldState<<2)] * _speed;
+    byte curState = _state;//sig1 | (sig2 << 1);
+    byte newState;
+    newState = (digitalRead(_pin1)==LOW ? 0x01 : 0);
+    newState |= (digitalRead(_pin2)==LOW ? 0x02 : 0);
 
-    if (thisState == LATCHSTATE) {
-	  _tps.update(_id, true);
-
-      _positionExt = (_position >> 2);
-	}
-
-    _oldState = thisState;
-  }// if
+    long now = millis();
+    if (newState != _state) {
+        if (now - lastToggleTime >= LINE_DEBOUNCE_MS) {
+            // Button state has not changed for #debounce# milliseconds. Consider it is stable.
+            int _speed = calcSpeed();
+            _position += KNOBDIR[newState | (_state<<2)] * _speed;
+            if (newState == LATCHSTATE) {
+                _tps.update(_id, true);
+                _positionExt = (_position >> 2);
+            }
+            _state = newState;
+        }
+        lastToggleTime = now;
+    } else if (now - lastToggleTime >= LINE_DEBOUNCE_MS) {
+        // Forward the last toggle time a bit
+        lastToggleTime = now - LINE_DEBOUNCE_MS - 1;
+    }
 } // tick()
 
 long RotaryEncoderShd::calcSpeed(void)
 {
-	int speed = constrain(_tps.getIntTPS_unsafe(), MIN_TPS, MAX_TPS) - MIN_TPS;
-	long delta = max(1, (_maxValue - _minValue) / TICKS_AT_MAX_SPEED_FOR_FULL_SPAN);
-
-	// Exponential acceleration - cubic (most comfortable)
-	long step = 1 + delta * speed * speed * speed /
-			((MAX_TPS - MIN_TPS) * (MAX_TPS - MIN_TPS) * (MAX_TPS - MIN_TPS));
-
-	return step;
+    int speed = constrain(_tps.getIntTPS_unsafe(), MIN_TPS, MAX_TPS) - MIN_TPS;
+    long delta = max(1, (_maxValue - _minValue) / TICKS_AT_MAX_SPEED_FOR_FULL_SPAN);
+    // Exponential acceleration - cubic (most comfortable)
+    long step = 1 + delta * speed * speed * speed /
+        ((MAX_TPS - MIN_TPS) * (MAX_TPS - MIN_TPS) * (MAX_TPS - MIN_TPS));
+    return step;
 }
-
 // End

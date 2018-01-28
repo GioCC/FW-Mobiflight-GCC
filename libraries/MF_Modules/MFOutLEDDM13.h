@@ -45,7 +45,7 @@ public:
     void attach(int dataPin, int csPin, int clkPin, int oenPin, int moduleCount);
     void send(byte *pattern = NULL);
 
-    void attach(int *params, char *name) {}; //TODO generic attach()
+    void attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
     void detach(void);
     void update(byte *snd, byte *get) { send(snd); }
 

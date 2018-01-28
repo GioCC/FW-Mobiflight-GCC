@@ -23,22 +23,25 @@
 class MFPeripheral
 {
 public:
-    MFPeripheral(uint8_t npins) : _npins(npins), _initialized(false) { };
-    virtual byte NPins(void);
+    MFPeripheral(uint8_t npins) : _npins(npins&0x7F) { };
+    virtual byte pinCount(void);
     virtual byte getPins(byte *dst);
 
-    virtual void attach(int *params, char *name) =0;
+    virtual void attach(byte *params, char *name) =0;
     virtual void detach(void) {};
     virtual void update(byte *send, byte *get) {};
     virtual void test(void) {};
     virtual byte pins(byte i) =0;
 
 protected:
-    byte    _npins;
-    bool    _initialized;
+    byte initialized(void) { return((_npins&0x80)!=0); }
+    void initialize(byte on) { if(on){_npins|=0x80;} else {_npins&=0x7F;} }
+
+    byte npins(byte n = 0xFF) { if(n!=0xFF) {_npins=(_npins&0x80)+(n&0x7F);} return (_npins&0x7F); }
 
 private:
-    // none
+    byte    _npins;   // bit 7 is the 'initialized' flag
+    //bool    _initialized;
 };
 
 #endif // MFPERIPHERAL_H_INCLUDED
