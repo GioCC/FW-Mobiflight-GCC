@@ -92,6 +92,13 @@ class MF_LedControl {
  public:
     /*
      * Create a new controller
+     * Neutral constructor - used for preallocation, will be setup by init()
+     */
+    MF_LedControl(void)
+    :numDevices(0) {};
+
+    /*
+     * Create a new controller
      * Params :
      * dataPin		pin on the Arduino where data gets shifted out
      * clockPin		pin for the clock
@@ -99,6 +106,13 @@ class MF_LedControl {
      * numDevices	maximum number of devices that can be controled
      */
     MF_LedControl(byte dataPin, byte clkPin, byte csPin, byte numDevices=1);
+
+    /*
+     * Init a new controller (when neutral constructor was used)
+     * Params :
+     * see constructor
+     */
+    void init(byte dataPin, byte clkPin, byte csPin, byte numDevices=1);
 
     /*
      * Sets the reference to the external digit buffer (size can be custom-tailored).

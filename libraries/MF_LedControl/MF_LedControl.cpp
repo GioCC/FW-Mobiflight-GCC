@@ -56,20 +56,24 @@
 
 byte MF_LedControl::spidata[16];
 
-
 MF_LedControl::MF_LedControl(byte dataPin, byte clkPin, byte csPin, byte numUnits)
 {
+    init(dataPin, clkPin, csPin, numUnits);
+}
+
+void MF_LedControl::init(byte dataPin, byte clkPin, byte csPin, byte numUnits)
+{
+    if(!numUnits) return;
     SPI_MOSI=dataPin;
     SPI_CLK=clkPin;
     SPI_CS=csPin;
-    if(numUnits<=0 || numUnits>8 ) numUnits=8;
+    if(numUnits>8) numUnits=8;
     numDevices=numUnits;
     pinMode(SPI_MOSI,OUTPUT);
     pinMode(SPI_CLK,OUTPUT);
     pinMode(SPI_CS,OUTPUT);
     digitalWrite(SPI_CS,HIGH);
-    SPI_MOSI=dataPin;
-    // for(int i=0;i<64;i++) status[i]=0x00; // removed 2018-01 by GCC
+    if(digits) { for(int i=0;i<numDevices*8;i++) digits[i]=0x00; }
     for(int i=0;i<numDevices;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
         //scanlimit is set to max on startup
@@ -89,8 +93,7 @@ byte MF_LedControl::getDeviceCount()
 
 void MF_LedControl::shutdown(byte addr, bool b)
 {
-    if(addr<0 || addr>=numDevices)
-	return;
+    if(addr>=numDevices) return;
     if(b)
         spiTransfer(addr, OP_SHUTDOWN,0);
     else
@@ -98,15 +101,13 @@ void MF_LedControl::shutdown(byte addr, bool b)
 }
 
 void MF_LedControl::setScanLimit(byte addr, byte limit) {
-    if(addr<0 || addr>=numDevices)
-        return;
+    if(addr>=numDevices) return;
     if(limit>=0 || limit<8)
         spiTransfer(addr, OP_SCANLIMIT,limit);
 }
 
 void MF_LedControl::setIntensity(byte addr, byte intensity) {
-    if(addr<0 || addr>=numDevices)
-        return;
+    if(addr>=numDevices) return;
     if(intensity>=0 || intensity<16)
         spiTransfer(addr, OP_INTENSITY,intensity);
 
@@ -115,8 +116,7 @@ void MF_LedControl::setIntensity(byte addr, byte intensity) {
 void MF_LedControl::clearDisplay(byte addr) {
     byte offset;
 
-    if(addr<0 || addr>=numDevices)
-        return;
+    if(addr>=numDevices) return;
     offset=addr*8;
     for(byte i=0;i<8;i++) {
         if(digits) digits[offset+i]=0;
@@ -130,10 +130,8 @@ void MF_LedControl::setLed(byte addr, byte row, byte column, bool state, bool no
     byte val=0x00;
 
     if(!digits) return;
-    if(addr<0 || addr>=numDevices)
-        return;
-    if(row<0 || row>7 || column<0 || column>7)
-        return;
+    if(addr>=numDevices) return;
+    if(row<0 || row>7 || column<0 || column>7) return;
     offset=addr*8;
     val=B10000000 >> column;
     if(state)
@@ -148,10 +146,8 @@ void MF_LedControl::setLed(byte addr, byte row, byte column, bool state, bool no
 void MF_LedControl::setRow(byte addr, byte row, byte value, bool noTX)
 {
     byte offset;
-    if(addr<0 || addr>=numDevices)
-        return;
-    if(row<0 || row>7)
-        return;
+    if(addr>=numDevices)  return;
+    if(row<0 || row>7)    return;
     offset=addr*8;
     if(digits) digits[offset+row]=value;
     if(!noTX) spiTransfer(addr, row+1, value); //digits[offset+row]);
@@ -160,10 +156,8 @@ void MF_LedControl::setRow(byte addr, byte row, byte value, bool noTX)
 void MF_LedControl::setColumn(byte addr, byte col, byte value, bool noTX) {
     byte val;
 
-    if(addr<0 || addr>=numDevices)
-        return;
-    if(col<0 || col>7)
-        return;
+    if(addr>=numDevices)  return;
+    if(col<0 || col>7)    return;
     for(byte row=0;row<8;row++) {
         val=value >> (7-row);
         val=val & 0x01;
@@ -176,17 +170,14 @@ void MF_LedControl::setDigit(byte addr, byte digit, byte value, bool dp, bool no
     byte offset;
     byte v;
 
-    if(addr<0 || addr>=numDevices)
-        return;
-    if(digit<0 || digit>7 || value>15)
-        return;
+    if(addr>=numDevices) return;
+    if(digit<0 || digit>7 || value>15) return;
     offset=addr*8;
-    v=charTable[value];
-    if(dp)
-        v|=B10000000;
+    //v=charTable[value];
+    v=pgm_read_byte_near(charTable+value);
+    if(dp) v|=B10000000;
     if(digits) digits[offset+digit]=v;
     if(!noTX) spiTransfer(addr, digit+1,v);
-
 }
 
 void MF_LedControl::setChar(byte addr, byte digit, char value, bool dp, bool noTX)
@@ -205,8 +196,7 @@ void MF_LedControl::setChar(byte addr, byte digit, char value, bool dp, bool noT
         value=32;
     }
     v=pgm_read_byte_near(charTable+value);
-    if(dp)
-        v|=B10000000;
+    if(dp) v|=B10000000;
     if(digits) digits[offset+digit]=v;
     if(!noTX) spiTransfer(addr, digit+1,v);
 }
@@ -233,7 +223,7 @@ void MF_LedControl::spiTransfer(byte addr, volatile byte opcode, volatile byte d
 
 void MF_LedControl::transmit(void)
 {
-    if(!digits) return;
+    if(!digits || !numDevices) return;
 
     for(byte d=0; d<8; d++) {
         //Create an array with the data to shift out

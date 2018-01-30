@@ -68,7 +68,11 @@ public:
 
     byte getSizeRows(void)  { return _nrows; }
     byte getSizeCols(void)  { return _ncols; }
-    byte getSize(void)      { return _nrows*_ncols; }
+    byte getSizeBits(void)   { return _nrows*_ncols; }
+
+    byte getBaseSize(void)  { return _ncols; }      // # of 8-bit banks per base unit
+    byte getChainSize(void) { return 1; }           // Conventionally 1 unit (non-cascadable)
+    byte getSize(void)      { return _ncols; }
 
     bool    changed;
 

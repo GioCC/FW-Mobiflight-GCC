@@ -52,7 +52,9 @@ public:
     void test(void);
     void powerSavingMode(bool state) { if(OENDM13!=0xFF) digitalWrite(OENDM13, state); }
 
-    byte getSize(void)      { return _moduleCount; }
+    byte getBaseSize(void)  { return 2; }   // # of 8-bit banks per base unit
+    byte getChainSize(void) { return _moduleCount; }
+    byte getSize(void)      { return _moduleCount*2; }
 
 protected:
     byte    pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }

@@ -130,7 +130,10 @@ public:
     void    test()  {};
     void    powerSavingMode(bool state) { state++;}   // Not currently implemented
 
-    byte    getSize(void)      { return _nUnits * 2; }
+    byte    getBaseSize(void)   { return 2; }   // # of 8-bit banks per base unit
+    byte    getChainSize(void)  { return _nUnits; }
+    byte    getSize(void)       { return _nUnits*2; }
+
 
     /// I/O setup functions
     /// <bank>  = 0..n

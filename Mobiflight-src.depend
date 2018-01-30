@@ -198,10 +198,10 @@
 	<wiring.h>
 	<bitStore.h>
 
-1517159608 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.cpp
+1517169290 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.cpp
 	"MFSegments.h"
 
-1517157192 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.h
+1517168672 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfsegments.h
 	<Arduino.h>
 	<WProgram.h>
 	<wiring.h>
@@ -252,9 +252,10 @@
 	<inttypes.h>
 	"Stream.h"
 
-1517093218 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight_mega.ino
+1517173621 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight_mega.ino
 	<WProgram.h>
 	<Arduino.h>
+	<avr/pgmspace.h>
 	"mobiflight.h"
 	<EEPROMex.h>
 	<bitStore.h>
@@ -274,8 +275,9 @@
 	<MFOutLEDDM13.h>
 	<MFIO_MCPS.h>
 	<MFIO_MCP0.h>
+	"MF_registration.inc"
 
-1517090071 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight.h
+1517169068 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mobiflight.h
 
 1482336942 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\lib_std\wire\utility\twi.c
 	<math.h>
@@ -1119,10 +1121,10 @@
 	<MFPeripheral.h>
 	<MCP23x17.h>
 
-1517159560 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_ledcontrol\mf_ledcontrol.cpp
+1517167805 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_ledcontrol\mf_ledcontrol.cpp
 	"MF_LedControl.h"
 
-1517159629 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_ledcontrol\mf_ledcontrol.h
+1517167807 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_ledcontrol\mf_ledcontrol.h
 	<Arduino.h>
 	<WProgram.h>
 	<avr/pgmspace.h>
@@ -1134,6 +1136,8 @@
 	<wiring.h>
 	<avr/pgmspace.h>
 
-1517155405 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfutility.cpp
+1517159797 source:e:\cloud\syncgcc\work\_panel interface\mobiflight-src\libraries\mf_modules\mfutility.cpp
 	"MFUtility.h"
+
+1517174535 e:\cloud\syncgcc\work\_panel interface\mobiflight-src\mobiflight_mega\mf_registration.inc
 

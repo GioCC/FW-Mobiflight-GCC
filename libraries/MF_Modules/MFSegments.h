@@ -22,11 +22,12 @@
 /////////////////////////////////////////////////////////////////////
 /// \class MFSegments MFSegments.h <MFSegments.h>
 class MFSegments
-: public MFPeripheral
+: public MFPeripheral,
+  public MF_LedControl
 {
 public:
     MFSegments();
-    void attach(int dataPin, int csPin, int clkPin, int moduleCount, int brightness);
+    void attach(byte dataPin, byte csPin, byte clkPin, byte moduleCount, byte brightness);
     void display(byte module, char *string, byte points, byte mask, bool convertPoints = false);
 
     void attach(byte *pm, char *name)  { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
@@ -36,13 +37,12 @@ public:
     void test(void);
     void powerSavingMode(bool state);
 
-    void setBrightness(int module, int value);
+    void setBrightness(byte module, byte value);
 
 protected:
     byte pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
-    MF_LedControl *_ledControl;
     byte          *_digitBuf;
     byte          _moduleCount;
     byte          _pin[3];

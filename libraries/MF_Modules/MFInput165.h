@@ -49,7 +49,9 @@ public:
     void detach(void);
     void update(byte *send, byte *get) { update(get); }
 
-    byte getSize(void)   { return _moduleCount; }
+    byte getBaseSize(void)  { return 1; }   // # of 8-bit banks per base unit
+    byte getChainSize(void) { return _moduleCount; }
+    byte getSize(void)      { return _moduleCount; }
 
 protected:
     byte pins(byte n) { return (n<3 ? _pin[n] : 0xFF); }

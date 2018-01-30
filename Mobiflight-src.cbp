@@ -719,16 +719,6 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
-		<Unit filename="libraries/Button/Button.cpp">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
-		<Unit filename="libraries/Button/Button.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
 		<Unit filename="libraries/CmdMessenger/CmdMessenger.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
@@ -817,6 +807,7 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFIOBlock.h" />
 		<Unit filename="libraries/MF_Modules/MFIO_MCP0.cpp" />
 		<Unit filename="libraries/MF_Modules/MFIO_MCP0.h" />
 		<Unit filename="libraries/MF_Modules/MFIO_MCPS.cpp" />
@@ -886,6 +877,8 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_Modules/MFUtility.cpp" />
+		<Unit filename="libraries/MF_Modules/MFUtility.h" />
 		<Unit filename="libraries/RotaryEncoderAcelleration/RotaryEncoderAcelleration.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -904,6 +897,7 @@
 		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.h" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.h" />
+		<Unit filename="mobiflight_mega/MF_registration.inc" />
 		<Unit filename="mobiflight_mega/mobiflight.h" />
 		<Unit filename="mobiflight_mega/mobiflight_mega.ino">
 			<Option compile="1" />

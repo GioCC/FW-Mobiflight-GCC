@@ -50,6 +50,8 @@ public:
     void test(void);
     void powerSavingMode(bool state) {}   // Not currently implemented
 
+    byte getBaseSize(void)  { return 1; }   // # of 8-bit banks per base unit
+    byte getChainSize(void) { return _moduleCount; }
     byte getSize(void)      { return _moduleCount; }
 
 protected:
