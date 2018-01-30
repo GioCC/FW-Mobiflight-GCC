@@ -6,12 +6,7 @@
 
 MFInput165::MFInput165()
 :MFPeripheral(3)
-#ifdef USE_BITSTORE
-, _store(NULL)
-#endif
-{
-  // initialize(false);
-}
+{}
 
 void MFInput165::attach(int dataPin, int csPin, int clkPin, int moduleCount)
 {
@@ -39,14 +34,6 @@ void MFInput165::detach()
     pinMode(DTA165, INPUT_PULLUP);
     initialize(false);
 }
-
-#ifdef USE_BITSTORE
-void MFInput165::bind(bitStore<byte> *store, byte slot)
-{
-    _store = store;
-    _base  = slot;
-}
-#endif
 
 void MFInput165::update(byte *dest)
 {

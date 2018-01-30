@@ -21,27 +21,15 @@
 #include "MCP23x17.h"
 
 MCP23x17::MCP23x17(void)
-:MFPeripheral(0)
-#ifdef USE_BITSTORE
-, _store(NULL)
-#endif
+:MFPeripheral(0),MFIOBlock()
 {}
 
 void MCP23x17::
 init(byte addr, byte nUnits)
 {
-    _nUnits  = nUnits;
+    _moduleCount  = nUnits;
     _address = addr & 0x07;
 }
-
-#ifdef USE_BITSTORE
-void MFIO_MCP0::
-bind(bitStore<byte> *store, byte slot)
-{
-    _store = store;
-    _base  = slot;
-}
-#endif
 
 void MCP23x17::
 refresh(byte *ins, byte *outs, byte unit)
@@ -53,20 +41,17 @@ refresh(byte *ins, byte *outs, byte unit)
     if(ins==0)  ins  = _store;
     if(outs==0) outs = _store;
 #endif
-    for(byte u=0; u<_nUnits; u++)
+    for(byte u=0; u<_moduleCount; u++)
     {
         if(unit!=0xFF && u!=unit) continue;
         d = 0;
         // sort bytes explicitly to make sure everything is in place
-        //TODO Masking with DDR!!!
-        //if(!outs) outs = data;
         idx = unit*2;
         if(outs) {
             d =  (outs[idx+1] & (~_DDR[idx+1]));
             d =  (d<<8) + (outs[idx] & (~_DDR[idx]));
             writeIOW(u, d);
         }
-        //if(!ins) ins = data;
         if(ins) {
             d = readIOW(u);
             ins[idx]   = (ins[idx] & ~_DDR[idx])|(d & _DDR[idx]);

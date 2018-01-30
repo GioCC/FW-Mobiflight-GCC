@@ -6,12 +6,7 @@
 
 MFInputMtx::MFInputMtx()
 :MFPeripheral(0)
-#ifdef USE_BITSTORE
-, _store(NULL)
-#endif
-{
-  // initialize(false);
-}
+{ _moduleCount = 1; }
 
 void MFInputMtx::fastModeSwitch(byte pin, byte val)
 {
@@ -80,15 +75,6 @@ void MFInputMtx::detach()
     initialize(false);
 }
 
-#ifdef USE_BITSTORE
-void MFInputMtx::bind(bitStore<byte> *store, byte slot)
-{
-    _store = store;
-    _base  = slot;
-    inputs = _store->bank(_base);
-}
-#endif
-
 void MFInputMtx::scanAll(byte *dst)
 {
     if(!initialized()) return;
@@ -103,6 +89,9 @@ void MFInputMtx::scanNext(byte init, byte *dst)
     byte ivec = 0;
 
     if(!initialized()) return;
+#ifdef USE_BITSTORE
+    inputs = _store->bank(_base);
+#endif
     if(!inputs && !dst)return;
 
     if(init) { _currCol = 0;}

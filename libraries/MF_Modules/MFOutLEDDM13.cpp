@@ -6,12 +6,7 @@
 
 MFOutLEDDM13::MFOutLEDDM13()
 :MFPeripheral(3)
-#ifdef USE_BITSTORE
-, _store(NULL)
-#endif
-{
-  // initialize(false);
-}
+{}
 
 void MFOutLEDDM13::attach(int dataPin, int csPin, int clkPin, int oenPin, int moduleCount)
 {
@@ -39,14 +34,6 @@ void MFOutLEDDM13::detach(void)
     if(OENDM13!=0xFF) pinMode(OENDM13, INPUT_PULLUP);
     initialize(false);
 }
-
-#ifdef USE_BITSTORE
-void MFOutLEDDM13::bind(bitStore<byte> *store, byte slot)
-{
-    _store = store;
-    _base  = slot;
-}
-#endif
 
 void MFOutLEDDM13::send(byte *pattern)
 {

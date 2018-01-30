@@ -201,7 +201,7 @@ byte servosRegistered = 0;
 MFLCDDisplay lcd_I2C[MAX_MFLCD_I2C];
 byte lcd_12cRegistered = 0;
 
-MFPeripheral *IOblocks[MAX_IOBLOCKS];
+MFPeripheral *IOBlocks[MAX_IOBLOCKS];
 byte IOBlocksRegistered = 0;
 
 byte        inStatusBuf   [roundUp(MAX_BUTTONS)];
@@ -211,7 +211,7 @@ bitStore<byte>  InStatus   (inStatusBuf,    roundUp(MAX_BUTTONS));
 bitStore<byte>  InStatusUpd(inStatusUpdBuf, roundUp(MAX_BUTTONS));
 bitStore<byte>  OutStatus  (outStatusBuf,   roundUp(MAX_OUTPUTS));
 
-#define COMPUTE_OBJ_SIZES
+//#define COMPUTE_OBJ_SIZES
 #ifdef COMPUTE_OBJ_SIZES
 const byte OBJ_SIZE[] = {
   sizeof(MFButtonT),
@@ -236,7 +236,7 @@ MFButtonT     SAMPLE_but;
 MFOutput      SAMPLE_out;
 MFEncoder     SAMPLE_enc;
 MFSegments    SAMPLE_seg;
-MF_LedControl    SAMPLE_LedCtrl(1,2,3,4);
+MF_LedControl SAMPLE_LedCtrl(1,2,3,4);
 MFServo       SAMPLE_srv;
 MFStepper     SAMPLE_stp;
 MFLCDDisplay  SAMPLE_LCD;
@@ -301,6 +301,14 @@ enum
   kTrigger,            // 23
   kResetBoard,         // 24
   kSetLcdDisplayI2C,   // 25
+};
+
+enum {
+  kErrNone ,        // 0
+  kErrFull,         // 1
+  kErrConflict,     // 2
+  kErrNotOnboard,   // 3
+  kErrGeneric,      // 4
 };
 
 // Callbacks define on which received commands we take action
@@ -519,7 +527,7 @@ void setPowerSavingMode(bool state)
   // disable the lights ;)
   powerSavingMode = state;
   powerSaveLedSegment(state);
-  ///TODO Add powersave for other peripheralst hat might have it
+  ///TODO Add powersave for other peripherals that might have it
 #ifdef DEBUG
   if (state)
     cmdMessenger.sendCmd(kStatus, PSTR("On"));

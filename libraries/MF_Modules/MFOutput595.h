@@ -23,9 +23,7 @@
 #define USE_BITSTORE
 
 #include <MFPeripheral.h>
-#ifdef USE_BITSTORE
-#include <bitStore.h>
-#endif
+#include <MFIOBlock.h>
 
 #define DTA595  _pin[0]
 #define LAT595  _pin[1]
@@ -34,13 +32,11 @@
 /////////////////////////////////////////////////////////////////////
 /// \class MFOutput595 MFOutput595.h <MFOutput595.h>
 class MFOutput595
-: public MFPeripheral
+: public MFPeripheral,
+  public MFIOBlock
 {
 public:
     MFOutput595();
-#ifdef USE_BITSTORE
-    void bind(bitStore<byte> *store, byte slot);
-#endif
     void attach(int dataPin, int csPin, int clkPin, int moduleCount);
     void send(byte *pattern = NULL);
 
@@ -50,20 +46,15 @@ public:
     void test(void);
     void powerSavingMode(bool state) {}   // Not currently implemented
 
-    byte getBaseSize(void)  { return 1; }   // # of 8-bit banks per base unit
-    byte getChainSize(void) { return _moduleCount; }
-    byte getSize(void)      { return _moduleCount; }
+    byte getBaseSize(void)      { return 1; }   // # of 8-bit banks per base unit
+    //byte getPinDir(byte bank)   { return 0x00; }
+    byte getInputMap(byte bank) { return 0x00; };
+    byte getOutputMap(byte bank){ return 0xFF; };
 
 protected:
     byte pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
-    byte        _moduleCount;
     byte        _pin[3];
-
-#ifdef USE_BITSTORE
-    bitStore<byte>  *_store;
-    byte            _base;
-#endif
 };
 #endif  //MFOUTPUT595_H

@@ -21,6 +21,7 @@
 #define _MCP23X17_H
 #include "Arduino.h"
 #include <MFPeripheral.h>
+#include <MFIOBlock.h>
 
 #define MAX_BANKS   (MAX_CHAINED_UNITS*BANKS_PER_UNIT)
 
@@ -81,17 +82,18 @@
 #define UNITADR       (_address+(bank>>1))
 
 class MCP23x17
-: public MFPeripheral
+: public MFPeripheral,
+  public MFIOBlock
 {
 private:
     // Units for SPI (MCPS) are not chained: just like for the I2C version,
-    // they share the same pins, and subsequent units have subsequent addersses.
-    static const uint8_t    MAX_UNITS = 4;
+    // they share the same pins, and subsequent units just have subsequent addersses.
     static const uint8_t    BANKS_PER_UNIT = 2;
+    static const uint8_t    MAX_UNITS = 4;
     static const byte       num_units = 1;
 
     //byte    data[MAX_UNITS*BANKS_PER_UNIT];
-    byte    _DDR[MAX_UNITS*BANKS_PER_UNIT];
+    byte    _DDR[MAX_UNITS*BANKS_PER_UNIT];     // Bits: Input = 1, Output = 0
 
     /// Device-specific functions:
     /// Generic register R/W functions (byte/word-wise)
@@ -103,36 +105,28 @@ private:
     virtual void          writeW(byte adr, byte reg, unsigned int val) =0;
 
 protected:
-#ifdef USE_BITSTORE
-    bitStore<byte>  *_store;
-    byte            _base;
-#endif
-
-    byte    _nUnits;
     byte    _address;
     byte    _pin[4];
-
+    // Virtuals from MFPeripheral
     byte    pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
+
+    byte    getIMap(byte bank) { return (bank >= (num_units*BANKS_PER_UNIT) ?  _DDR[bank] : 0); };
+    byte    getOMap(byte bank){ return (bank >= (num_units*BANKS_PER_UNIT) ? ~_DDR[bank] : 0); };
+    byte    getBSize(void)      { return 2; }   // # of 8-bit banks per base unit
 
 public:
 
     MCP23x17(void);
     //~MCP23x17();
-#ifdef USE_BITSTORE
-    void    bind(bitStore<byte> *store, byte slot);
-#endif
     void    init(byte addr=0, byte nUnits=1);
 
+    // Virtuals from MFPeripheral
     // These must be implemented by MFIO_MCPS and MFIO_MCP0//
     // void    attach(byte *pm, char *name) { .... }
     // void    detach(void) { .... };
     void    update(byte *snd, byte *get) { refresh(snd, get); }
-    void    test()  {};
-    void    powerSavingMode(bool state) { state++;}   // Not currently implemented
-
-    byte    getBaseSize(void)   { return 2; }   // # of 8-bit banks per base unit
-    byte    getChainSize(void)  { return _nUnits; }
-    byte    getSize(void)       { return _nUnits*2; }
+    //void    test()  {};
+    //void    powerSavingMode(bool state) { state++;}   // Not currently implemented
 
 
     /// I/O setup functions

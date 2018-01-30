@@ -23,9 +23,7 @@
 #define USE_BITSTORE
 
 #include <MFPeripheral.h>
-#ifdef USE_BITSTORE
-#include <bitStore.h>
-#endif
+#include <MFIOBlock.h>
 
 #define DTADM13  _pin[0]
 #define LATDM13  _pin[1]
@@ -35,13 +33,11 @@
 /////////////////////////////////////////////////////////////////////
 /// \class MFOutLEDDM13 MFOutLEDDM13.h <MFOutLEDDM13.h>
 class MFOutLEDDM13
-: public MFPeripheral
+: public MFPeripheral,
+  public MFIOBlock
 {
 public:
     MFOutLEDDM13();
-#ifdef USE_BITSTORE
-    void bind(bitStore<byte> *store, byte slot);
-#endif
     void attach(int dataPin, int csPin, int clkPin, int oenPin, int moduleCount);
     void send(byte *pattern = NULL);
 
@@ -52,20 +48,16 @@ public:
     void test(void);
     void powerSavingMode(bool state) { if(OENDM13!=0xFF) digitalWrite(OENDM13, state); }
 
-    byte getBaseSize(void)  { return 2; }   // # of 8-bit banks per base unit
-    byte getChainSize(void) { return _moduleCount; }
-    byte getSize(void)      { return _moduleCount*2; }
+    byte getBaseSize(void)      { return 2; }   // # of 8-bit banks per base unit
+    //byte getPinDir(byte bank)   { return 0x00; }
+    byte getInputMap(byte bank) { return 0x00; };
+    byte getOutputMap(byte bank){ return 0xFF; };
 
 protected:
-    byte    pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }
+    byte pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }
 
 private:
-    byte    _moduleCount;
-    byte    _pin[4];
+    byte _pin[4];
 
-#ifdef USE_BITSTORE
-    bitStore<byte>  *_store;
-    byte            _base;
-#endif
 };
 #endif  //MFOutLEDDM13_H

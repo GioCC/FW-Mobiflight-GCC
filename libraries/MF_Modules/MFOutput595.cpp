@@ -6,12 +6,7 @@
 
 MFOutput595::MFOutput595()
 :MFPeripheral(3)
-#ifdef USE_BITSTORE
-, _store(NULL)
-#endif
-{
-  // initialize(false);
-}
+{}
 
 void MFOutput595::attach(int dataPin, int csPin, int clkPin, int moduleCount)
 {
@@ -40,14 +35,6 @@ void MFOutput595::detach()
     pinMode(DTA595, INPUT_PULLUP);
     initialize(false);
 }
-
-#ifdef USE_BITSTORE
-void MFOutput595::bind(bitStore<byte> *store, byte slot)
-{
-    _store = store;
-    _base  = slot;
-}
-#endif
 
 void MFOutput595::send(byte *pattern)
 {

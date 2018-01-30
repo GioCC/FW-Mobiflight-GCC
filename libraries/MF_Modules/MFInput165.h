@@ -24,9 +24,7 @@
 #define USE_BITSTORE
 
 #include <MFPeripheral.h>
-#ifdef USE_BITSTORE
-#include <bitStore.h>
-#endif
+#include <MFIOBlock.h>
 
 #define DTA165  _pin[0]
 #define LAT165  _pin[1]
@@ -35,13 +33,11 @@
 /////////////////////////////////////////////////////////////////////
 /// \class MFInput165 MFInput165.h <MFInput165.h>
 class MFInput165
-: public MFPeripheral
+: public MFPeripheral,
+  public MFIOBlock
 {
 public:
     MFInput165();
-#ifdef USE_BITSTORE
-    void bind(bitStore<byte> *store, byte slot);
-#endif
     void update(byte *dest = NULL);
     void attach(int dataPin, int csPin, int clkPin, int moduleCount);
 
@@ -49,20 +45,15 @@ public:
     void detach(void);
     void update(byte *send, byte *get) { update(get); }
 
-    byte getBaseSize(void)  { return 1; }   // # of 8-bit banks per base unit
-    byte getChainSize(void) { return _moduleCount; }
-    byte getSize(void)      { return _moduleCount; }
+    byte getBaseSize(void)      { return 1; }   // # of 8-bit banks per base unit
+    //byte getPinDir(byte bank)   { return 0xFF; }
+    byte getInputMap(byte bank) { return 0xFF; };
+    byte getOutputMap(byte bank){ return 0x00; };
 
 protected:
     byte pins(byte n) { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
-    byte    _moduleCount;
     byte    _pin[3];
-
-#ifdef USE_BITSTORE
-    bitStore<byte>  *_store;
-    byte            _base;
-#endif
 };
 #endif  //MFINPUT165_H

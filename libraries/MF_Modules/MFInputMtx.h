@@ -38,21 +38,17 @@
 #define USE_BITSTORE
 
 #include <MFPeripheral.h>
-#ifdef USE_BITSTORE
-#include <bitStore.h>
-#endif
+#include <MFIOBlock.h>
 
 /////////////////////////////////////////////////////////////////////
 /// \class MFInputMtx MFInputMtx.h <MFInputMtx.h>
 class MFInputMtx
-: public MFPeripheral
+: public MFPeripheral,
+  public MFIOBlock
 {
 public:
     MFInputMtx();
-#ifdef USE_BITSTORE
-    void bind(bitStore<byte> *store, byte slot);
-#endif
-    void attach(int dataPin, int csPin, int clkPin, int moduleCount);
+    void attach(int Row0, int NRows, int Col0, int NCols);
     void scanNext(byte init = 0, byte *dst = NULL);
     void scanAll(byte *dst);
 
@@ -68,13 +64,16 @@ public:
 
     byte getSizeRows(void)  { return _nrows; }
     byte getSizeCols(void)  { return _ncols; }
-    byte getSizeBits(void)   { return _nrows*_ncols; }
+    byte getSizeBits(void)  { return _nrows*_ncols; }
 
     byte getBaseSize(void)  { return _ncols; }      // # of 8-bit banks per base unit
-    byte getChainSize(void) { return 1; }           // Conventionally 1 unit (non-cascadable)
-    byte getSize(void)      { return _ncols; }
+    byte getChainSize(void) { return (_moduleCount = 1); }           // Conventionally 1 unit (non-cascadable)
 
-    bool    changed;
+    //byte getPinDir(byte bank)   { return 0xFF; }
+    byte getInputMap(byte bank) { return 0xFF&((1<<_nrows)-1); };
+    byte getOutputMap(byte bank){ return 0x00; };
+
+    bool changed;
 
     // Allow public access to inputs - if too permissive, make it private
 #ifndef USE_BITSTORE
@@ -92,10 +91,6 @@ protected:
     byte    pins(byte n);
 
 private:
-#ifdef USE_BITSTORE
-    bitStore<byte>  *_store;
-    byte    _base;
-#endif
     static const byte DEB_DEFAULT = 10;
     byte    _deb_steps;
     byte    _inPrev[8];   // Previous raw input status

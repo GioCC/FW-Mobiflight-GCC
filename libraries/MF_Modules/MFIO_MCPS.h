@@ -49,6 +49,7 @@ private:
     void          _sendb(byte val);   // for slaved use, does not touch _cs
     byte          _readb(void);       // for slaved use, does not touch _cs
 
+    // Virtuals from MCP23x17
     byte          readB(byte adr, byte reg);
     unsigned int  readW(byte adr, byte reg);
     void          writeB(byte adr, byte reg, byte val);
@@ -58,8 +59,13 @@ public:
     MFIO_MCPS(void);
     void    attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte nUnits=1);
 
+    // Virtuals from MCP23x17::MFPeripheral
     void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5]); }    // name unused
     void    detach();
 
+    // Virtuals from MCP23x17::MFIOBlock
+    byte    getInputMap(byte bank) { return MCP23x17::getIMap(bank); };
+    byte    getOutputMap(byte bank){ return MCP23x17::getOMap(bank); };
+    byte    getBaseSize(void)      { return MCP23x17::getBSize(); }   // # of 8-bit banks per base unit
 };
 #endif  //MFIO_MCPS_H
