@@ -6,10 +6,10 @@ This README would normally document whatever steps are necessary to get your app
 
 Mobiflight-src-GCC
 
-Evoluzione del progetto MobiFlight per estensione a moduli I/O a banchi multipli (WIP)
-Inizialmente solo per SW Arduino, possibilmente poi anche sw C#
-Repository originale:   https://bitbucket.org/mobiflight/mobiflightfc/overview
-Versione base:          2017-09-05
+Evoluzione del progetto MobiFlight per estensione a moduli I/O a banchi multipli (WIP)  
+Inizialmente solo per SW Arduino, possibilmente poi anche sw C#  
+Repository originale:   https://bitbucket.org/mobiflight/mobiflightfc/overview  
+Versione base:          2017-09-05  
 * Quick summary
 * Version
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
