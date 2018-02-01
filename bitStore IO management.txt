@@ -1,0 +1,18 @@
+bitStores:
+
+bsLines
+bsValLines (validated)
+
+Inputs:
+- new values (IOBlocks/digitalRead) read in bsLines (MASKED FOR DDR)
+- upon reading (always through MFButton: readButtons()=>buttons[i].update()), 
+  if(bsLines[i]!=bsValLines[i]) { bsValLines[i]=bsLines[i]; trigger(i); }
+
+Outputs (option A, direct):
+- new values written in bsValLines[] (MASKED FOR DDR)
+- cyclic sweep: update() from bsValLines[]
+
+Outputs (option B, optimized):
+- new values written in bsLines[] (MASKED FOR DDR)
+- cyclic sweep: if bsLines[i]!=bsValLines[i] => { bsValLines[i]=bsLines[i]; send(i); }
+

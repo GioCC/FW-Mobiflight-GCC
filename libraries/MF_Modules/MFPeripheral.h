@@ -23,13 +23,17 @@ class MFPeripheral
 {
 public:
     MFPeripheral(uint8_t npins) : _npins(npins&0x7F) { };
+    // Virtual destructor required: this is meant as a (polymorphic) base class, and derived-class objects
+    // may possibly be destroyed through a "base class *" rather than a "derived class *".
+    virtual ~MFPeripheral(void) {}
+
     virtual byte pinCount(void);
     virtual byte getPins(byte *dst);
 
     virtual void attach(byte *params, char *name) =0;
-    virtual void detach(void) {};
-    virtual void update(byte *send, byte *get) {};
-    virtual void test(void) {};
+    virtual void detach(void) {}
+    virtual void update(byte *send, byte *get) {}
+    virtual void test(void) {}
     virtual byte pins(byte i) =0;
 
 protected:

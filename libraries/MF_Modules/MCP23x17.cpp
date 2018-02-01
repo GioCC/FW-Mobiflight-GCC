@@ -24,6 +24,10 @@ MCP23x17::MCP23x17(void)
 :MFPeripheral(0),MFIOBlock()
 {}
 
+MCP23x17::~MCP23x17(void)
+{}
+
+
 void MCP23x17::
 init(byte addr, byte nUnits)
 {
@@ -31,31 +35,52 @@ init(byte addr, byte nUnits)
     _address = addr & 0x07;
 }
 
+#define FILTER_OUTS(a, i)  ((a[i]&(~_DDR[i])))
+#define FILTER_INS(a, i)   ((a[i]&(_DDR[i])))
+
 void MCP23x17::
 refresh(byte *ins, byte *outs, byte unit)
 {
     if(!initialized()) return;
+    byte          *newouts = outs;
     byte          idx = 0;
-    unsigned int    d = 0;
+    unsigned int  d   = 0;
+    unsigned int  nd  = 0;
 #ifdef USE_BITSTORE
-    if(ins==0)  ins  = _store;
-    if(outs==0) outs = _store;
+    //if(ins==0)  ins  = _storeNew;
+    //if(outs==0) outs = _storeVal;
+    if(ins==0)  ins  = _storeNew;
+    if(outs==0) { outs = _storeVal; newouts = _storeNew; }
 #endif
     for(byte u=0; u<_moduleCount; u++)
     {
         if(unit!=0xFF && u!=unit) continue;
-        d = 0;
+        d  = 0;
+        nd = 0;
         // sort bytes explicitly to make sure everything is in place
         idx = unit*2;
         if(outs) {
-            d =  (outs[idx+1] & (~_DDR[idx+1]));
-            d =  (d<<8) + (outs[idx] & (~_DDR[idx]));
-            writeIOW(u, d);
+            // Mask values so as to affect only bits corresponding to Outputs
+            d  =  FILTER_OUTS(outs, idx+1); //(outs[idx+1] & (~_DDR[idx+1]));
+            d  =  (d<<8) + FILTER_OUTS(outs, idx); //(outs[idx] & (~_DDR[idx]));
+            nd =  FILTER_OUTS(newouts, idx+1); //(newouts[idx+1] & (~_DDR[idx+1]));
+            nd =  (nd<<8) + FILTER_OUTS(newouts, idx); //(newouts[idx] & (~_DDR[idx]));
+            if(nd != d) {
+                // Make sure to leave untouched all bits not used as outputs
+                outs[idx]   = FILTER_OUTS(newouts, idx)|FILTER_INS(outs, idx); //(newouts[idx] & ~_DDR[idx])|(outs[idx] & _DDR[idx]);
+                outs[idx+1] = FILTER_OUTS(newouts, idx+1)|FILTER_INS(outs, idx+1); //(newouts[idx+1] & ~_DDR[idx+1])|(outs[idx+1] & _DDR[idx+1]);
+                // Mask values so as to affect only bits corresponding to Outputs
+                d =  FILTER_OUTS(outs, idx+1);  //(outs[idx+1] & (~_DDR[idx+1]));
+                d =  (d<<8) + FILTER_OUTS(outs, idx);  //(outs[idx] & (~_DDR[idx]));
+                writeIOW(u, d);
+            }
         }
         if(ins) {
+            // Mask values so as to affect only bits corresponding to Inputs
+            // Make sure to leave untouched all bits not used as inputs
             d = readIOW(u);
-            ins[idx]   = (ins[idx] & ~_DDR[idx])|(d & _DDR[idx]);
-            ins[idx+1] = (ins[idx+1] & ~_DDR[idx+1])|((d>>8) & _DDR[idx+1]);
+            ins[idx]   = FILTER_OUTS(ins, idx)  |(d & _DDR[idx]);   // (ins[idx] & ~_DDR[idx])|(d & _DDR[idx]);
+            ins[idx+1] = FILTER_OUTS(ins, idx+1)|((d>>8) & _DDR[idx+1]);  // (ins[idx+1] & ~_DDR[idx+1])|((d>>8) & _DDR[idx+1]);
         }
         idx += 2;
     }

@@ -24,7 +24,7 @@
 class MFOutput
 {
 public:
-    static void setBitStore(bitStore<byte> *storage, byte maxOBPin);
+    static void setBitStore(bitStore<byte> *val_status, bitStore<byte> *new_status, byte maxOBPin);
 
     MFOutput(void) {}
     void attach(uint8_t pin);
@@ -43,7 +43,8 @@ protected:
     byte pins(byte n)    { return (n=0 ? _pin : 0xFF); }
 
 private:
-    static bitStore<byte>   *_OutBits;
+    static bitStore<byte>   *_OutBitsVal;
+    static bitStore<byte>   *_OutBitsNew;
     static byte             _MaxOnboardPin;
     uint8_t                 _pin;
     //bool          _state; // now superceded by lookup into _bits

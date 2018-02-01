@@ -63,8 +63,7 @@ void clearRegisteredPins(byte type)
     case kTypeOutLED5940:
     case kTypeInOutMCPS:
     case kTypeInOutMCP0:
-        ne = IOBlocksRegistered;
-        /// mfp = IOblocks;     //TODO
+        unregIOBlocks();  //TODO check if correct
     break;
     default:
     break;
@@ -83,11 +82,6 @@ void clearRegisteredPins(byte type)
   }
 }
 
-//void clearRegisteredPins(byte type) {
-//  for(int i=0; i<MODULE_MAX_PINS;++i)
-//    if (pinsRegistered[i] == type)
-//      pinsRegistered[i] = kTypeNotSet;
-//}
 byte checkVirtualPins(byte base, byte nBanks)
 {
     byte i = 64+(base*8);   // Virtual inputs start from #64
@@ -114,141 +108,104 @@ byte registerVirtualPins(MFIOBlock *obj, byte checkOnly=false)
     return kErrNone;
 }
 
-/*
-// Virtual pins are unregistered through ClearOutputs() and ClearButtons()
 byte unregisterVirtualPins(MFIOBlock *obj)
 {
+/*
+// Virtual pins are unregistered through ClearOutputs() and ClearButtons()
     byte i = 64+(obj->getBase()*8);   // Virtual inputs start from #64
     for(byte b=0; b<obj->getSize(); b++) {
         for(byte msk=0x01; msk; msk<<=1, i++) {
             pinsRegistered.clr(pin);
         }
     }
+*/
     return kErrNone;
 }
-*/
 
-///************************************************************************************************
-/// Registration macro
+// Register peripheral
+// (see http://forum.arduino.cc/index.php?topic=376860.msg2598440#msg2598440)
+
+template<class T>
+byte registerPeripheral(T *vec[], byte &nElem, byte nMax, byte *argList, byte nPins, char *Name)
+{
+    byte j;
+    byte errReg = 0;
+    if (nElem < nMax) {
+        for(j=0; j<nPins && !errReg; j++) { if(isPinRegistered(argList[j])) { errReg = 2; }}
+        if(!errReg) {
+            T *objp = new T;
+            vec[nElem] = objp;
+            // Static cast here is not required as much to upcast vec[n]
+            // as to identify its type, which the compiler has no way of knowing
+            // (so it can't detect whether it has an attach() method).
+            (static_cast<MFPeripheral *>(objp))->attach(argList, Name);
+            for(j=0; j<nPins; j++) registerPin(argList[j]);
+            nElem++;
+        }
+    } else {
+      errReg = 1;
+    }
+    return errReg;
+}
+
+template<class T>
+void unregPeripherals(T *vec[], byte &n)
+{
+    for (byte j=0; j<n; j++) {
+        vec[j]->detach();
+        delete vec[j]; vec[j] = NULL;
+    }
+    n = 0;
+}
+
+// Register IOBlock
+template<class T>
+byte registerIOB(byte *argList, byte nPins, byte base, byte nBlocks, char *Name)
+{
+    byte j;
+    byte errReg = 0;
+    if (IOBlocksRegistered<MAX_IOBLOCKS) {
+        for(j=0; j<nPins && !errReg; j++) { if(isPinRegistered(argList[j])) { errReg = 2; }}
+        if(!errReg) {
+          errReg = checkVirtualPins(base, nBlocks);
+        }
+        if(!errReg) {
+            T *obj = new T;
+            IOBlocks[IOBlocksRegistered] = (MFPeripheral *)obj;
+            IOBlocks[IOBlocksRegistered]->attach(argList, Name);
+            obj->bind(&IOStatusVal, &IOStatusNew, base);
+            for(j=0; j<nPins; j++) {
+                registerPin(argList[j]);
+            }
+            IOBlocksRegistered++;
+            registerVirtualPins((MFIOBlock *)obj);
+        }
+    } else {
+      errReg = 1;
+    }
+    return errReg;
+}
+
+
+// When unregistering an IOBlock, the IOBlock obj is deallocated and
+// driver pins are reset (HW-wise); all pin reservations (drivers and IOs)
+// are deallocated through ClearOutputs() and ClearButtons().
+void unregIOBlocks(void)
+{
+    MFPeripheral *iobp;
+    for (byte j=0; j<IOBlocksRegistered; j++) {
+        iobp = IOBlocks[j];
+        iobp->detach();
+        delete iobp; IOBlocks[j] = NULL;
+    }
+    IOBlocksRegistered = 0;
+}
+
 
 // BEWARE:
 // arglist contains <nPins> interface pin at the start, then (possibly) more arguments
 // <nPins>  is the number of PINS, not of arguments - the called .attach() method is supposed
 // to be aware of the required arg count!
-
-// Object array version:
-#define Mregister(x, xNRegd, MAX_x, argList, nPins, Name) \
-{ \
-    byte j;\
-    errReg = 0; \
-    if (xNRegd < MAX_x) {\
-        for(j=0; j<nPins; j++) if(isPinRegistered(argList[j])) { \
-          errReg = 2; \
-          break; \
-        }\
-        if(j == nPins) {\
-            x[xNRegd].attach(argList, Name); \
-            for(j=0; j<nPins; j++) registerPin(argList[j]); \
-            xNRegd++; \
-        }\
-    } else {\
-      errReg = 1; \
-    } \
-}
-
-#define Munreg(x, xNRegd) \
-{ \
-    for (byte j=0; j<xNRegd; j++) { \
-        x[xNRegd].detach(); \
-    } \
-    xNRegd = 0; \
-}
-/*
-// custom section following: e.g.
-if(!errReg) {
-  if(xNRegd == 1) {
-      MFButtonT::attachHandler(btnOnRelease, handlerOnRelease);
-      MFButtonT::attachHandler(btnOnPress, handlerOnRelease);
-  }
-}
-// end custom section
-*/
-
-// Object POINTER array version:
-// (see http://forum.arduino.cc/index.php?topic=376860.msg2598440#msg2598440)
-
-#define MregisterPtr(x, xNRegd, MAX_x, argList, nPins, Name) \
-{ \
-    byte j;\
-    errReg = 0; \
-    if (xNRegd < MAX_x) {\
-        for(j=0; j<nPins; j++) if(isPinRegistered(argList[j])) { \
-          errReg = 2; \
-          break; \
-        }\
-        if(j == nPins) {\
-            x[xNRegd] = new typeof(*x[0]); \
-            x[xNRegd]->attach(argList, Name); \
-            for(j=0; j<nPins; j++) registerPin(argList[j]); \
-            xNRegd++; \
-        }\
-    } else {\
-      errReg = 1; \
-    } \
-}
-
-#define MunregPtr(x, xNRegd) \
-{ \
-    for (byte j=0; j<xNRegd; j++) { \
-        x[xNRegd]->detach(); \
-        delete x[xNRegd]; x[xNRegd] = NULL;\
-    } \
-    xNRegd = 0; \
-}
-
-// IOBlock (pointer) version:
-// (see http://forum.arduino.cc/index.php?topic=376860.msg2598440#msg2598440)
-
-///TODO SELECT IN OR OUT in bind()!!!!!
-#define MregisterIOB(x, argList, nPins, base, nBlocks, Name) \
-{ \
-    byte j;\
-    errReg = 0; \
-    if (IOBlocksRegistered<MAX_IOBLOCKS) {\
-        for(j=0; j<nPins; j++) if(isPinRegistered(argList[j])) { \
-          errReg = 2; \
-          break; \
-        }\
-        if(!errReg) {\
-          errReg = checkVirtualPins(base, nBlocks); \
-        } \
-        if(!errReg) {\
-            x *obj = new x; \
-            IOBlocks[IOBlocksRegistered] = (MFPeripheral *)obj; \
-            IOBlocks[IOBlocksRegistered]->attach(argList, Name); \
-            obj->bind(&InStatus, base); \
-            for(j=0; j<nPins; j++) registerPin(argList[j]); \
-            IOBlocksRegistered++; \
-            registerVirtualPins((MFIOBlock *)obj);\
-        }\
-    } else {\
-      errReg = 1; \
-    } \
-}
-
-// When unregistering an IOBlock, the IOBlock obj is deallocated and
-// driver pins are reset (HW-wise); all pin reservations (drivers and IOs)
-// are deallocated through ClearOutputs() and ClearButtons().
-#define MunregIOB(x, xNRegd) \
-{ \
-    MFIOBlock *iobp; \
-    for (byte j=0; j<xNRegd; j++) { \
-        iobp = (MFIOBlock *)IOBlocks[xNRegd]; \
-        iobp->detach(); \
-        delete iobp; IOBlocks[xNRegd] = NULL;\
-    } \
-    xNRegd = 0; \
-}
 
 // Error msg management:
 
@@ -362,7 +319,8 @@ void AddEncoder(byte pin1, byte pin2, char *Name)
     argList[0] = pin1;
     argList[1] = pin2;
     argList[2] = encodersRegistered+1;
-    MregisterPtr(encoders, encodersRegistered, MAX_ENCODERS, argList, 2, Name); //Name will be ignored anyway
+    errReg = registerPeripheral<MFEncoder>(encoders, encodersRegistered, MAX_ENCODERS, argList, 2, Name);
+
   #ifdef DEBUG
       if(errReg==kErrFull)      cmdMessenger.sendCmd(kStatus,PSTR("Encoder limit exceeded"));
       if(errReg==kErrConflict)  cmdMessenger.sendCmd(kStatus,PSTR("Encoder pin conflict"));
@@ -388,7 +346,7 @@ void AddEncoder(byte pin1, byte pin2, char *Name)
 void ClearEncoders()
 {
   clearRegisteredPins(kTypeEncoder);
-  MunregPtr(encoders, encodersRegistered);
+  unregPeripherals(encoders, encodersRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Cleared encoders"));
 #endif
@@ -409,7 +367,7 @@ void AddLedSegment(byte dataPin, byte csPin, byte clkPin, byte numDevices, byte 
     argList[2] = clkPin;
     argList[3] = numDevices;
     argList[4] = brightness;
-    MregisterPtr(ledSegments, ledSegmentsRegistered, MAX_LEDSEGMENTS, argList, 3, NULL); //Name will be ignored anyway
+    errReg = registerPeripheral<MFSegments>(ledSegments, ledSegmentsRegistered, MAX_LEDSEGMENTS, argList, 3, NULL); //Name will be ignored anyway
   }
 #ifdef DEBUG
   const char *cp;
@@ -424,7 +382,7 @@ void AddLedSegment(byte dataPin, byte csPin, byte clkPin, byte numDevices, byte 
 void ClearLedSegments()
 {
   clearRegisteredPins(kTypeLedSegment);
-  MunregPtr(ledSegments, ledSegmentsRegistered);
+  unregPeripherals(ledSegments, ledSegmentsRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus, PSTR("Cleared segments"));
 #endif
@@ -445,7 +403,7 @@ void AddStepper(byte pin1, byte pin2, byte pin3, byte pin4, byte btnPin1)
     argList[2] = pin3;
     argList[3] = pin4;
     argList[4] = 0; //btnPin1;  // autoreset is not released yet
-    MregisterPtr(steppers, steppersRegistered, MAX_STEPPERS, argList, 4, NULL);
+    errReg = registerPeripheral<MFStepper>(steppers, steppersRegistered, MAX_STEPPERS, argList, 4, NULL);
     if(!errReg) {
       steppers[steppersRegistered-1]->setMaxSpeed(STEPPER_SPEED);
       steppers[steppersRegistered-1]->setAcceleration(STEPPER_ACCEL);
@@ -464,7 +422,7 @@ void AddStepper(byte pin1, byte pin2, byte pin3, byte pin4, byte btnPin1)
 void ClearSteppers()
 {
   clearRegisteredPins(kTypeStepper);
-  MunregPtr(steppers, steppersRegistered);
+  unregPeripherals(steppers, steppersRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Cleared steppers"));
 #endif
@@ -551,7 +509,8 @@ void AddInput165(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevic
     argList[2] = clkPin;
     argList[3] = base;
     argList[4] = numDevices;
-    MregisterIOB(MFInput165, argList, 3, base, numDevices, NULL); //Name ignored
+    //MregisterIOB(MFInput165, argList, 3, base, numDevices, NULL); //Name ignored
+    errReg = registerIOB<MFInput165>(argList, 3, base, numDevices, NULL);
   }
   Merrors(Input165);
 }
@@ -571,7 +530,7 @@ void AddOutput595(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevi
     argList[2] = clkPin;
     argList[3] = base;
     argList[4] = numDevices;
-    MregisterIOB(MFOutput595, argList, 3, base, numDevices, NULL); //Name ignored
+    errReg = registerIOB<MFOutput595>(argList, 3, base, numDevices, NULL); //Name ignored
   }
   Merrors(Output595);
 }
@@ -591,33 +550,32 @@ void AddOutLEDDM13(byte dataPin, byte csPin, byte clkPin, byte base, byte numDev
     argList[2] = clkPin;
     argList[3] = base;
     argList[4] = numDevices;
-    MregisterIOB(MFOutput595, argList, 3, base, numDevices, NULL); //Name ignored
+    errReg = registerIOB<MFOutLEDDM13>(argList, 3, base, numDevices, NULL); //Name ignored
   }
-  Merrors(Output595);
+  Merrors(OutputLED_DM13);
 }
 
 ///========================///
 /// IOBlock: InOutMCP23017 ///
 ///========================///
-void AddOutIOMCP0(byte SDAPin, byte SCLPin, byte addr, byte base, byte numDevices=1)
+void AddIOMCP0(byte SDAPin, byte SCLPin, byte addr, byte base)
 {
   byte errReg = kErrNone;
   if (!isOnboard(SDAPin) || !isOnboard(SCLPin)) errReg=kErrNotOnboard;
 
   if(!errReg) {
     byte np = 0;
-    byte argList[4];        // This is the same as expected by specific MFmodule.attach()
+    byte argList[3];        // This is the same as expected by specific MFmodule.attach()
     argList[0] = SDAPin;
     argList[1] = SCLPin;
     argList[2] = addr;
-    argList[3] = numDevices;
     if(SDAPin == SDA || SCLPin == SCL) {
         // If any std HW I2C pins is used, force both to be used
         np = 0;  // don't register them in the macro, otherwise they will appear occupied
         registerPin(SDAPin = SDA);
         registerPin(SCLPin = SCL);
     }
-    MregisterIOB(MFIO_MCP0, argList, np, base, numDevices, NULL); //Name ignored
+    errReg = registerIOB<MFIO_MCP0>(argList, np, base, 2, NULL); //Name ignored
   }
   Merrors(IO-MCP0);
 }
@@ -625,21 +583,19 @@ void AddOutIOMCP0(byte SDAPin, byte SCLPin, byte addr, byte base, byte numDevice
 ///========================///
 /// IOBlock: InOutMCP23S17 ///
 ///========================///
-void AddOutIOMCPS(byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte addr, byte base, byte numDevices=1)
+void AddIOMCPS(byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte addr, byte base)
 {
   byte errReg = kErrNone;
   if (!isOnboard(dataInPin) || !isOnboard(dataOutPin) || !isOnboard(csPin) || !isOnboard(clkPin)) errReg=kErrNotOnboard;
 
   if(!errReg) {
-    byte np = 0;
-    byte argList[6];        // This is the same as expected by specific MFmodule.attach()
+    byte argList[5];        // This is the same as expected by specific MFmodule.attach()
     argList[0] = dataInPin;
     argList[1] = dataOutPin;
     argList[2] = csPin;
     argList[3] = clkPin;
     argList[4] = addr;
-    argList[5] = numDevices;
-    MregisterIOB(MFIO_MCPS, argList, 4, base, numDevices, NULL); //Name ignored
+    errReg = registerIOB<MFIO_MCPS>(argList, 4, base, 2, NULL); //Name ignored
   }
   Merrors(IO-MCPS);
 }
@@ -647,42 +603,39 @@ void AddOutIOMCPS(byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte
 ///===================///
 /// IOBlock: InputMtx ///
 ///===================///
-void AddInputMtx(int Row0, int NRows, int Col0, int NCols, byte base)
+void AddInputMtx(byte Row0, byte NRows, byte Col0, byte NCols, byte base)
 {
   byte errReg = kErrNone;
   ///TODO Check isOnboard...
   //if (!isOnboard(dataPin) || !isOnboard(csPin) || !isOnboard(clkPin)) errReg=kErrNotOnboard;
-
+  // Check driver pins
   if(!errReg) {
-    byte argList[4];        // This is the same as expected by specific MFmodule.attach()
+    for(byte c=0; c<NCols && !errReg; c++) {
+        if(isPinRegistered(c)) errReg = kErrConflict;
+        if(!isOnboard(c))      errReg = kErrNotOnboard;
+    }
+    for(byte r=0; r<NRows && !errReg; r++) {
+        if(isPinRegistered(r)) errReg = kErrConflict;
+        if(!isOnboard(r))      errReg = kErrNotOnboard;
+    }
+  }
+  if(!errReg) {
+    byte argList[5];        // This is the same as expected by specific MFmodule.attach()
     argList[0] = Row0;
-    argList[1] = NRows;
-    argList[2] = Col0;
+    argList[1] = Col0;
+    argList[2] = NRows;
     argList[3] = NCols;
     argList[4] = base;
-    MregisterIOB(MFInput165, argList, 4, base, NCols, NULL); //Name ignored
+    // Driver pin count is 0, they were custom-checked before
+    errReg = registerIOB<MFInputMtx>(argList, 0, base, NCols, NULL); //Name ignored
+    // Register all driver pins
+    if(!errReg) {
+        for(byte c=0; c<NCols && !errReg; c++) registerPin(c);
+        for(byte r=0; r<NRows && !errReg; r++) registerPin(r);
+    }
   }
   Merrors(InputMtx);
 }
 
 
-/*
-void ClearXXXs()
-{
-    Munreg(XXX, XXXNRegd);
-#ifdef DEBUG
-    cmdMessenger.sendCmd(kStatus,"Cleared XXXs");
-#endif
-}
-
 ///-------------------------------------------------------------------------------------------------
-
-XXX are:
-kTypeInputMtx
-kTypeInput165
-kTypeOutput595
-kTypeOutLEDDM13
-kTypeOutLED5940
-kTypeInOutMCPS
-kTypeInOutMCP0
-*/

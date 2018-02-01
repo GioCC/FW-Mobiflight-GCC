@@ -4,18 +4,19 @@
 
 #include "MFIO_MCPS.h"
 
-MFIO_MCPS::
-MFIO_MCPS(void)
+MFIO_MCPS::MFIO_MCPS(void)
 : MCP23x17()
 {
     npins(4);
     // initialize(false);
 }
 
+//MFIO_MCPS::~MFIO_MCPS() {}
+
 void MFIO_MCPS::
-attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte nUnits)
+attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin) //, byte nUnits)
 {
-    MCP23x17::init(addr, nUnits);
+    MCP23x17::init(addr, 1); //nUnits);
 
     // We should check that the pin nr. values are legal!
     MCPDTI = dataInPin;

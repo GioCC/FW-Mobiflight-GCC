@@ -38,22 +38,31 @@ void MFOutLEDDM13::detach(void)
 void MFOutLEDDM13::send(byte *pattern)
 {
     if(!initialized()) return;
+    byte *newpattern = pattern;
 #ifdef USE_BITSTORE
-    if(!pattern && _store) pattern = _store->bank(_base);
+    //if(!pattern && _store) pattern = _store->bank(_base);
+    if(!pattern && _storeVal) {
+        pattern    = _storeVal->bank(_base);
+        newpattern = _storeNew->bank(_base);
+    }
 #endif
-    if(pattern) {
+    if(pattern && newpattern) {
         register byte dto;
         for(byte i=_moduleCount*2; i;){
-            dto = pattern[--i];
-            for (byte k=0x80; k ; k>>=1) { // MSB FIRST
-                if(dto & k) {
-                    digitalWrite(DTADM13, HIGH);
-                } else {
-                    digitalWrite(DTADM13, LOW);
+            dto = newpattern[--i];
+            if(dto != pattern[i]) {
+                // Transmit only if something changed
+                pattern[i] = dto;
+                for (byte k=0x80; k ; k>>=1) { // MSB FIRST
+                    if(dto & k) {
+                        digitalWrite(DTADM13, HIGH);
+                    } else {
+                        digitalWrite(DTADM13, LOW);
+                    }
+                    delayMicroseconds(DELAYDM13_US);
+                    digitalWrite(CLKDM13, HIGH); delayMicroseconds(DELAYDM13_US);
+                    digitalWrite(CLKDM13, LOW);
                 }
-                delayMicroseconds(DELAYDM13_US);
-                digitalWrite(CLKDM13, HIGH); delayMicroseconds(DELAYDM13_US);
-                digitalWrite(CLKDM13, LOW);
             }
         }
         digitalWrite(LATDM13, HIGH); delayMicroseconds(DELAYDM13_US);

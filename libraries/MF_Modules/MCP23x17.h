@@ -13,8 +13,7 @@
 /// depends on how the IC is user-configured.
 /// For further comments see specialized end classes
 
-/// [TODO] WARNING - TO BE COMPLETED!!!
-/// Check init values and setup (for reference: MCP23017 class from Adafruit and MCP23S17 Class for Arduino by Cort Buffington & Keith Neufeld
+///TODO Check init values and setup (for reference: MCP23017 class from Adafruit and MCP23S17 Class for Arduino by Cort Buffington & Keith Neufeld
 ///
 
 #ifndef _MCP23X17_H
@@ -22,8 +21,6 @@
 #include "Arduino.h"
 #include <MFPeripheral.h>
 #include <MFIOBlock.h>
-
-#define MAX_BANKS   (MAX_CHAINED_UNITS*BANKS_PER_UNIT)
 
 // #Defines for user settings
 
@@ -89,7 +86,7 @@ private:
     // Units for SPI (MCPS) are not chained: just like for the I2C version,
     // they share the same pins, and subsequent units just have subsequent addersses.
     static const uint8_t    BANKS_PER_UNIT = 2;
-    static const uint8_t    MAX_UNITS = 4;
+    static const uint8_t    MAX_UNITS = 1; //4;
     static const byte       num_units = 1;
 
     //byte    data[MAX_UNITS*BANKS_PER_UNIT];
@@ -115,9 +112,11 @@ protected:
     byte    getBSize(void)      { return 2; }   // # of 8-bit banks per base unit
 
 public:
-
     MCP23x17(void);
-    //~MCP23x17();
+    // Virtual destructor required: this is meant as a (polymorphic) base class, and derived-class objects
+    // may possibly be destroyed through a "base class *" rather than a "derived class *".
+    virtual ~MCP23x17(void); // {}
+
     void    init(byte addr=0, byte nUnits=1);
 
     // Virtuals from MFPeripheral

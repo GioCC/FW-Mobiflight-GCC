@@ -38,7 +38,7 @@ enum
 class MFButtonT
 {
 public:
-    static void setBitStore(bitStore<byte> *status, bitStore<byte> *upd_status, byte maxOBPin);
+    static void setBitStore(bitStore<byte> *val_status, bitStore<byte> *new_status, byte maxOBPin);
     static void attachHandler(buttonEvent newHandler);
 
     uint8_t       _pin;
@@ -62,8 +62,8 @@ protected:
 
 private:
     static buttonEvent      _handler;
-    static bitStore<byte>   *_InBits;
-    static bitStore<byte>   *_InBitsUpdate;
+    static bitStore<byte>   *_InBitsVal;
+    static bitStore<byte>   *_InBitsNew;
     static byte             _MaxOnboardPin;
 };
 #endif

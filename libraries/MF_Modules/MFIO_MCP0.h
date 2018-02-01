@@ -6,6 +6,9 @@
 /// \author  Giorgio Croci Candiani (g.crocic@gmail.com) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
 // Copyright (C) 2018 Giorgio Croci Candiani
 
+/// WARNING The parent class could manage groups of "multiple" units (just like independent units, but
+/// with addresses starting from the one specified);
+/// however, in Mobiflight an MCP IOBlock is always based on a _single_ MCP.
 
 #ifndef MFIO_MCP0_H
 #define MFIO_MCP0_H
@@ -56,10 +59,12 @@ private:
 public:
 
     MFIO_MCP0(void);
-    void    attach(byte addr, byte SDAPin = 0xFF, byte SCLPin = 0xFF, byte nUnits=1);    // Any pin =0xFF means we are using HW I2C
+    //~MFIO_MCP0(void);
+
+    void    attach(byte addr, byte SDAPin = 0xFF, byte SCLPin = 0xFF);//, byte nUnits=1);    // Any pin =0xFF means we are using HW I2C
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[1], pm[2], pm[0], pm[3]); }    // name unused
+    void    attach(byte *pm, char *name) { attach(pm[1], pm[2], pm[0] /*, pm[3]*/); }    // name unused
     void    detach(void);
 
     // Virtuals from MCP23x17::MFIOBlock

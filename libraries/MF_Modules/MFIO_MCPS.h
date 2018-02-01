@@ -6,17 +6,19 @@
 /// \author  Giorgio Croci Candiani (g.crocic@gmail.com) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS
 // Copyright (C) 2018 Giorgio Croci Candiani
 
-/// Driver for MCP23S17 I/O card -
-/// 1x MCP23S17 (SPI I/O expander)
-/// Multiple units can be connected in parallel (SCK, DI, DO lines), provided that
-/// the _CS line is only active (low) for ONE unit at a time.
-/// This can be achieved by instantiating more than one object, specifying the
-/// same SCK, DI, DO line numbers but a different SEL(=_CS) line for each of them.
-/// Another option is using the same _CS line but using the address jumpers on the IC.
+/// WARNING The parent class could manage groups of "multiple" units (just like independent units, but
+/// with addresses starting from the one specified), sharing the same SCK/DI/DO lines but with different HW address jumpers set;
+/// however, in Mobiflight an MCP IOBlock is always based on a _single_ MCP.
+
+/// Multiple units can be connected in parallel (SCK, DI, DO lines), provided that:
+/// - the _CS line is only active (low) for ONE unit at a time.
+///   This can be achieved by instantiating more than one object, specifying the
+///   same SCK, DI, DO line numbers but a different SEL(=_CS) line for each of them.
+/// - the same _CS line is used, but the address jumpers on the IC are set differently
 /// I/Os are read/written in byte banks (2 for each unit) which are numbered from 1 up.
 /// Each unit has 2 input _and_ 2 output banks; which bits in these banks are significant
 /// depends on how the IC is user-configured.
-///
+
 
 #ifndef MFIO_MCPS_H
 #define MFIO_MCPS_H
@@ -57,10 +59,12 @@ private:
 
 public:
     MFIO_MCPS(void);
-    void    attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte nUnits=1);
+    //~MFIO_MCPS(void);
+
+    void    attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin); //, byte nUnits=1);
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5]); }    // name unused
+    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4] /*, pm[5]*/); }    // name unused
     void    detach();
 
     // Virtuals from MCP23x17::MFIOBlock

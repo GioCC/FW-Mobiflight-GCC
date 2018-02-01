@@ -90,7 +90,8 @@ void MFInputMtx::scanNext(byte init, byte *dst)
 
     if(!initialized()) return;
 #ifdef USE_BITSTORE
-    inputs = _store->bank(_base);
+    //inputs = _store->bank(_base);
+    inputs = _storeNew->bank(_base);
 #endif
     if(!inputs && !dst)return;
 

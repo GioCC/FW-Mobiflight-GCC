@@ -163,20 +163,23 @@ int eepromSize               = EEPROMSizeUno;
 const int  MEM_LEN_CONFIG    = 256;
 #endif
 
-char configBuffer[MEM_LEN_CONFIG] = "";
+char            configBuffer[MEM_LEN_CONFIG] = "";
 
-int configLength = 0;
-boolean configActivated = false;
+int             configLength = 0;
+boolean         configActivated = false;
 
-bool powerSavingMode = false;
+bool            powerSavingMode = false;
 //byte pinsRegistered[MODULE_MAX_PINS];
-byte pinRegBuf  [roundUp(MAX_LINES)];
+byte            pinRegBuf[roundUp(MAX_LINES)];
+
 bitStore<byte>  pinsRegistered(pinRegBuf,roundUp(MAX_LINES));
+///TODO: (for pin overlay) Split <pinsRegistered> into pinsRegIn, pinsRegInShared, pinsRegOut, pinsRegOutShared
 
-const unsigned long POWER_SAVING_TIME = 60*15; // in seconds
+const
+unsigned long   POWER_SAVING_TIME = 60*15; // in seconds
 
-CmdMessenger cmdMessenger = CmdMessenger(Serial);
-unsigned long lastCommand;
+CmdMessenger    cmdMessenger = CmdMessenger(Serial);
+unsigned long   lastCommand;
 
 MFOutput outputs[MAX_OUTPUTS];
 byte outputsRegistered = 0;
@@ -204,12 +207,19 @@ byte lcd_12cRegistered = 0;
 MFPeripheral *IOBlocks[MAX_IOBLOCKS];
 byte IOBlocksRegistered = 0;
 
+/*
 byte        inStatusBuf   [roundUp(MAX_BUTTONS)];
 byte        inStatusUpdBuf[roundUp(MAX_BUTTONS)];
 byte        outStatusBuf  [roundUp(MAX_OUTPUTS)];
 bitStore<byte>  InStatus   (inStatusBuf,    roundUp(MAX_BUTTONS));
 bitStore<byte>  InStatusUpd(inStatusUpdBuf, roundUp(MAX_BUTTONS));
 bitStore<byte>  OutStatus  (outStatusBuf,   roundUp(MAX_OUTPUTS));
+*/
+byte            IOStatusValBuf[roundUp(MAX_LINES)];
+byte            IOStatusNewBuf[roundUp(MAX_LINES)];
+bitStore<byte>  IOStatusVal(IOStatusValBuf, roundUp(MAX_LINES));
+bitStore<byte>  IOStatusNew(IOStatusNewBuf, roundUp(MAX_LINES));
+
 
 //#define COMPUTE_OBJ_SIZES
 #ifdef COMPUTE_OBJ_SIZES
@@ -364,9 +374,8 @@ void resetBoard()
   configBuffer[0]='\0';
   //readBuffer[0]='\0';
   generateSerial(false);
-  //MFButton::setBitStore(&InStatus, &InStatusUpd, MAX_ONB_PIN);
-  MFButtonT::setBitStore(&InStatus, &InStatusUpd, NUM_ONB_PINS);
-  MFOutput::setBitStore(&OutStatus, NUM_ONB_PINS);
+  MFButtonT::setBitStore(&IOStatusVal, &IOStatusNew, NUM_ONB_PINS);
+  MFOutput::setBitStore(&IOStatusVal, &IOStatusNew, NUM_ONB_PINS);
   clearRegisteredPins();
   lastCommand = millis();
   loadConfig();
@@ -422,14 +431,17 @@ void activateConfig()
   configActivated = true;
 }
 
-void parse(char **parms, byte nparms, char *p0)
+void parse(char **parms, byte nparms, char **pp)
 {
-  char *p = p0;
+  char *tp;
   //if(nparms==0) return;
   for(int8_t i=0; i<(nparms-1); i++) {
-      parms[i] = strtok_r(NULL, ".", &p);
+      parms[i] = strtok_r(NULL, ".", pp);
   }
-  parms[nparms-1] = strtok_r(NULL, ":", &p);
+  parms[nparms-1] = tp = strtok_r(NULL, ":", pp);
+  // if more parameters are provided than required, the additional ones
+  // become part of the last one: strip them.
+  while((tp = strchr(tp, '.')) != NULL) parms[nparms-1] = ++tp;
 }
 
 void readConfig(String cfg)
@@ -439,80 +451,78 @@ void readConfig(String cfg)
   cfg.toCharArray(readBuffer, MEM_LEN_CONFIG);
 
   char *command = strtok_r(readBuffer, ".", &p);
-  char *params[6];
+  char *params[8];
   if (*command == 0) return;
 
   do {
     switch (atoi(command)) {
       case kTypeButton:
-        parse(params, 2, p); // pin, name
+        parse(params, 2, &p); // pin, name
         AddButton(atoi(params[0])); //, params[1]);
       break;
 
       case kTypeOutput:
-        parse(params, 2, p); // pin, name
+        parse(params, 2, &p); // pin, name
         AddOutput(atoi(params[0])); //, params[1]);
       break;
 
       case kTypeLedSegment:
-        parse(params, 6, p); // pinData, pinCS, pinCLK, brightness, numModules, Name
+        parse(params, 6, &p); // pinData, pinCS, pinCLK, brightness, numModules, Name
         // AddLedSegment(dataPin, clkPin, csPin, numDevices, brightness)
         AddLedSegment(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[4]), atoi(params[3]));
       break;
 
       case kTypeStepper:
-        parse(params, 6, p); // pin1, pin2, pin3, pin4, btnpin, Name
+        parse(params, 6, &p); // pin1, pin2, pin3, pin4, btnpin, Name
         // AddStepper(pin1, pin2, int , pin4)
         AddStepper(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
 
       case kTypeServo:
-        parse(params, 2, p); // pin1, Name
+        parse(params, 2, &p); // pin1, Name
         // AddServo(pin)
         AddServo(atoi(params[0]));
       break;
 
       case kTypeEncoder:
-        parse(params, 3, p); // pin1, pin2, Name
+        parse(params, 3, &p); // pin1, pin2, Name
         // AddEncoder(pin1, pin2, name)
         AddEncoder(atoi(params[0]), atoi(params[1]), params[2]);
       break;
 
       case kTypeLcdDisplayI2C:
-        parse(params, 4, p); // addr, cols, lines, name
+        parse(params, 4, &p); // addr, cols, lines, name
         // AddLcdDisplay(address, cols, lines, name)
         AddLcdDisplay(atoi(params[0]), atoi(params[1]), atoi(params[2]), params[3]);
       break;
       // New IO bank peripherals (GCC 2018-01):
       case kTypeInputMtx:
-        ///parse(params, 4, p); // addr, cols, lines, Name
-        ///AddInputMtx(....);
+        parse(params, 5, &p); // Row0, Col0, NRows, NCols, base
+        AddInputMtx(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
       case kTypeInput165:
-        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
-        ///AddInput165(....);
+        parse(params, 5, &p); // pinData, pinCS, pinCLK, base, numDevices
+        AddInput165(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
       case kTypeOutput595:
-        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
-        ///AddOutput595(....);
+        parse(params, 5, &p); // pinData, pinCS, pinCLK, base, numDevices
+        AddOutput595(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
       case kTypeOutLEDDM13:
-        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
-        ///AddOutLEDDM13(....);
-      break;
-      case kTypeOutLED5940:
-        ///parse(params, 5, p); // pinData, pinCS, pinCLK, numModules, Name
-        ///AddOutLED5940(....);
-      break;
-      case kTypeInOutMCPS:
-        ///parse(params, 6, p); // pinData, pinCS, pinCLK, addr, numModules, Name
-        ///AddInOutMCPS(....);
+        parse(params, 5, &p); // pinData, pinCS, pinCLK, base, numDevices
+        AddOutLEDDM13(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
       case kTypeInOutMCP0:
-        ///parse(params, 5, p); // pinSDA, pinSCL, addr, numModules, Name
-        ///AddInOutMCP0(....);
+        parse(params, 4, &p); // pinSDA, pinSCL, addr, base
+        AddIOMCP0(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]));
+      break;
+      case kTypeInOutMCPS:
+        parse(params, 6, &p); // pinDataIn, pinDataOut, pinCS, pinCLK, addr, base
+        AddIOMCPS(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]),
+                  atoi(params[4]), atoi(params[5]));
       break;
 
+      case kTypeOutLED5940:
       default:
         // read to the end of the current command which is
         // apparently not understood
@@ -728,8 +738,9 @@ void OnSetPin()
   // Read led state argument, interpret string as boolean
   int pin = cmdMessenger.readIntArg();
   int state = cmdMessenger.readIntArg();
-  // Set led
-  digitalWrite(pin, state > 0 ? HIGH : LOW);
+  // Set output line
+  //digitalWrite(pin, state > 0 ? HIGH : LOW);
+  outputs[pin].set(state);
   lastCommand = millis();
 }
 

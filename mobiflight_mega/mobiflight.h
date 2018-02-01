@@ -27,6 +27,11 @@ bool isPinRegistered(byte pin);
 void registerPin(byte pin);
 void clearRegisteredPins(void);
 void clearRegisteredPins(byte type);
+void unregIOBlocks(void);
+template<class T> byte registerPeripherals(T *vec[], byte &n, byte nMax, byte *argList, byte nPins, char *Name);
+template<class T> void unregPeripherals(T *vec[], byte &n);
+template<class T> byte registerIOB(byte *argList, byte nPins, byte base, byte nBlocks, char *Name);
+void unregIOBlocks(void);
 void AddOutput(byte pin = 1);
 void ClearOutputs(void);
 void AddButton(byte pin = 1);
@@ -42,6 +47,14 @@ void AddServo(byte pin);
 void ClearServos(void);
 void AddLcdDisplay (byte address = 0x24, byte cols = 16, byte lines = 2, char *name = "LCD");
 void ClearLcdDisplays(void);
+
+void AddInputMtx(byte Row0, byte NRows, byte Col0, byte NCols, byte base);
+void AddInput165(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
+void AddOutput595(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
+void AddOutLEDDM13(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
+void AddIOMCP0(byte SDAPin, byte SCLPin, byte addr, byte base);
+void AddIOMCPS(byte dataInPin, byte dataOutPin, byte csPin, byte clkPin, byte addr, byte base);
+
 void handlerOnButton(byte eventId, byte pin, const char *); //String name);
 void handlerOnEncoder(byte eventId, byte pin, const char *); //String name);
 void OnSetConfig(void);

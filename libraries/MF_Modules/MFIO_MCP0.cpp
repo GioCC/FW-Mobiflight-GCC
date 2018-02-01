@@ -4,18 +4,18 @@
 
 #include "MFIO_MCP0.h"
 
-MFIO_MCP0::
-MFIO_MCP0(void)
+MFIO_MCP0::MFIO_MCP0(void)
 : MCP23x17()
 {
-    // initialize(false);
     npins(2);
 }
 
+//MFIO_MCP0::~MFIO_MCP0() {}
+
 void MFIO_MCP0::
-attach(byte addr, byte SDAPin, byte SCLPin, byte nUnits)    // Any pin =0xFF means we are using HW I2C
+attach(byte addr, byte SDAPin, byte SCLPin) //, byte nUnits)    // Any pin =0xFF means we are using HW I2C
 {
-    MCP23x17::init(addr, nUnits);
+    MCP23x17::init(addr, 1); //nUnits);
     if(SCLPin!=0xFF && SDAPin!=0xFF) {
         if(SCLPin == SDAPin) return;
         // Not using standard I2C pins:
