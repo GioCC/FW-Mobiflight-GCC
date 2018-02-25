@@ -84,7 +84,7 @@ void RotaryEncoderShd::tick(void)
 
     long now = millis();
     if (newState != _state) {
-        if (now - lastToggleTime >= LINE_DEBOUNCE_MS) {
+        if (now - _lastToggleTime >= LINE_DEBOUNCE_MS) {
             // Button state has not changed for #debounce# milliseconds. Consider it is stable.
             int _speed = calcSpeed();
             _position += KNOBDIR[newState | (_state<<2)] * _speed;
@@ -94,10 +94,10 @@ void RotaryEncoderShd::tick(void)
             }
             _state = newState;
         }
-        lastToggleTime = now;
-    } else if (now - lastToggleTime >= LINE_DEBOUNCE_MS) {
+        _lastToggleTime = now;
+    } else if (now - _lastToggleTime >= LINE_DEBOUNCE_MS) {
         // Forward the last toggle time a bit
-        lastToggleTime = now - LINE_DEBOUNCE_MS - 1;
+        _lastToggleTime = now - LINE_DEBOUNCE_MS - 1;
     }
 } // tick()
 

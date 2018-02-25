@@ -34,7 +34,7 @@ public:
     virtual void detach(void) {}
     virtual void update(byte *send, byte *get) {}
     virtual void test(void) {}
-    virtual byte pins(byte i) =0;
+    virtual byte pins(byte i) =0;       // i = 0..n
 
 protected:
     byte initialized(void) { return((_npins&0x80)!=0); }

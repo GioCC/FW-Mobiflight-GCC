@@ -74,7 +74,8 @@ private:
 
   byte    _pin1, _pin2;   // Arduino pins used for the encoder.
   byte    _state;
-  unsigned long lastToggleTime;
+  unsigned
+  long    _lastToggleTime;
   int     _position;      // Internal position (4 times _positionExt)
   int     _positionExt;   // External position
 

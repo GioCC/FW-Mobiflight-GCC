@@ -25,6 +25,7 @@ char foo;
 //#define MODULETYPE MTYPE_MICRO
 //#define MODULETYPE MTYPE_UNO
 
+// Fixed definitions
 #if MODULETYPE == MTYPE_MEGA
 #define MODULE_MAX_PINS 58
 #endif
@@ -41,6 +42,7 @@ char foo;
 #define STEPPER_SPEED 600 // 300 already worked, 467, too?
 #define STEPPER_ACCEL 900
 
+// Custom (parametric) definitions
 #if MODULETYPE == MTYPE_MICRO
 #define MAX_OUTPUTS     10 // ? Find correct value
 #define MAX_BUTTONS     10 // ? Find correct value
@@ -85,9 +87,9 @@ char foo;
 #endif
 
 #define NUM_ONB_PINS    MODULE_MAX_PINS    // beyond this limit, I/Os are no longer onboard pins
-#define isOnboard(pin)  ((pin)<MODULE_MAX_PINS)
+#define isOnboard(pin)  ((pin)<NUM_ONB_PINS)
 #define MAX_LINES       128 //256 // Includes actual+virtual pins
-#define NUM_VLINES      MAX_LINES-MODULE_MAX_PINS // Includes actual+virtual pins
+#define NUM_VLINES      (MAX_LINES-MODULE_MAX_PINS) // Includes actual+virtual pins
 
 #include <EEPROMex.h>
 #include <bitStore.h>   //GCC
@@ -169,11 +171,27 @@ int             configLength = 0;
 boolean         configActivated = false;
 
 bool            powerSavingMode = false;
-//byte pinsRegistered[MODULE_MAX_PINS];
-byte            pinRegBuf[roundUp(MAX_LINES)];
 
-bitStore<byte>  pinsRegistered(pinRegBuf,roundUp(MAX_LINES));
-///TODO: (for pin overlay) Split <pinsRegistered> into pinsRegIn, pinsRegInShared, pinsRegOut, pinsRegOutShared
+//byte            pinRegBuf[roundUp(MAX_LINES)];
+//bitStore<byte>  pinsRegistered(pinRegBuf,roundUp(MAX_LINES));
+
+// For pin overlay:
+// a flag in <pinsRegIn> marks that the pin is registered as INPUT
+// a flag in <pinsRegOut> marks that the pin is registered as OUTPUT
+// a flag in <pinsRegInShared> (implies reg in <pinsRegIn>) marks that the input pin
+//   can be additionally claimed by another client trying to register a sharable input pin
+// a flag in <pinsRegOutShared> (implies reg in <pinsRegOut>) marks that the output pin
+//   can be additionally claimed by another client trying to register a sharable output pin
+// Currently, only Onboard pins can be shared; this is meant to allow for sharing of HW driving lines
+// for certain interfaces (e.g. software I2C).
+// Conceptually, Virtual pins could also be shared, but it must be defined exactly how,
+// what for and to what extent.
+byte            pBufIn  [roundUp(MAX_LINES)];
+byte            pBufOut [roundUp(MAX_LINES)];
+byte            pBufShd [NUM_ONB_PINS];         // Only onboard pins can (currently) be shared
+bitStore<byte>  pinsRegIn (pBufIn, sizeof(pBufIn));
+bitStore<byte>  pinsRegOut(pBufOut,sizeof(pBufOut));
+bitStore<byte>  pinsRegSharable(pBufShd, sizeof(pBufShd));
 
 const
 unsigned long   POWER_SAVING_TIME = 60*15; // in seconds
@@ -271,7 +289,7 @@ enum
   kTypeStepper,       // 5
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
-  // New IO bank peripherals (GCC 2018-01):
+  // New IOblock peripherals (GCC 2018-01):
   kTypeInputMtx,      // 8
   kTypeInput165,      // 9
   kTypeOutput595,     // 10
@@ -285,8 +303,8 @@ enum
 // In order to receive, attach a callback function to these events
 enum
 {
-  kInitModule,         // 0
-  kSetModule,          // 1
+  kInitLEDModule,      // 0
+  kSetLEDModule,       // 1
   kSetPin,             // 2
   kSetStepper,         // 3
   kSetServo,           // 4
@@ -304,7 +322,7 @@ enum
   kActivateConfig,     // 16
   kConfigActivated,    // 17
   kSetPowerSavingMode, // 18
-  kSetName,            // 19
+  kSetBoardName,       // 19
   kGenNewSerial,       // 20
   kResetStepper,       // 21
   kSetZeroStepper,     // 22
@@ -326,24 +344,31 @@ void attachCommandCallbacks()
 {
   // Attach callback methods
   cmdMessenger.attach(OnUnknownCommand);
-  cmdMessenger.attach(kInitModule, OnInitModule);
-  cmdMessenger.attach(kSetModule, OnSetModule);
-  cmdMessenger.attach(kSetPin, OnSetPin);
-  cmdMessenger.attach(kSetStepper, OnSetStepper);
-  cmdMessenger.attach(kSetServo, OnSetServo);
+
+  // *** System setup ***
   cmdMessenger.attach(kGetInfo, OnGetInfo);
+  cmdMessenger.attach(kGenNewSerial, OnGenNewSerial);
+  cmdMessenger.attach(kResetBoard, OnResetBoard);
+  cmdMessenger.attach(kSetBoardName, OnSetBoardName);
+
+  // *** Configuration ***
   cmdMessenger.attach(kGetConfig, OnGetConfig);
   cmdMessenger.attach(kSetConfig, OnSetConfig);
   cmdMessenger.attach(kResetConfig, OnResetConfig);
   cmdMessenger.attach(kSaveConfig, OnSaveConfig);
   cmdMessenger.attach(kActivateConfig, OnActivateConfig);
-  cmdMessenger.attach(kSetName, OnSetName);
-  cmdMessenger.attach(kGenNewSerial, OnGenNewSerial);
+
+  // *** Output commands ***
+  cmdMessenger.attach(kTrigger, OnTrigger);
+  cmdMessenger.attach(kSetPin, OnSetPin);
+  cmdMessenger.attach(kSetStepper, OnSetStepper);
+  cmdMessenger.attach(kSetServo, OnSetServo);
   cmdMessenger.attach(kResetStepper, OnResetStepper);
   cmdMessenger.attach(kSetZeroStepper, OnSetZeroStepper);
-  cmdMessenger.attach(kTrigger, OnTrigger);
-  cmdMessenger.attach(kResetBoard, OnResetBoard);
+  cmdMessenger.attach(kInitLEDModule, OnInitLEDModule);
+  cmdMessenger.attach(kSetLEDModule, OnSetLEDModule);
   cmdMessenger.attach(kSetLcdDisplayI2C, OnSetLcdDisplayI2C);
+
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Attached callbacks"));
 #endif
@@ -401,6 +426,7 @@ void resetConfig()
   ClearServos();
   ClearSteppers();
   ClearLcdDisplays();
+  ClearIOBlocks();
   configLength = 0;
   configActivated = false;
 }
@@ -443,6 +469,8 @@ void parse(char **parms, byte nparms, char **pp)
   // become part of the last one: strip them.
   while((tp = strchr(tp, '.')) != NULL) parms[nparms-1] = ++tp;
 }
+
+#define atoi(s) fast_atoi(s)
 
 void readConfig(String cfg)
 {
@@ -513,13 +541,14 @@ void readConfig(String cfg)
         AddOutLEDDM13(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
       break;
       case kTypeInOutMCP0:
-        parse(params, 4, &p); // pinSDA, pinSCL, addr, base
-        AddIOMCP0(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]));
+        parse(params, 6, &p); // pinSDA, pinSCL, addr, IOdir1, IOdir2, base
+        AddIOMCP0(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]),
+                  atoi(params[4]), atoi(params[5]));
       break;
       case kTypeInOutMCPS:
-        parse(params, 6, &p); // pinDataIn, pinDataOut, pinCS, pinCLK, addr, base
+        parse(params, 8, &p); // MOSI, MISO, pinCS, pinCLK, addr, IOdir1, IOdir2, base
         AddIOMCPS(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]),
-                  atoi(params[4]), atoi(params[5]));
+                  atoi(params[4]), atoi(params[5]), atoi(params[6]), atoi(params[7]));
       break;
 
       case kTypeOutLED5940:
@@ -583,6 +612,13 @@ void updateServos()
   }
 }
 
+void updateIOBlocks(void)
+{
+  for (int i=0; i!=IOBlocksRegistered; i++) {
+    IOBlocks[i]->update(NULL, NULL);
+  }
+}
+
 void readButtons()
 {
   long now = millis();
@@ -634,6 +670,7 @@ void loop()
   // segments do not need update
   updateSteppers();
   updateServos();
+  updateIOBlocks();
 }
 
 #include "MF_registration.inc"
@@ -744,7 +781,7 @@ void OnSetPin()
   lastCommand = millis();
 }
 
-void OnInitModule()
+void OnInitLEDModule()
 {
   int module = cmdMessenger.readIntArg();
   int subModule = cmdMessenger.readIntArg();
@@ -753,7 +790,7 @@ void OnInitModule()
   lastCommand = millis();
 }
 
-void OnSetModule()
+void OnSetLEDModule()
 {
   int module = cmdMessenger.readIntArg();
   int subModule = cmdMessenger.readIntArg();
@@ -817,7 +854,7 @@ void OnGenNewSerial()
   cmdMessenger.sendCmdEnd();
 }
 
-void OnSetName()
+void OnSetBoardName()
 {
   String cfg = cmdMessenger.readStringArg();
   cfg.toCharArray(&name[0], MEM_LEN_NAME);
