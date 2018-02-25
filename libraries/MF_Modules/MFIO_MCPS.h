@@ -61,10 +61,12 @@ public:
     MFIO_MCPS(void);
     //~MFIO_MCPS(void);
 
-    void    attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin); //, byte nUnits=1);
+    void    attach(byte addr,
+                   byte MOSIpin, byte MISOpin, byte csPin, byte clkPin,
+                   byte IOdir1, byte IOdir2);
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4] /*, pm[5]*/); }    // name unused
+    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6]); }    // name unused
     void    detach();
 
     // Virtuals from MCP23x17::MFIOBlock

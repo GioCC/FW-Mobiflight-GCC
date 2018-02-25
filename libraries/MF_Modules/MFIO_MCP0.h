@@ -61,10 +61,10 @@ public:
     MFIO_MCP0(void);
     //~MFIO_MCP0(void);
 
-    void    attach(byte addr, byte SDAPin = 0xFF, byte SCLPin = 0xFF);//, byte nUnits=1);    // Any pin =0xFF means we are using HW I2C
+    void    attach(byte addr, byte SDAPin, byte SCLPin, byte IOdir1, byte IOdir2); // Any pin =0xFF means we are using HW I2C
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[1], pm[2], pm[0] /*, pm[3]*/); }    // name unused
+    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
     void    detach(void);
 
     // Virtuals from MCP23x17::MFIOBlock

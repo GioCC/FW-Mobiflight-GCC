@@ -13,8 +13,11 @@ MFIO_MCP0::MFIO_MCP0(void)
 //MFIO_MCP0::~MFIO_MCP0() {}
 
 void MFIO_MCP0::
-attach(byte addr, byte SDAPin, byte SCLPin) //, byte nUnits)    // Any pin =0xFF means we are using HW I2C
+attach(byte addr,
+       byte SDAPin, byte SCLPin,
+       byte IOdir1, byte IOdir2) //, byte nUnits)    // Any pin =0xFF means we are using HW I2C
 {
+    ///TODO setup dir1/dir2!!!
     MCP23x17::init(addr, 1); //nUnits);
     if(SCLPin!=0xFF && SDAPin!=0xFF) {
         if(SCLPin == SDAPin) return;

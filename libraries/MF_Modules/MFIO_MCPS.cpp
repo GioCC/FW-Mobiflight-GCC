@@ -14,13 +14,16 @@ MFIO_MCPS::MFIO_MCPS(void)
 //MFIO_MCPS::~MFIO_MCPS() {}
 
 void MFIO_MCPS::
-attach(byte addr, byte dataInPin, byte dataOutPin, byte csPin, byte clkPin) //, byte nUnits)
+attach(byte addr,
+       byte MOSIpin, byte MISOpin, byte csPin, byte clkPin,
+       byte IOdir1, byte IOdir2) //, byte nUnits)
 {
+    ///TODO setup dir1/dir2!!!
     MCP23x17::init(addr, 1); //nUnits);
 
     // We should check that the pin nr. values are legal!
-    MCPDTI = dataInPin;
-    MCPDTO = dataOutPin;
+    MCPDTI = MOSIpin;
+    MCPDTO = MISOpin;
     MCPSEL = csPin;
     MCPCLK = clkPin;
 
