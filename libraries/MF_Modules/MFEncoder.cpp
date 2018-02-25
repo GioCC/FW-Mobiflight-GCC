@@ -47,8 +47,17 @@ void MFEncoder::update()
   }
 
   // Build name to pass back
-  char nm[4];
-  nm[0] = 'E'; nm[1] = _name[0]; nm[2] = _name[1]; nm[3] = 0;
+
+
+  char nm[5];
+  nm[0] = 'E';
+  // A name based on _name (ie the encoder #) would be better and would allow to "multiplex" several encoders
+  // on the same pins:
+  //nm[1] = _name[0]; nm[2] = _name[1]; nm[3] = 0;
+  // However, for now we follow the same coding used for Buttons by using the 1st Pin no. as distinctive name
+  // (which also makes things a little easier on the Connector application's side):
+  // Please notice that pin no. is used here as _conventional name_ for the encoder, not as actual pin indicator.
+  fast_itoa(&nm[1], _encoder.pin(1));
 
   long delta = pos - _pos;
   long dir = 1;

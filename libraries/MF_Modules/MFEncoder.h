@@ -59,7 +59,7 @@ public:
     byte getPins(byte *dst)             { dst[0] = _encoder.pin(1); dst[1] = _encoder.pin(2); return npins(); }
 
 protected:
-    byte    pins(byte n) { return _encoder.pin(n+1); }
+    byte    pins(byte n) { return _encoder.pin(n+1); }  // implements MFPeripheral.pins(n)
 
 private:
     static encoderEvent       _handler; //[4];
