@@ -25,7 +25,7 @@
 //#include <Button.h>
 
 
-#define LATCHSTATE 3
+//#define LATCHSTATE 3
 /**
  * Minimum rotary encoder tick per second to start acceleration.
  * If the speed of ticking is below this value no acceleration
@@ -50,12 +50,24 @@
 
 #define LINE_DEBOUNCE_MS   5
 
+typedef struct {
+	// Detent positions in the quadrature (by value, not position)
+	bool    detents[4];
+
+	// Bit shift to apply given the detent resolution of this encoder.
+	//
+	// Example: An encoder with 1 detent per quadrature cycle has a useful resolution of
+    // 1/4 of the number of pulses so we can apply a simple bit shift of 2 to 
+	// determine the effective position of the encoder.
+	uint8_t resolutionShift;
+} encoderType;
+
 class RotaryEncoderShd
 {
 public:
   RotaryEncoderShd(void) {}
 
-  void  initialize(byte pin1, byte pin2);
+  void  initialize(byte pin1, byte pin2, byte encoder_type);
 
   void  setMinMax(long min, long max);
 
@@ -81,6 +93,8 @@ private:
 
   long    _minValue;
   long    _maxValue;
+
+  encoderType _encoderType;
 
   //uint8_t _id;
 #define _id   _pin1   // Use pin no. as ID (this implies no shared pins!)

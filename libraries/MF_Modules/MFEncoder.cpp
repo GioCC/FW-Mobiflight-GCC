@@ -14,7 +14,7 @@ MFEncoder::MFEncoder()
   // initialize(false);
 }
 
-void MFEncoder::attach(byte pin1, byte pin2, byte encno) //, String name)
+void MFEncoder::attach(byte pin1, byte pin2, byte encoder_type, byte encno) //, String name)
 {
   char ns[4];
   _pos   = 0;
@@ -26,7 +26,7 @@ void MFEncoder::attach(byte pin1, byte pin2, byte encno) //, String name)
   _name[0] = ns[1];
   _name[1] = ns[2];
 
-  _encoder.initialize(pin1,pin2);
+  _encoder.initialize(pin1, pin2, encoder_type);
   _encoder.setMinMax(MF_ENC_MIN,MF_ENC_MAX);
   _encoder.setPosition(_pos);
 

@@ -139,7 +139,9 @@ const byte MEM_OFFSET_CONFIG = MEM_OFFSET_NAME + MEM_LEN_NAME + MEM_LEN_SERIAL;
 // 1.7.2 : "???"
 // 1.7.3 : Servo behaviour improved, fixed stepper bug #178, increased number of buttons per module (MEGA)
 // 1.8.0 : added support for LCDs
-const char version[8] = "1.8.0";
+// 1.9.0 : Support for rotary encoders with different detent configurations
+// 2.0.0 : [WIP] GCC mods
+const char version[8] = "2.0.0";
 
 #if MODULETYPE == MTYPE_MEGA
 char type[20]                = "MobiFlight Mega";
@@ -283,20 +285,21 @@ enum
 {
   kTypeNotSet,        // 0
   kTypeButton,        // 1
-  kTypeEncoder,       // 2
+  kTypeEncoderSingleDetent, // 2 (retained for backwards compatibility, use kTypeEncoder for new configs)
   kTypeOutput,        // 3
   kTypeLedSegment,    // 4
   kTypeStepper,       // 5
   kTypeServo,         // 6
   kTypeLcdDisplayI2C, // 7
+  kTypeEncoder,       // 8
   // New IOblock peripherals (GCC 2018-01):
-  kTypeInputMtx,      // 8
-  kTypeInput165,      // 9
-  kTypeOutput595,     // 10
-  kTypeOutLEDDM13,    // 11
-  kTypeOutLED5940,    // 12
-  kTypeInOutMCPS,     // 13
-  kTypeInOutMCP0,     // 14
+  kTypeInputMtx,      // 9
+  kTypeInput165,      // 10
+  kTypeOutput595,     // 11
+  kTypeOutLEDDM13,    // 12
+  kTypeOutLED5940,    // 13
+  kTypeInOutMCPS,     // 14
+  kTypeInOutMCP0,     // 15
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
@@ -512,10 +515,16 @@ void readConfig(String cfg)
         AddServo(atoi(params[0]));
       break;
 
-      case kTypeEncoder:
+      case kTypeEncoderSingleDetent:
         parse(params, 3, &p); // pin1, pin2, Name
-        // AddEncoder(pin1, pin2, name)
-        AddEncoder(atoi(params[0]), atoi(params[1]), params[2]);
+        // AddEncoder(pin1, pin2, encType=0, name)
+        AddEncoder(atoi(params[0]), atoi(params[1]), 0, params[2]);
+      break;
+
+      case kTypeEncoder:
+        parse(params, 4, &p); // pin1, pin2, encType, Name
+        // AddEncoder(pin1, pin2, encType, name)
+        AddEncoder(atoi(params[0]), atoi(params[1]), atoi(params[2]), params[3]);
       break;
 
       case kTypeLcdDisplayI2C:

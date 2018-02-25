@@ -51,9 +51,9 @@ public:
     //static void attachHandler(byte eventId, encoderEvent newHandler);
     static void attachHandler(encoderEvent newHandler);
     void update(void);
-    void attach(byte pin1, byte pin2, byte encno); //String name = "Encoder");
+    void attach(byte pin1, byte pin2, byte encoder_type, byte encno); //String name = "Encoder");
 
-    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2]); } //name); }
+    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2], pm[3]); } //name); }
     void detach(void) {};
     void update(byte *send, byte *get)  { update(); }
     byte getPins(byte *dst)             { dst[0] = _encoder.pin(1); dst[1] = _encoder.pin(2); return npins(); }
