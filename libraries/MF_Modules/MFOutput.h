@@ -33,11 +33,12 @@ public:
     byte getPin(void) { return _pin; }
 
     // Expose the same interface style as MFPeripheral, but without inheriting it (too much overhead and no real need)
-    byte NPins(void)                    { return 1; }
-    void attach(byte *pm, char *name)   { attach(pm[0]); }
-    void detach(void)                   {}
-    void update(byte *send, byte *get)  { set(*send); }
-    byte getPins(byte *dst)             { dst[0]=_pin; return 1; }
+    // in case it is found fitting to process MFOutput in the same way as MFPeripherals.
+    //byte NPins(void)                    { return 1; }
+    //void attach(byte *pm, char *name)   { attach(pm[0]); }
+    //void detach(void)                   {}
+    //void update(byte *send, byte *get)  { set(*send); }
+    //byte getPins(byte *dst)             { dst[0]=_pin; return 1; }
     //void test(void) {};
 protected:
     byte pins(byte n)    { return (n=0 ? _pin : 0xFF); }
