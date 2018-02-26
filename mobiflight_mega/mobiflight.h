@@ -41,7 +41,7 @@ void AddOutput(byte pin = 1);
 void ClearOutputs(void);
 void AddButton(byte pin = 1);
 void ClearButtons(void);
-void AddEncoder(byte pin1 = 1, byte pin2 = 2, char *name = "Encoder");
+void AddEncoder(byte pin1 = 1, byte pin2 = 2, byte type = 0, char *name = "Encoder");
 void ClearEncoders(void);
 void AddLedSegment(byte dataPin, byte csPin, byte clkPin, byte numDevices, byte brightness);
 void ClearLedSegments(void);
