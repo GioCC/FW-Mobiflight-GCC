@@ -2,3 +2,5 @@ build
 ^.*\.bak$
 cscope.out$
 #_CubeMX/.*\.zip$
+libraries/_shelved/
+_shelved/

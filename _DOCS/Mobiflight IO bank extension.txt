@@ -1,0 +1,99 @@
+Mobiflight Arduino - Mega
+Changes for I/O Banks
+
+1. Memory/speed optimizations:
+   ===========================
+
+- replace the standard digitalWrite()/digitalRead() with fast versions
+
+V Handler pointers
+    MFButton/MFEncoder (and other input devices): make handler pointers static, since they're all equal anyway, to spare memory (particularly for AddButton). Or just remove it altogether (there's just one callback for any Button action, and one for any encoder action).
+
+V use of bitStores
+    The bit values for I/O (both existing Button/Output and HW expansions) are no longer contained in the objects,  but kept in a packed bit bank buffer, implemented by a new class (e.g. bitStore), and accessible both bit-wise and bank- (byte-)wise.
+    Each MFButton/MFOutput will carry a reference to the bitStore through a static pointer in the class (eg MFButton::_textStore).
+
+V Reduce memory used by Encoders
+    Each encoder uses a huge amount of memory, particularly through MFEncoder <- RotaryEncoder <- TicksPerSecond; this latter has lots of 'long's.
+    Currently, each encoder takes about 80 bytes(!). 10 Encoders already take 10% of MCU memory!
+        V First thing, limit the number of encoders to a reasonable value (from original 20 to max 10).
+        V Use a single, shared, static tps=TicksPerSecond object common to all RotaryEncoders (one tps takes 35 bytes alone).
+        This implies the (reasonable) limitation that no more that one encoder will be activated at any time.
+        Beside the class static tps reference (modif. class RotaryEncoder), an argument should be added to TicksPerSecond.update() for the index of the encoder (or generically: object) that ticks. Whenever a tick comes from an object different from the previous one, the tps counters are reset.
+
+V Reduce memory used by MFButton names.
+    Currently a name is kept in a String; a String object occupies 6 bytes PLUS the actual string data (that goes in the heap, with further overhead).
+    Possible solutions:
+    X change the String for a char[] as member of MFButton. With just a few more bytes than the 6 already occupied by the String object, we already have the space also for data (and allocated compile-time). Drawback: fixed, and somehow short, length for names and space wasted for shorter names.
+    X Store the string data (nul-term) contiguously in a large char[] buffer (eg 'textStore'), which takes the place of the heap; MFButtons contain the char* to the text start. Two bytes only instead of 6 per MFButton; no heap allocation; required memory known at compile-time.
+    V MOST SENSIBLE: Get rid of names (at least for inputs)!!!
+    In MF, in order to have an input trigger an action:
+        - an input must be defined on the module, with a chosen name and a pin associated; this is required to issue a configuration instruction to the module;
+        - an action (linked eg to a FSUIPC offset value setting) can be defined; this has a description (meaningful for the user) and is linked to the corresponding input through its name.
+    The name has no particular significance; the description is mnemonic enough.
+    Currently, we define the action "DoThisAndThat" and link it to a name "foobar" associated with one of the defined inputs (we can only choose in the set of names of inputs already defined). The input is bound e.g. to pin #8, and given the name "foobar" by us.
+    It must be noted that the name "foobar" (that we have to invent) has no other reason than to be a recallable token for linking input and action.
+    We could as well link the action to the conventional name "P008" (which again can only be selected if an input, which we incidentally can see is linked to pin #8, has been defined).
+    Even reassignment for pin change would be no harder. Currently eg we just change the name to the input "foobar" to "ex-foobar", and define another input with name "foobar" (eg pin #10); the action then has its reference changed to pin #10.
+    In the new system, we just define the new input linked to pin #10 (which is then auto-named "P010") and change the name ref in the action entry to "P010".
+    Basically, the new system just auto-assigns the "name" field.
+    The main problem would be the backward compatibility of the PC application (for existing configurations).
+    -> Defined class MFButtonT (no name stored, 1 shared String obj, -7 bytes): just by replacing MFButton with MFButtonT in a given condition,
+    with MAX_BUTTONS=80 data size decreases from 4654 bytes/57% to 4092 bytes/50%. (with MAX_BUTTONS=50: from 4274 bytes/52% to 3922 bytes/48%.)
+    More importantly, no additional bytes at runtime on the heap anymore.
+
+2. Modifications to add new modular I/O blocks:
+   ============================================
+
+V Virtual pins
+    Pins >= MODULE_MAX_PINS are Virtual pins, as opposed to "true" onboard pins.
+    Define a macro isPinVirtual(p) (p >= MODULE_MAX_PINS) ('pin' variables remain uint8_t: theor. max (256-MODULE_MAX_PINS[=58 for Mega2560])>= 198 inputs + 198 outputs)
+
+V Neutralize registerPin() if pin# is of a virtual pin.
+
+V pinsRegistered[] values (1)
+    Change pinsRegistered[i] to a bitStore. Turns out that it's not important to know what a pin is assigned to (there is a reference in the owning object anyway): isPinRegisteredForType() is never used.
+    The only situation in which a difference is made is clearRegisteredPins(type); it is actually useless in practice, because it is called just in one place and repeatedly for ALL types (might as well use clearRegisteredPins(void)).
+    In order to keed the differentiation, however, clearRegisteredPins(type) can be implemented differently by scanning the registry of objects of the desired type and clearing the pinsRegistered value of their pins.
+
+X pinsRegistered[] values (2)
+    the same virtual pin # can be shared between different pin types (eg: "true" pin #3 can only be EITHER an input or an output; but pin #115 can be assigned BOTH to virtual input #115 AND virtual output #115).
+    For this reason, for virtual I/Os there a need to allow multiple assignments for the same v-pin.
+    A second bitStore could be used (meaningful for v-pins only), where the first records v-pin assignments as inputs (beside all true-pin assignments), and the second records v-pin assignments as outputs.
+    >>> NOT IMPLEMENTED - even if a virtual pin number could easily be shared, for consistency it will refer to _either one_ only.
+    This implies that the (bit) storage space for virtual ins & outs is 50% wasted; this is however deemed acceptable (just a few bytes) for the sake of clarity and consistency.
+
+V Only True pins for peripherals
+    Allow pins used for Encoders, displays etc. to be TRUE pins only (just add limit check to args, which should be in place anyway).
+    In principle, virtual pins could be used for peripherals, but it is unknown if performance is sufficient; besides, there should be a way to resolve assignment conflicts (since virtual pins are currently always unassigned). [probably better forget this one.]
+
+V AddButton/AddOutput ext for virtual pins
+    Inside AddButton, either of these:
+        X use a new class 'MFBankInput' (mostly similar to MFButton)
+        V use MFButton, but modify it for a different behaviour if pin is virtual
+    Same for AddOutput/MFOutput.
+
+V New MF-classes for IOBlocks: 
+    V KeyMatrix
+    V HC163
+    V HC/TPIC595
+    V TLC5926/STP16C05/DM13A/SM16126D
+    V MCP23S17
+    V MCP23017 (Wire+SoftI2C)
+    - TM1638 ?
+
+V New 'kType[IOBlockXXX]' constants, XXX -> 163, 595, DM13, MCPS, MCP0...
+
+V New 'Add[IOBlockXXX]()' functions, each with its own:
+    - specific HW driver params (e.g. pins, I/O banks per unit, hw adr, hw pin direction...)
+    - config (n. chained units, assignment to position in IO bank buffer )
+    Inside Add[IOBlock_XXX], perform a series of "AddButton" and/or "AddOutput" for each I/O with "virtual" pin numbers.
+    This way, I/Os in external modules will be configured exactly like ordinary HW I/Os.
+
+V Processing of IOBlocks in readConfig()
+    
+V IOBlock polling (updateIOBlocks())
+    Items from the IOBlock_XXX list will be refreshed (hw poll) during cyclic scan, and their data read/written from/to the IO bank buffer
+
+
+

@@ -107,8 +107,8 @@ protected:
     // Virtuals from MFPeripheral
     byte    pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
 
-    byte    getIMap(byte bank) { return (bank >= (num_units*BANKS_PER_UNIT) ?  _DDR[bank] : 0); };
-    byte    getOMap(byte bank){ return (bank >= (num_units*BANKS_PER_UNIT) ? ~_DDR[bank] : 0); };
+    byte    getIMap(byte bank) { return (bank >= (num_units*BANKS_PER_UNIT) ? 0 : _DDR[bank]); };
+    byte    getOMap(byte bank){ return (bank >= (num_units*BANKS_PER_UNIT)  ? 0 : ~_DDR[bank]); };
     byte    getBSize(void)      { return 2; }   // # of 8-bit banks per base unit
 
 public:

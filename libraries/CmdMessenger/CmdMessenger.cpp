@@ -1,6 +1,6 @@
 /*
   CmdMessenger - library that provides command based messaging
-  
+
 	Permission is hereby granted, free of charge, to any person obtaining
 	a copy of this software and associated documentation files (the
 	"Software"), to deal in the Software without restriction, including
@@ -45,7 +45,7 @@ extern "C" {
 
 #define _CMDMESSENGER_VERSION 3_3 // software version of this library
 
-// **** Initialization **** 
+// **** Initialization ****
 
 /**
  * CmdMessenger constructor
@@ -121,20 +121,20 @@ void CmdMessenger::attach(byte msgId, messengerCallbackFunction newFunction)
 void CmdMessenger::feedinSerialData()
 {
     while ( !pauseProcessing && comms->available() )
-	{	   
-		// The Stream class has a readBytes() function that reads many bytes at once. On Teensy 2.0 and 3.0, readBytes() is optimized. 
+	{
+		// The Stream class has a readBytes() function that reads many bytes at once. On Teensy 2.0 and 3.0, readBytes() is optimized.
 		// Benchmarks about the incredible difference it makes: http://www.pjrc.com/teensy/benchmark_usb_serial_receive.html
 
 		int bytesAvailable = min(comms->available(),MAXSTREAMBUFFERSIZE);
-		comms->readBytes(streamBuffer, bytesAvailable); 
-		
+		comms->readBytes(streamBuffer, bytesAvailable);
+
 		// Process the bytes in the stream buffer, and handles dispatches callbacks, if commands are received
-		for (int byteNo = 0; byteNo < bytesAvailable ; byteNo++) 
-		{   
+		for (int byteNo = 0; byteNo < bytesAvailable ; byteNo++)
+		{
 		    int messageState = processLine(streamBuffer[byteNo]);
 
 			// If waiting for acknowledge command
-			if ( messageState == kEndOfMessage ) 
+			if ( messageState == kEndOfMessage )
 			{
 				handleMessage();
 			}
@@ -199,7 +199,7 @@ bool CmdMessenger::blockedTillReply(unsigned long timeout, int ackCmdId)
 }
 
 /**
- *   Loops as long data is available to determine if acknowledge has come in 
+ *   Loops as long data is available to determine if acknowledge has come in
  */
 bool CmdMessenger::CheckForAck(int AckCommand)
 {
@@ -256,7 +256,7 @@ bool CmdMessenger::available()
 }
 
 /**
- * Returns if the latest argument is well formed. 
+ * Returns if the latest argument is well formed.
  */
 bool CmdMessenger::isArgOk ()
 {
@@ -342,7 +342,7 @@ int CmdMessenger::findNext(char *str, char delim)
 {
     int pos = 0;
     bool escaped;
-    ArglastChar = NULL;
+    ArglastChar = '\0';
     while (*str != '\0') {
         escaped = isEscaped(str,escape_character,&ArglastChar);
         if (*str==field_separator && !escaped) {
@@ -389,7 +389,7 @@ long CmdMessenger::readLongArg()
 bool CmdMessenger::readBoolArg()
 {
 	return (readIntArg()!=0)?true:false;
-    
+
 }
 
 /**

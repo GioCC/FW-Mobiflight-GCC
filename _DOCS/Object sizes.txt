@@ -1,0 +1,15 @@
+SAMPLE_but                   1  
+SAMPLE_out                   1  
+//SAMPLE_enc      0x2b        43       (1 + 8 + 14 + 2*9 + ?) MFPeripheral, MFEncoder, RotaryEncoderShd, Button 
+SAMPLE_enc      0x1c        28       (1 + 6 + 19 + ?)    MFPeripheral, MFEncoder, RotaryEncoderShd 
+SAMPLE_seg      0x9 + 0x4    9 (+ 4) (1 + 6 + ?)         MFPeripheral, MFSegment; MF_LEDControl
+SAMPLE_srv      0x1d        29       (1 + 23 + 4 + ?)    MFPeripheral, MFServo, Servo (+ 144 static)
+SAMPLE_stp      0x50        80       (1 + 9 + 66 + ?)    MFPeripheral, MFStepper, AccelStepper
+SAMPLE_LCD      0x8          8 (+ 8) (1 + 5 + ?)         MFPeripheral, MFLCDDisplay; LiquidCrystal_I2C
+SAMPLE_inMtx    0x1f        31       (1 + 25 + ?)        MFPeripheral, MFInputMtx
+SAMPLE_in165    0xa         10       (1 + 7 + ?)         MFPeripheral, MFInput165
+SAMPLE_out595   0xa         10       (1 + 7 + ?)         MFPeripheral, MFOutput595
+SAMPLE_LEDDM13  0xb         11       (1 + 8 + ?)         MFPeripheral, MFOutLEDDM13
+SAMPLE_MCPS     0x14        20       (1 + 17 + 0 + ?)    MFPeripheral, MCP23x17, MFIO_MCPS
+SAMPLE_MCP0     0x16        22 (+ 4) (1 + 17 + 2 + ?)    MFPeripheral, MCP23x17, MFIO_MCP0; SlowSoftI2CMaster
+

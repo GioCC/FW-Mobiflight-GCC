@@ -774,6 +774,8 @@
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
 		</Unit>
+		<Unit filename="libraries/MF_LedControlMpx/MF_LedControlMpx.cpp" />
+		<Unit filename="libraries/MF_LedControlMpx/MF_LedControlMpx.h" />
 		<Unit filename="libraries/MF_LedControl/MF_LedControl.cpp" />
 		<Unit filename="libraries/MF_LedControl/MF_LedControl.h" />
 		<Unit filename="libraries/MF_Modules/MCP23x17.cpp" />

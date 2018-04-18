@@ -415,7 +415,7 @@ void ClearButtons(void)
 ///==========///
 /// ENCODERS ///
 ///==========///
-void AddEncoder(byte pin1, byte pin2, char *Name)
+void AddEncoder(byte pin1, byte pin2, byte type, char *Name)
 {
   byte errReg = kErrNone;
   // Pin validation
@@ -425,10 +425,11 @@ void AddEncoder(byte pin1, byte pin2, char *Name)
    || isPinRegistered(pin2)) errReg=kErrConflict;
 
   if(!errReg) {
-    byte  argList[3];
+    byte  argList[4];
     argList[0] = pin1;
     argList[1] = pin2;
-    argList[2] = encodersRegistered+1;
+    argList[2] = type;
+    argList[3] = encodersRegistered+1;
     errReg = registerPeripheral<MFEncoder>(encoders, encodersRegistered, MAX_ENCODERS, argList, 2, Name);
 
   #ifdef DEBUG
