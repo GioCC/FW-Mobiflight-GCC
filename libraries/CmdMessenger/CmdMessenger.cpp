@@ -389,7 +389,6 @@ long CmdMessenger::readLongArg()
 bool CmdMessenger::readBoolArg()
 {
 	return (readIntArg()!=0)?true:false;
-
 }
 
 /**

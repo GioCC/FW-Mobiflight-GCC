@@ -35,6 +35,7 @@ public:
     virtual void update(byte *send, byte *get) {}
     virtual void test(void) {}
     virtual byte pins(byte i) =0;       // i = 0..n
+    byte mpxAdr(byte n = 0xFF) { if(n!=0xFF) MPX_adr = n; return MPX_adr;}
 
 protected:
     byte initialized(void) { return((_npins&0x80)!=0); }
@@ -43,8 +44,9 @@ protected:
     byte npins(byte n = 0xFF) { if(n!=0xFF) {_npins=(_npins&0x80)+(n&0x7F);} return (_npins&0x7F); }
 
 private:
-    byte    _npins;   // bit 7 is the 'initialized' flag
+    byte    _npins;     // bit 7 is the 'initialized' flag
     //bool    _initialized;
+    byte    MPX_adr;
 };
 
 #endif // MFPERIPHERAL_H_INCLUDED

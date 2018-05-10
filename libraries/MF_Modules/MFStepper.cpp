@@ -14,7 +14,7 @@ void addStepper(MFStepper *stepper) {
 }
 
 void HandlerOnRelease(byte eventId, uint8_t pin, String name) {
-  if ( eventId != btnOnPress ) return;
+  if ( eventId != btnPress ) return;
   for (int i=0; i < MFStepper_stepperCount; i++) {
       if (MFStepper_steppers[i]->getButton()->_pin == pin) {
         MFStepper_steppers[i]->setZeroInReset();
@@ -35,8 +35,8 @@ MFStepper::MFStepper(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4 /*, 
     _pin[0] = pin1; _pin[1] = pin2; _pin[2] = pin3; _pin[3] = pin4;
     _resetting = false;
     /* addStepper(this);
-    _button.attachHandler(btnOnPress, HandlerOnRelease);
-    _button.attachHandler(btnOnRelease, HandlerOnRelease);
+    _button.attachHandler(btnPress, HandlerOnRelease);
+    _button.attachHandler(btnRelease, HandlerOnRelease);
     */
 }
 

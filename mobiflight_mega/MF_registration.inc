@@ -252,6 +252,7 @@ void unregPeripherals(T *vec[], byte &n)
 // Registers IOBlock objects;
 // also registers the associated virtual pins and generates Button and Output objects for them.
 // Does NOT register driver pins.
+// NB Argument <nPins> is actually unused, temporarily kept until proven absolutely unnecessary
 template<class T>
 byte registerIOB(byte *argList, byte nPins, byte base, byte nBlocks, char *Name)
 {
@@ -271,7 +272,7 @@ byte registerIOB(byte *argList, byte nPins, byte base, byte nBlocks, char *Name)
             //Can't register onboard pins in bulk, should know whether I or O
             //for(j=0; j<nPins; j++) { registerPin(argList[j]); }
             IOBlocksRegistered++;
-            //Can register virtual pins in bulk, now obj carries the info about direction
+            //Can register _virtual_ pins in bulk, now obj carries the info about direction
             registerVirtualPins((MFIOBlock *)obj);
         }
     } else {
@@ -338,39 +339,39 @@ void unregIOBlocks(void)
 
 void AddOutput(uint8_t pin) //, String name)
 {
-  byte errReg = kErrNone;
-  if (outputsRegistered == MAX_OUTPUTS) errReg=kErrFull;
-  // Direct I/O pins (whether onboard or virtual) can't share assignment with anything else
-  if (isPinRegistered(pin))             errReg=kErrConflict;
+    byte errReg = kErrNone;
+    if (outputsRegistered == MAX_OUTPUTS) errReg=kErrFull;
+    // Direct I/O pins (whether onboard or virtual) can't share assignment with anything else
+    if (isPinRegistered(pin))             errReg=kErrConflict;
 
-  if(!errReg) {
-    //outputs[outputsRegistered] = MFOutput(pin);
-    outputs[outputsRegistered].attach(pin);
-    registerPin(pin, 0, 0);
-    outputsRegistered++;
-  }
+    if(!errReg) {
+        //outputs[outputsRegistered] = MFOutput(pin);
+        outputs[outputsRegistered].attach(pin);
+        registerPin(pin, 0, 0);
+        outputsRegistered++;
+    }
 
 #ifdef DEBUG
-  const char *cp;
-  if(errReg==kErrFull)      cp=PSTR("Output limit exceeded");
-  if(errReg==kErrConflict)  cp=PSTR("Output pin conflict");
-  if(!errReg)   cp=PSTR("Added Output");
-  cmdMessenger.sendCmd(kStatus,cp);
-  //cmdMessenger.sendCmd(kStatus, PSTR("Added output.")); // " + name);
+    const char *cp;
+    if(errReg==kErrFull)      cp=PSTR("Output limit exceeded");
+    if(errReg==kErrConflict)  cp=PSTR("Output pin conflict");
+    if(!errReg)   cp=PSTR("Added Output");
+    cmdMessenger.sendCmd(kStatus,cp);
+    //cmdMessenger.sendCmd(kStatus, PSTR("Added output.")); // " + name);
 #endif
 }
 
 void ClearOutputs(void)
 {
-  //Better to reset pin status to INPUT_PULLUP for onboard pins
-  byte p;
-  for(byte i=0; i<outputsRegistered; i++) {
-    if(isOnboard(p = outputs[i].getPin())) pinMode(p, INPUT_PULLUP);
-  }
-  clearRegisteredPins(kTypeOutput);
-  outputsRegistered = 0;
+    //Better to reset pin status to INPUT_PULLUP for onboard pins
+    byte p;
+    for(byte i=0; i<outputsRegistered; i++) {
+        if(isOnboard(p = outputs[i].getPin())) pinMode(p, INPUT_PULLUP);
+    }
+    clearRegisteredPins(kTypeOutput);
+    outputsRegistered = 0;
 #ifdef DEBUG
-  cmdMessenger.sendCmd(kStatus,PSTR("Cleared outputs"));
+    cmdMessenger.sendCmd(kStatus,PSTR("Cleared outputs"));
 #endif
 }
 
@@ -609,13 +610,13 @@ void ClearServos()
 void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, char *name)
 {
   byte errReg = kErrNone;
-  if (lcd_12cRegistered == MAX_MFLCD_I2C) return;
+  if (lcd_i2cRegistered == MAX_MFLCD_I2C) return;
   // Pin validation (using fixed HW I2C)
   if(!checkPinReg(SDA, 0, true) ||
      !checkPinReg(SCL, 0, true))  errReg=kErrConflict;
 
-  lcd_I2C[lcd_12cRegistered].attach(address, cols, lines);
-  lcd_12cRegistered++;
+  lcd_I2C[lcd_i2cRegistered].attach(address, cols, lines);
+  lcd_i2cRegistered++;
   // Register std I2C pins to prevent accidental hijacking
   // I2C pins are to be registered as INPUTS by convention
   // (to avoid that they are forced to an unwanted state)
@@ -629,10 +630,10 @@ void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, char *name)
 
 void ClearLcdDisplays()
 {
-  for (int i=0; i!=lcd_12cRegistered; i++) {
-    lcd_I2C[lcd_12cRegistered].detach();
+  for (int i=0; i!=lcd_i2cRegistered; i++) {
+    lcd_I2C[lcd_i2cRegistered].detach();
   }
-  lcd_12cRegistered = 0;
+  lcd_i2cRegistered = 0;
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Cleared lcdDisplays"));
 #endif
@@ -859,5 +860,30 @@ void AddInputMtx(byte Row0, byte NRows, byte Col0, byte NCols, byte base)
   Merrors(InputMtx);
 }
 
+///===================///
+/// IOBlock: InputMPX ///
+///===================///
+void AddInputMPX(byte inPin, byte firstSelPin, byte base)
+{
+    byte errReg = kErrNone;
+    // Pin validation
+    if(!errReg) {
+        if(!isOnboard(inPin))             errReg = kErrNotOnboard;
+        if(!checkPinReg(inPin, 0, false)) errReg = kErrConflict;
+    }
+    if(!errReg) {
+        byte argList[1];        // This is the same as expected by specific MFmodule.attach()
+        argList[0] = inPin;
+        errReg = registerIOB<MFInputMPX>(argList, 1, base, 2, NULL); //Name ignored
+        if(!errReg) {
+            registerPin(inPin, 1, false);
+        }
+    }
+    if(!errReg) {
+        // TODO set _selector function for the object!
+        // Use global <Multiplexer> object, allocate here if it doesn't exist (use firstSelPin)
+    }
+    Merrors(InputMtx);
+}
 
 ///-------------------------------------------------------------------------------------------------

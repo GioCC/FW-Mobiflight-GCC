@@ -35,20 +35,20 @@ const int8_t KNOBDIR[] = {
 // Configuration for different types of rotary encoders.
 // For more information, refer to http://svglobe.com/arduino/in_encoder.html
 //
-// The detents in the encoder type settings below are indexed 
-// by value, not by the order in the quadrature cycle. For example, a rotary 
-// encoder with detents at 00 and 11 (positions 0 and 2 in the 
+// The detents in the encoder type settings below are indexed
+// by value, not by the order in the quadrature cycle. For example, a rotary
+// encoder with detents at 00 and 11 (positions 0 and 2 in the
 // quadrature) but are indexed based on their decimal values (0 and 3).
 // This allows simple lookup of detent positions by value.
-const encoderType encoderTypes[]{
+const encoderType encoderTypes[] ={
 
-	// 1 detents per cycle:  00 ,  10 , [11],  01 
+	// 1 detents per cycle:  00 ,  10 , [11],  01
 	{ { false, false, false, true }, 2 },
 
-	// 1 detents per cycle: [00],  10 ,  11 ,  01 
+	// 1 detents per cycle: [00],  10 ,  11 ,  01
 	{ { true, false, false, false }, 2 },
 
-	// 2 detents per cycle: [00],  10 , [11],  01 
+	// 2 detents per cycle: [00],  10 , [11],  01
 	{ { true, false, false, true }, 1 },
 
 	// 2 detents per cycle:  00 , [10],  11,  [01]
@@ -81,7 +81,7 @@ void RotaryEncoderShd::initialize(byte pin1, byte pin2, byte encoder_type) {
     _maxValue = 1000;
 
     _encoderType = encoderTypes[encoder_type];
-    
+
     _tps.initialize();  // Shared TPS is reset whenever a new encoder is initialized
 }
 

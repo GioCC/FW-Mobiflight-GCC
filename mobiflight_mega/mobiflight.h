@@ -55,6 +55,7 @@ void ClearLcdDisplays(void);
 
 void ClearIOBlocks(void);
 void AddInputMtx(byte Row0, byte NRows, byte Col0, byte NCols, byte base);
+void AddInputMPX(byte inPin, byte firstSelPin, byte base);
 void AddInput165(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
 void AddOutput595(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
 void AddOutLEDDM13(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);

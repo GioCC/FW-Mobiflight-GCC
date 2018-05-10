@@ -102,13 +102,13 @@ void MF_LedControl::shutdown(byte addr, bool b)
 
 void MF_LedControl::setScanLimit(byte addr, byte limit) {
     if(addr>=numDevices) return;
-    if(limit>=0 || limit<8)
+    if(/*limit>=0 || */limit<8)
         spiTransfer(addr, OP_SCANLIMIT,limit);
 }
 
 void MF_LedControl::setIntensity(byte addr, byte intensity) {
     if(addr>=numDevices) return;
-    if(intensity>=0 || intensity<16)
+    if(/*intensity>=0 || */ intensity<16)
         spiTransfer(addr, OP_INTENSITY,intensity);
 
 }
@@ -131,7 +131,8 @@ void MF_LedControl::setLed(byte addr, byte row, byte column, bool state, bool no
 
     if(!digits) return;
     if(addr>=numDevices) return;
-    if(row<0 || row>7 || column<0 || column>7) return;
+    if(/*row<0 || column<0 || */
+       row>7 || column>7) return;
     offset=addr*8;
     val=B10000000 >> column;
     if(state)
@@ -147,7 +148,7 @@ void MF_LedControl::setRow(byte addr, byte row, byte value, bool noTX)
 {
     byte offset;
     if(addr>=numDevices)  return;
-    if(row<0 || row>7)    return;
+    if(/*row<0 ||*/ row>7)    return;
     offset=addr*8;
     if(digits) digits[offset+row]=value;
     if(!noTX) spiTransfer(addr, row+1, value); //digits[offset+row]);
@@ -157,7 +158,7 @@ void MF_LedControl::setColumn(byte addr, byte col, byte value, bool noTX) {
     byte val;
 
     if(addr>=numDevices)  return;
-    if(col<0 || col>7)    return;
+    if(/*col<0 ||*/ col>7)    return;
     for(byte row=0;row<8;row++) {
         val=value >> (7-row);
         val=val & 0x01;
@@ -171,7 +172,7 @@ void MF_LedControl::setDigit(byte addr, byte digit, byte value, bool dp, bool no
     byte v;
 
     if(addr>=numDevices) return;
-    if(digit<0 || digit>7 || value>15) return;
+    if(/*digit<0 ||*/ digit>7 || value>15) return;
     offset=addr*8;
     //v=charTable[value];
     v=pgm_read_byte_near(charTable+value);
@@ -185,9 +186,9 @@ void MF_LedControl::setChar(byte addr, byte digit, char value, bool dp, bool noT
     byte offset;
     byte index,v;
 
-    if(addr<0 || addr>=numDevices)
+    if(/*addr<0 ||*/ addr>=numDevices)
         return;
-    if(digit<0 || digit>7)
+    if(/*digit<0 ||*/ digit>7)
         return;
     offset=addr*8;
     index=(byte)value;

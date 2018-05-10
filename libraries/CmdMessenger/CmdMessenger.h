@@ -27,9 +27,9 @@
 
 #include <inttypes.h>
 #if ARDUINO >= 100
-#include <Arduino.h> 
+#include <Arduino.h>
 #else
-#include <WProgram.h> 
+#include <WProgram.h>
 #endif
 
 //#include "Stream.h"
@@ -48,7 +48,7 @@ extern "C"
 
 // Message States
 enum
-{  
+{
   kProccesingMessage,            // Message is being received, not reached command separator
   kEndOfMessage,				 // Message is fully received, reached command separator
   kProcessingArguments,			 // Message is received, arguments are being read parsed
@@ -58,72 +58,72 @@ class CmdMessenger
 {
 private:
 
-  // **** Private variables *** 
-  
+  // **** Private variables ***
+
   bool    startCommand;            // Indicates if sending of a command is underway
-  uint8_t lastCommandId;		    // ID of last received command 
+  uint8_t lastCommandId;		    // ID of last received command
   uint8_t bufferIndex;              // Index where to write data in buffer
   uint8_t bufferLength;             // Is set to MESSENGERBUFFERSIZE
   uint8_t bufferLastIndex;          // The last index of the buffer
-  char ArglastChar;                 // Bookkeeping of argument escape char 
-  char CmdlastChar;                 // Bookkeeping of command escape char 
+  char ArglastChar;                 // Bookkeeping of argument escape char
+  char CmdlastChar;                 // Bookkeeping of command escape char
   bool pauseProcessing;             // pauses processing of new commands, during sending
   bool print_newlines;              // Indicates if \r\n should be added after send command
   char commandBuffer[MESSENGERBUFFERSIZE]; // Buffer that holds the data
   char streamBuffer[MAXSTREAMBUFFERSIZE]; // Buffer that holds the data
   uint8_t messageState;             // Current state of message processing
-  bool dumped;                      // Indicates if last argument has been externally read 
+  bool dumped;                      // Indicates if last argument has been externally read
   bool ArgOk;						// Indicated if last fetched argument could be read
   char *current;                    // Pointer to current buffer position
   char *last;                       // Pointer to previous buffer position
   char prevChar;                    // Previous char (needed for unescaping)
   Stream *comms;                    // Serial data stream
-  
+
   char command_separator;           // Character indicating end of command (default: ';')
   char field_separator;				// Character indicating end of argument (default: ',')
   char escape_character;		    // Character indicating escaping of special chars
-    
-  messengerCallbackFunction default_callback;            // default callback function  
-  messengerCallbackFunction callbackList[MAXCALLBACKS];  // list of attached callback functions 
-  
-  // ****** Private functions ******   
-  
+
+  messengerCallbackFunction default_callback;            // default callback function
+  messengerCallbackFunction callbackList[MAXCALLBACKS];  // list of attached callback functions
+
+  // ****** Private functions ******
+
   // **** Initialize ****
-  
+
   void init (Stream & comms, const char fld_separator, const char cmd_separator, const char esc_character);
   void reset ();
-  
+
   // **** Command processing ****
-  
+
   inline uint8_t processLine (int serialByte) __attribute__((always_inline));
   inline void handleMessage() __attribute__((always_inline));
   inline bool blockedTillReply (unsigned long timeout = DEFAULT_TIMEOUT, int ackCmdId = 1) __attribute__((always_inline));
   inline bool CheckForAck (int AckCommand) __attribute__((always_inline));
 
   // **** Command sending ****
-   
+
   /**
    * Print variable of type T binary in binary format
    */
-  template < class T > 
+  template < class T >
     void writeBin (const T & value)
   {
 	const byte *bytePointer = (const byte *) (const void *) &value;
     for (unsigned int i = 0; i < sizeof (value); i++)
       {
-        printEsc (*bytePointer); 
+        printEsc (*bytePointer);
         *bytePointer++;
       }
   }
-    
+
   // **** Command receiving ****
-  
+
   int findNext (char *str, char delim);
 
   /**
    * Read a variable of any type in binary format
    */
-  template < class T > 
+  template < class T >
     T readBin (char *str)
   {
     T value;
@@ -136,45 +136,46 @@ private:
       }
     return value;
   }
-  
+
   // **** Escaping tools ****
-  
+
   char *split_r (char *str, const char delim, char **nextp);
   bool isEscaped (char *currChar, const char escapeChar, char *lastChar);
-  
+
   void printEsc (char *str);
-  void printEsc (char str); 
-  
+  void printEsc (char str);
+
 public:
 
   // ****** Public functions ******
 
   // **** Initialization ****
-  
-  CmdMessenger (Stream & comms, const char fld_separator = ',', 
-				const char cmd_separator = ';', 
+
+  CmdMessenger (Stream & comms,
+                const char fld_separator = ',',
+                const char cmd_separator = ';',
                 const char esc_character = '/');
-  
+
   void printLfCr (bool addNewLine=true);
   void attach (messengerCallbackFunction newFunction);
   void attach (byte msgId, messengerCallbackFunction newFunction);
-  
+
   // **** Command processing ****
-  
+
   void feedinSerialData ();
   bool next ();
   bool available ();
   bool isArgOk ();
   uint8_t CommandID ();
-  
+
   // ****  Command sending ****
-  
+
   /**
-   * Send a command with a single argument of any type 
+   * Send a command with a single argument of any type
    * Note that the argument is sent as string
    */
   template < class T >
-    bool sendCmd (int cmdId, T arg, bool reqAc = false, int ackCmdId = 1, 
+    bool sendCmd (int cmdId, T arg, bool reqAc = false, int ackCmdId = 1,
 				  int timeout = DEFAULT_TIMEOUT)
   {
     if (!startCommand) {
@@ -184,9 +185,9 @@ public:
 	}
 	return false;
   }
-  
+
   /**
-   * Send a command with a single argument of any type 
+   * Send a command with a single argument of any type
    * Note that the argument is sent in binary format
    */
   template < class T >
@@ -202,14 +203,14 @@ public:
   }
 
   // **** Command sending with multiple arguments ****
-  
+
   void sendCmdStart (int cmdId);
   void sendCmdEscArg (char *arg);
   void sendCmdfArg (char *fmt, ...);
   bool sendCmdEnd (bool reqAc = false, int ackCmdId = 1, int timeout = DEFAULT_TIMEOUT);
-  
+
   /**
-   * Send a single argument as string 
+   * Send a single argument as string
    *  Note that this will only succeed if a sendCmdStart has been issued first
    */
   template < class T > void sendCmdArg (T arg)
@@ -220,7 +221,7 @@ public:
         comms->print (arg);
       }
   }
-  
+
   /**
    * Send a single argument as string with custom accuracy
    *  Note that this will only succeed if a sendCmdStart has been issued first
@@ -233,11 +234,11 @@ public:
         comms->print (arg, n);
       }
   }
-  
+
   /**
    * Send a single argument in binary format
    *  Note that this will only succeed if a sendCmdStart has been issued first
-   */  
+   */
   template < class T > void sendCmdBinArg (T arg)
   {
     if (startCommand)
@@ -245,7 +246,7 @@ public:
         comms->print (field_separator);
         writeBin (arg);
       }
-  }  
+  }
 
   // **** Command receiving ****
   bool readBoolArg();
@@ -256,10 +257,10 @@ public:
   char *readStringArg ();
   void copyStringArg (char *string, uint8_t size);
   uint8_t compareStringArg (char *string);
- 
+
   /**
    * Read an argument of any type in binary format
-   */  
+   */
   template < class T > T readBinArg ()
   {
     if (next ())
@@ -271,7 +272,7 @@ public:
   }
 
   // **** Escaping tools ****
-  
-  void unescape (char *fromChar);	
+
+  void unescape (char *fromChar);
 };
 #endif

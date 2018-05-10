@@ -99,6 +99,7 @@ char foo;
 
 #include <MFButtonT.h>        //#include <MFButton.h>
 #include <MFOutput.h>
+#include <Multiplexer.h>
 //#include <Button.h>
 //#include <RotaryEncoder.h>
 //#include <RotaryEncoderShd.h>
@@ -112,6 +113,7 @@ char foo;
 //#include <LiquidCrystal_I2C.h>
 #include <MFLCDDisplay.h>
 #include <MFInputMtx.h>
+#include <MFInputMPX.h>
 #include <MFInput165.h>
 #include <MFOutput595.h>
 #include <MFOutLEDDM13.h>
@@ -222,7 +224,7 @@ MFServo *servos[MAX_MFSERVOS];
 byte servosRegistered = 0;
 
 MFLCDDisplay lcd_I2C[MAX_MFLCD_I2C];
-byte lcd_12cRegistered = 0;
+byte lcd_i2cRegistered = 0;
 
 MFPeripheral *IOBlocks[MAX_IOBLOCKS];
 byte IOBlocksRegistered = 0;
@@ -300,6 +302,7 @@ enum
   kTypeOutLED5940,    // 13
   kTypeInOutMCPS,     // 14
   kTypeInOutMCP0,     // 15
+  kTypeInputMPX,      // 16
 };
 
 // This is the list of recognized commands. These can be commands that can either be sent or received.
@@ -467,7 +470,8 @@ void parse(char **parms, byte nparms, char **pp)
   for(int8_t i=0; i<(nparms-1); i++) {
       parms[i] = strtok_r(NULL, ".", pp);
   }
-  parms[nparms-1] = tp = strtok_r(NULL, ":", pp);
+  /// should handle the case of less parms found than expected
+  parms[nparms-1] = tp = strtok_r(NULL, ":", pp);   // last token returned can be followed either by ':' or end of string
   // if more parameters are provided than required, the additional ones
   // become part of the last one: strip them.
   while((tp = strchr(tp, '.')) != NULL) parms[nparms-1] = ++tp;
@@ -481,7 +485,7 @@ void readConfig(String cfg)
   char *p = NULL;
   cfg.toCharArray(readBuffer, MEM_LEN_CONFIG);
 
-  char *command = strtok_r(readBuffer, ".", &p);
+  char *command = strtok_r(readBuffer, ".", &p);    // First call; will do next ones in parse(.)
   char *params[8];
   if (*command == 0) return;
 
@@ -536,6 +540,10 @@ void readConfig(String cfg)
       case kTypeInputMtx:
         parse(params, 5, &p); // Row0, Col0, NRows, NCols, base
         AddInputMtx(atoi(params[0]), atoi(params[1]), atoi(params[2]), atoi(params[3]), atoi(params[4]));
+      break;
+      case kTypeInputMPX:
+        parse(params, 2, &p); // inPin, firstSelPin, base
+        AddInputMPX(atoi(params[0]), atoi(params[1]), atoi(params[2]));
       break;
       case kTypeInput165:
         parse(params, 5, &p); // pinData, pinCS, pinCLK, base, numDevices
@@ -738,14 +746,14 @@ void OnResetConfig()
 void OnSaveConfig()
 {
   storeConfig();
-  cmdMessenger.sendCmd(kConfigSaved, "OK");
+  cmdMessenger.sendCmd(kConfigSaved, PSTR("OK"));
 }
 
 void OnActivateConfig()
 {
   readConfig(configBuffer);
   activateConfig();
-  cmdMessenger.sendCmd(kConfigActivated, "OK");
+  cmdMessenger.sendCmd(kConfigActivated, PSTR("OK"));
 }
 
 void OnUnknownCommand()

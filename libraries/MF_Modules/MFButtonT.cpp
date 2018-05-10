@@ -55,14 +55,14 @@ void MFButtonT::trigger()
       fast_itoa(&pt[1], _pin);
       //_nameStr = pt;
 
-      if (_handler) {(*_handler)((_InBitsVal->get(_pin)==LOW ? btnOnPress : btnOnRelease), _pin, pt); } //_nameStr); }
+      if (_handler) {(*_handler)((_InBitsVal->get(_pin)==LOW ? btnPress : btnRelease), _pin, pt); } //_nameStr); }
 
       /*
-      if (_InBits->get(_pin)==LOW && _handler[btnOnPress]!= NULL) {
-        (*_handler[btnOnPress])(btnOnPress, _pin, _nameStr);
+      if (_InBits->get(_pin)==LOW && _handler[btnPress]!= NULL) {
+        (*_handler[btnPress])(btnPress, _pin, _nameStr);
       }
-      else if (_handler[btnOnRelease] != NULL)
-        (*_handler[btnOnRelease])(btnOnRelease, _pin, _nameStr);
+      else if (_handler[btnRelease] != NULL)
+        (*_handler[btnRelease])(btnRelease, _pin, _nameStr);
       */
 }
 

@@ -29,8 +29,8 @@ extern "C"
 
 enum
 {
-  btnOnPress,
-  btnOnRelease,
+  btnPress,
+  btnRelease,
 };
 
 /////////////////////////////////////////////////////////////////////
