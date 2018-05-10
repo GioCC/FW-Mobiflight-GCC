@@ -649,6 +649,43 @@
 					<Variable name="UPLOAD_PORT" value="" />
 				</Environment>
 			</Target>
+			<Target title="Arduino Mega 2560 STD_IDE">
+				<Option output="build/Mobiflight_CBP_${BOARD_ID}.elf" prefix_auto="1" extension_auto="0" />
+				<Option object_output="build" />
+				<Option type="1" />
+				<Option compiler="avrgcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-x c++" />
+					<Add option="-mmcu=$(MCU)" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-D__AVR_ATmega2560__" />
+					<Add directory="$(ARDUINO_DIR)/libraries" />
+					<Add directory="$(ARDUINO_DIR)/hardware/arduino/cores/arduino" />
+					<Add directory="$(ARDUINO_DIR)/hardware/arduino/variants/mega" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=$(MCU)" />
+					<Add option='&quot;$(PROJECT_DIR)${TARGET_OUTPUT_DIR}/lib_${BOARD_ID}_${MCU_CLOCK}.a&quot;' />
+					<Add option='&quot;$(PROJECT_DIR)${TARGET_OUTPUT_DIR}/core_${BOARD_ID}_${MCU_CLOCK}.a&quot;' />
+					<Add option="-Wl,-Map=$(TARGET_OUTPUT_FILE).map,--cref" />
+				</Linker>
+				<ExtraCommands>
+					<Add before='$(TARGET_COMPILER_DIR)ArduinoUploader &quot;$(PROJECT_DIR).&quot; $(BOARD_ID) - $(MCU_CLOCK) 0 &quot;$(PROJECT_DIR)${TARGET_OUTPUT_DIR}/lib_${BOARD_ID}_${MCU_CLOCK}.a&quot; &quot;$(PROJECT_DIR)${TARGET_OUTPUT_DIR}/core_${BOARD_ID}_${MCU_CLOCK}.a&quot;' />
+					<Add after='avr-objcopy -O ihex -R .eeprom -R .eesafe &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;$(TARGET_OUTPUT_FILE).hex&quot;' />
+					<Add after='avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex &quot;$(TARGET_OUTPUT_FILE)&quot; &quot;$(TARGET_OUTPUT_FILE).eep.hex&quot;' />
+					<Add after='avr-size --mcu=$(MCU) --format=avr &quot;$(TARGET_OUTPUT_FILE)&quot;' />
+					<Add after='cmd /c &quot;avr-objdump -h -S $(TARGET_OUTPUT_FILE) &gt; $(TARGET_OUTPUT_FILE).lss&quot;' />
+				</ExtraCommands>
+				<Environment>
+					<Variable name="BOARD" value="Arduino Mega 2560\ADK" />
+					<Variable name="BOARD_ID" value="mega2560" />
+					<Variable name="MCU" value="atmega2560" />
+					<Variable name="MCU_CLOCK" value="16" />
+					<Variable name="UPLOAD_BAUDRATE" value="57600" />
+					<Variable name="UPLOAD_PORT" value="" />
+				</Environment>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wl,--gc-sections  -Wno-unused-parameter" />
@@ -663,6 +700,7 @@
 			<Add directory="libraries/MF_LedControl" />
 			<Add directory="libraries/LiquidCrystal-I2C" />
 			<Add directory="libraries/MF_Modules" />
+			<Add directory="libraries/Multiplexer" />
 			<Add directory="libraries/RotaryEncoder" />
 			<Add directory="libraries/RotaryEncoderShd" />
 			<Add directory="libraries/RotaryEncoderAcelleration" />
@@ -684,9 +722,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="GCC/textStore.h" />
-		<Unit filename="Mobiflight IO bank extension.txt">
-			<Option virtualFolder="Docs/" />
-		</Unit>
 		<Unit filename="lib_std/Servo/Servo.cpp" />
 		<Unit filename="lib_std/Servo/Servo.h" />
 		<Unit filename="lib_std/Servo/ServoTimers.h" />
@@ -703,76 +738,91 @@
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/AccelStepper/AccelStepper.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/AccelStepper/MultiStepper.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/AccelStepper/MultiStepper.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/CmdMessenger.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/CmdMessenger.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/utility/DoEvery.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/utility/DoEvery.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/utility/HeaterSim.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/CmdMessenger/utility/HeaterSim.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/EEPROMEx/EEPROMVar.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/EEPROMEx/EEPROMex.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/EEPROMEx/EEPROMex.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/LiquidCrystal-I2C/LiquidCrystal_I2C.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/LiquidCrystal-I2C/LiquidCrystal_I2C.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_LedControlMpx/MF_LedControlMpx.cpp" />
 		<Unit filename="libraries/MF_LedControlMpx/MF_LedControlMpx.h" />
@@ -784,6 +834,7 @@
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFButtonT.cpp" />
 		<Unit filename="libraries/MF_Modules/MFButtonT.h" />
@@ -793,21 +844,25 @@
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFCore.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFEncoder.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFEncoder.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFIOBlock.h" />
 		<Unit filename="libraries/MF_Modules/MFIO_MCP0.cpp" />
@@ -816,22 +871,27 @@
 		<Unit filename="libraries/MF_Modules/MFIO_MCPS.h" />
 		<Unit filename="libraries/MF_Modules/MFInput165.cpp" />
 		<Unit filename="libraries/MF_Modules/MFInput165.h" />
+		<Unit filename="libraries/MF_Modules/MFInputMPX.cpp" />
+		<Unit filename="libraries/MF_Modules/MFInputMPX.h" />
 		<Unit filename="libraries/MF_Modules/MFInputMtx.cpp" />
 		<Unit filename="libraries/MF_Modules/MFInputMtx.h" />
 		<Unit filename="libraries/MF_Modules/MFLCDDisplay.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFLCDDisplay.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFMain.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFOutLEDDM13.cpp" />
 		<Unit filename="libraries/MF_Modules/MFOutLEDDM13.h" />
@@ -839,11 +899,13 @@
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFOutput.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFOutput595.cpp" />
 		<Unit filename="libraries/MF_Modules/MFOutput595.h" />
@@ -853,45 +915,55 @@
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFSegments.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFServo.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFServo.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFStepper.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFStepper.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFUtility.cpp" />
 		<Unit filename="libraries/MF_Modules/MFUtility.h" />
+		<Unit filename="libraries/Multiplexer/Multiplexer.cpp" />
+		<Unit filename="libraries/Multiplexer/Multiplexer.h" />
 		<Unit filename="libraries/RotaryEncoderAcelleration/RotaryEncoderAcelleration.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/RotaryEncoderAcelleration/RotaryEncoderAcelleration.h">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="libraries/RotaryEncoderShd/RotaryEncoderShd.cpp" />
 		<Unit filename="libraries/RotaryEncoderShd/RotaryEncoderShd.h" />
@@ -899,14 +971,62 @@
 		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.h" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.h" />
-		<Unit filename="mobiflight_mega/MF_registration.inc" />
-		<Unit filename="mobiflight_mega/mobiflight.h" />
+		<Unit filename="mobiflight_mega/MF_registration.inc">
+			<Option target="Simulator - Debug" />
+			<Option target="Simulator - Release" />
+			<Option target="Arduino Uno" />
+			<Option target="Arduino Leonardo" />
+			<Option target="Arduino Esplora" />
+			<Option target="Arduino Micro" />
+			<Option target="Arduino Duemilanove (328)" />
+			<Option target="Arduino Duemilanove (168)" />
+			<Option target="Arduino Nano (328)" />
+			<Option target="Arduino Nano (168)" />
+			<Option target="Arduino Mini (328)" />
+			<Option target="Arduino Mini (168)" />
+			<Option target="Arduino Pro Mini (328)" />
+			<Option target="Arduino Pro Mini (168)" />
+			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 1280" />
+			<Option target="Arduino Mega 8" />
+			<Option target="Microduino Core+ (644P)" />
+		</Unit>
+		<Unit filename="mobiflight_mega/mobiflight.h">
+			<Option target="Simulator - Debug" />
+			<Option target="Simulator - Release" />
+			<Option target="Arduino Uno" />
+			<Option target="Arduino Leonardo" />
+			<Option target="Arduino Esplora" />
+			<Option target="Arduino Micro" />
+			<Option target="Arduino Duemilanove (328)" />
+			<Option target="Arduino Duemilanove (168)" />
+			<Option target="Arduino Nano (328)" />
+			<Option target="Arduino Nano (168)" />
+			<Option target="Arduino Mini (328)" />
+			<Option target="Arduino Mini (168)" />
+			<Option target="Arduino Pro Mini (328)" />
+			<Option target="Arduino Pro Mini (168)" />
+			<Option target="Arduino Mega 2560/ADK" />
+			<Option target="Arduino Mega 1280" />
+			<Option target="Arduino Mega 8" />
+			<Option target="Microduino Core+ (644P)" />
+		</Unit>
 		<Unit filename="mobiflight_mega/mobiflight_mega.ino">
 			<Option compile="1" />
 			<Option link="1" />
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
 			<Option target="Arduino Mega 2560/ADK" />
+		</Unit>
+		<Unit filename="mobiflight_v2/MF_registration.cpp">
+			<Option target="Arduino Mega 2560 STD_IDE" />
+		</Unit>
+		<Unit filename="mobiflight_v2/mobiflight.h">
+			<Option compile="1" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
+		</Unit>
+		<Unit filename="mobiflight_v2/mobiflight_v2.cpp">
+			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Extensions>
 			<code_completion />
