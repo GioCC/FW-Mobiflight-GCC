@@ -1,5 +1,19 @@
-//GCC
-// mobiflight.h
+/********************************************************************
+*
+* mobiflight.h
+*
+* Declarations for MobiFlight core
+* Originally part of main file mobiflight_XXXX.ino, now extracted to allow
+* splitting the original file to a more manageable size and also
+* allow the project to be built with a "conventional" IDE (not the Arduino one)
+*
+* Project:  MobiFlight v2
+* Hardware: Arduino Mega (/ Uno / Nano)
+* Author:   Giorgio CROCI CANDIANI g.crocic@gmail.com
+* Date:     2018-01
+*
+********************************************************************/
+
 
 #define DEBUG
 #define NO_ARDUINO_IDE

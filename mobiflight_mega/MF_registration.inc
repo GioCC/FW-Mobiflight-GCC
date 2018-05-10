@@ -1,7 +1,20 @@
-/// ===================
+/********************************************************************
+*
+* MF_registration.inc
+*
+* Code for MobiFlight core, mostly related to peripheral registration on configuration
+* Originally part of main file mobiflight_XXXX.ino, now extracted to allow
+* splitting the original file to a more manageable size.
+* Configured as macro inclusion file for mobiflight_mega.ino
+* to allow the project to be built with the standard Arduino IDE
+*
+* Project:  MobiFlight v2
+* Hardware: Arduino Mega (/ Uno / Nano)
+* Author:   Giorgio CROCI CANDIANI g.crocic@gmail.com
+* Date:     2018-01
+*
+********************************************************************/
 /// MF_registration.inc
-///
-/// macro inclusion file for mobiflight_mega_ino
 
 inline
 byte isPinRegdAsIn(byte pin)

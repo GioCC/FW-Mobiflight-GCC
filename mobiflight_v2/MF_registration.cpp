@@ -1,7 +1,18 @@
-/// ===================
-/// MF_registration.cpp
-///
-/// macro inclusion file for mobiflight_mega_ino
+/********************************************************************
+*
+* MF_registration.cpp
+*
+* Code for MobiFlight core, mostly related to peripheral registration on configuration
+* Originally part of main file mobiflight_XXXX.ino, now extracted to allow
+* splitting the original file to a more manageable size and also
+* to allow the project to be built with a "conventional" IDE (not the Arduino one)
+*
+* Project:  MobiFlight v2
+* Hardware: Arduino Mega (/ Uno / Nano)
+* Author:   Giorgio CROCI CANDIANI g.crocic@gmail.com
+* Date:     2018-01
+*
+********************************************************************/
 
 #include <Arduino.h>
 #include <avr/pgmspace.h>

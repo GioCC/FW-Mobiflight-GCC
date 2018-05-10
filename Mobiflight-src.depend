@@ -2029,3 +2029,35 @@
 	<avr/pgmspace.h>
 	"mobiflight.h"
 
+1525971138 source:d:\cloud\syncgcc\work\_panel interface\mobiflight-gcc-fw-src\mobiflight_v2\mf_registration.cpp
+	<Arduino.h>
+	<avr/pgmspace.h>
+	"mobiflight.h"
+
+1525971138 d:\cloud\syncgcc\work\_panel interface\mobiflight-gcc-fw-src\mobiflight_v2\mobiflight.h
+	<EEPROMex.h>
+	<bitStore.h>
+	<CmdMessenger.h>
+	<TicksPerSecond.h>
+	<Wire.h>
+	<MFButtonT.h>
+	<MFOutput.h>
+	<Multiplexer.h>
+	<MFEncoder.h>
+	<MFSegments.h>
+	<MFServo.h>
+	<MFStepper.h>
+	<MFLCDDisplay.h>
+	<MFInputMtx.h>
+	<MFInputMPX.h>
+	<MFInput165.h>
+	<MFOutput595.h>
+	<MFOutLEDDM13.h>
+	<MFIO_MCPS.h>
+	<MFIO_MCP0.h>
+
+1525971719 source:d:\cloud\syncgcc\work\_panel interface\mobiflight-gcc-fw-src\mobiflight_v2\mobiflight_v2.cpp
+	<Arduino.h>
+	<avr/pgmspace.h>
+	"mobiflight.h"
+

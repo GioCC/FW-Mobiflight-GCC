@@ -1028,6 +1028,11 @@
 		<Unit filename="mobiflight_v2/mobiflight_v2.cpp">
 			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
+		<Unit filename="mobiflight_v2/mobiflight_v2_mega.ino">
+			<Option compile="1" />
+			<Option link="1" />
+			<Option target="Arduino Mega 2560 STD_IDE" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />

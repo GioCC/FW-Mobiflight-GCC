@@ -1,8 +1,29 @@
-/**
- * Includes Core Arduino functionality
- **/
-char foo;
+/********************************************************************
+*
+* MobiFlight Project - v2
+*
+* Panel controller with Arduino for FSX/P3D flight simulators (also X-Plane through XPUIPC)
+*
+* MobiFlight is a project by Sebastian MOEBIUS
+* Version 2 has been improved and expanded by Giorgio CROCI CANDIANI
+*
+* Project:  MobiFlight v2
+* Hardware: Arduino Mega (/ Uno / Nano)
+* Author:   Giorgio CROCI CANDIANI g.crocic@gmail.com
+* Date:     2018-01
+*
+* This code for the MobiFlight core was originally part in the main file
+* "mobiflight_XXXX.ino";
+* it has now been extracted in order to allow splitting the file to a more
+* manageable size, and also to allow the project to be built as a normal
+* .cpp module with a "conventional" IDE (not the Arduino one)
+* for easier debugging.
+*
+* >>> STILL requires to be built with an Arduino-aware toolchain!!!
+*
+********************************************************************/
 
+// Include Core Arduino functionality
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 
@@ -550,44 +571,6 @@ void readEncoder()
   }
 }
 
-// Setup function
-void setup()
-{
-  Serial.begin(115200);
-  attachCommandCallbacks();
-  OnResetBoard();
-  cmdMessenger.printLfCr();
-#ifdef COMPUTE_OBJ_SIZES
-  // Just required so the compiler doesn't dismiss OBJ_SIZE because unused
-  if(OBJ_SIZE[0])
-    cmdMessenger.printLfCr();
-#endif // COMPUTE_OBJ_SIZES
-}
-
-// Loop function
-void loop()
-{
-  // Process incoming serial data, and perform callbacks
-  cmdMessenger.feedinSerialData();
-  updatePowerSaving();
-
-  // if config has been reset
-  // and still is not activated
-  // do not perform updates
-  // to prevent mangling input for config (shared buffers)
-  if (!configActivated) return;
-
-  readButtons();
-  readEncoder();
-
-  // segments do not need update
-  updateSteppers();
-  updateServos();
-  updateIOBlocks();
-}
-
-//#include "MF_registration.inc"
-
 ///================///
 /// EVENT HANDLERS ///
 ///================///
@@ -783,3 +766,9 @@ void OnTrigger()
     buttons[i].trigger();
   }
 }
+
+//#include "MF_registration.inc"
+// Arduino Setup / Loop functions left in '.ino' file
+
+//END mobiflight_v2.cpp
+

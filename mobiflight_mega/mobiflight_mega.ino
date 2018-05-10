@@ -1,12 +1,7 @@
 /**
  * Includes Core Arduino functionality
  **/
-char foo;
-#if ARDUINO < 100
-  #include <WProgram.h>
-#else
-  #include <Arduino.h>
-#endif
+#include <Arduino.h>
 #include <avr/pgmspace.h>
 
 ///NOTE GCC - restore for orig MF
