@@ -69,7 +69,7 @@ void MF_LedControlMpx::init_helper(byte nd)
     for(int i=0;i<nd;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
         //scanlimit is set to max on startup
-        setScanLimit(i,7);
+        setScanLimit(i,8);
         //decode is done in source
         spiTransfer(i,OP_DECODEMODE,0);
         clearDisplay(i);
@@ -119,13 +119,14 @@ void MF_LedControlMpx::shutdown(byte addr, bool b)
 
 void MF_LedControlMpx::setScanLimit(byte addr, byte limit) {
     if(addr>=getDeviceCount()) return;
-    if(limit>=0 || limit<8)
+    limit--;
+    if(/*limit>=0 ||*/ limit<8)
         spiTransfer(addr, OP_SCANLIMIT,limit);
 }
 
 void MF_LedControlMpx::setIntensity(byte addr, byte intensity) {
     if(addr>=getDeviceCount()) return;
-    if(intensity>=0 || intensity<16)
+    if(/*intensity>=0 ||*/ intensity<16)
         spiTransfer(addr, OP_INTENSITY,intensity);
 
 }
@@ -148,8 +149,9 @@ void MF_LedControlMpx::setLed(byte addr, byte row, byte column, bool state, bool
 
     if(!digits) return;
     if(addr>=getDeviceCount()) return;
-    if(row<0 || row>7 || column<0 || column>7) return;
-    offset=addr*8;
+    if(/*row<0 || column<0 || */
+       row>7 || column>7) return;
+     offset=addr*8;
     val=B10000000 >> column;
     if(state)
         digits[offset+row]=digits[offset+row]|val;
@@ -164,7 +166,7 @@ void MF_LedControlMpx::setRow(byte addr, byte row, byte value, bool noTX)
 {
     byte offset;
     if(addr>=getDeviceCount())  return;
-    if(row<0 || row>7)    return;
+    if(/*row<0 ||*/ row>7)    return;
     offset=addr*8;
     if(digits) digits[offset+row]=value;
     if(!noTX) spiTransfer(addr, row+1, value); //digits[offset+row]);
@@ -174,7 +176,7 @@ void MF_LedControlMpx::setColumn(byte addr, byte col, byte value, bool noTX) {
     byte val;
 
     if(addr>=getDeviceCount())  return;
-    if(col<0 || col>7)    return;
+    if(/*col<0 ||*/ col>7)    return;
     for(byte row=0;row<8;row++) {
         val=value >> (7-row);
         val=val & 0x01;
@@ -188,7 +190,7 @@ void MF_LedControlMpx::setDigit(byte addr, byte digit, byte value, bool dp, bool
     byte v;
 
     if(addr>=getDeviceCount()) return;
-    if(digit<0 || digit>7 || value>15) return;
+    if(/*digit<0 ||*/ digit>7 || value>15) return;
     offset=addr*8;
     //v=charTable[value];
     v=pgm_read_byte_near(charTable+value);
@@ -202,10 +204,8 @@ void MF_LedControlMpx::setChar(byte addr, byte digit, char value, bool dp, bool 
     byte offset;
     byte index,v;
 
-    if(addr<0 || addr>=getDeviceCount())
-        return;
-    if(digit<0 || digit>7)
-        return;
+    if(/*addr<0 ||*/ addr>=numDevices) return;
+    if(/*digit<0 ||*/ digit>7) return;
     offset=addr*8;
     index=(byte)value;
     if(index >127) {
@@ -259,9 +259,9 @@ void MF_LedControlMpx::transmit(void)
 
     for(byte d=0; d<8; d++) {
         //Create an array with the data to shift out
-        for(byte u=0; u<(getDeviceCount()*2); u++) {
-            spidata[u+1]= d+1;                //opcode;
-            spidata[u]  = digits[(u<<3)+d];  //data;
+        for(byte u=0; u<(getDeviceCount()*2); u++, u++) {
+            spidata[u+1]= d+1;                  //opcode
+            spidata[u]  = digits[(u<<2)+d];     //data: u = (unit_no*2); (u<<2) = (unit_no*8)
         }
         digitalWrite(SPI_CS,LOW);
         for(byte i=(getDeviceCount()*2);i>0;i--) {

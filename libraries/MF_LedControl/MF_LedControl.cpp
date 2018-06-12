@@ -77,7 +77,7 @@ void MF_LedControl::init(byte dataPin, byte clkPin, byte csPin, byte numUnits)
     for(int i=0;i<numDevices;i++) {
         spiTransfer(i,OP_DISPLAYTEST,0);
         //scanlimit is set to max on startup
-        setScanLimit(i,7);
+        setScanLimit(i,8);
         //decode is done in source
         spiTransfer(i,OP_DECODEMODE,0);
         clearDisplay(i);
@@ -102,6 +102,7 @@ void MF_LedControl::shutdown(byte addr, bool b)
 
 void MF_LedControl::setScanLimit(byte addr, byte limit) {
     if(addr>=numDevices) return;
+    limit--;
     if(/*limit>=0 || */limit<8)
         spiTransfer(addr, OP_SCANLIMIT,limit);
 }
@@ -186,10 +187,8 @@ void MF_LedControl::setChar(byte addr, byte digit, char value, bool dp, bool noT
     byte offset;
     byte index,v;
 
-    if(/*addr<0 ||*/ addr>=numDevices)
-        return;
-    if(/*digit<0 ||*/ digit>7)
-        return;
+    if(/*addr<0 ||*/ addr>=numDevices) return;
+    if(/*digit<0 ||*/ digit>7) return;
     offset=addr*8;
     index=(byte)value;
     if(index >127) {
@@ -228,9 +227,9 @@ void MF_LedControl::transmit(void)
 
     for(byte d=0; d<8; d++) {
         //Create an array with the data to shift out
-        for(byte u=0; u<numDevices*2; u++) {
-            spidata[u+1]= d+1;                //opcode;
-            spidata[u]  = digits[(u<<3)+d];  //data;
+        for(byte u=0; u<numDevices*2; u++,u++) {
+            spidata[u+1]= d+1;                  //opcode
+            spidata[u]  = digits[(u<<2)+d];     //data: u = (unit_no*2); (u<<2) = (unit_no*8)
         }
         digitalWrite(SPI_CS,LOW);
         for(byte i=numDevices*2;i>0;i--) {

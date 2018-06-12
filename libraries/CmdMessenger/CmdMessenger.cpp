@@ -131,7 +131,7 @@ void CmdMessenger::feedinSerialData()
 		// Process the bytes in the stream buffer, and handles dispatches callbacks, if commands are received
 		for (int byteNo = 0; byteNo < bytesAvailable ; byteNo++)
 		{
-		    int messageState = processLine(streamBuffer[byteNo]);
+		    int messageState = collectLine(streamBuffer[byteNo]);
 
 			// If waiting for acknowledge command
 			if ( messageState == kEndOfMessage )
@@ -145,7 +145,7 @@ void CmdMessenger::feedinSerialData()
 /**
  * Processes bytes and determines message state
  */
-uint8_t CmdMessenger::processLine(int serialByte)
+uint8_t CmdMessenger::collectLine(int serialByte)
 {
     messageState = kProccesingMessage;
     char serialChar = (char)serialByte;
@@ -206,7 +206,7 @@ bool CmdMessenger::CheckForAck(int AckCommand)
     while (  comms->available() ) {
 		//Processes a byte and determines if an acknowlegde has come in
 	    //*comms << "1, processAndWaitForAck,";
-		int messageState = processLine(comms->read());
+		int messageState = collectLine(comms->read());
 		if ( messageState == kEndOfMessage ) {
 			int id = readIntArg();
 			if (AckCommand==id && ArgOk) {

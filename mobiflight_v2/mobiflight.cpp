@@ -221,7 +221,8 @@ enum
   kTypeInputMPX,      // 16
 };
 
-// This is the list of recognized commands. These can be commands that can either be sent or received.
+// This is the list of recognized commands.
+// These are commands that can either be sent or received.
 // In order to receive, attach a callback function to these events
 enum
 {

@@ -9,7 +9,7 @@
 		<Build>
 			<Target title="Simulator - Debug">
 				<Option output="build/Mobiflight_CBP_sim.exe" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj/Debug/" />
+				<Option object_output="build/sim" />
 				<Option type="1" />
 				<Option compiler="GCC" />
 				<Compiler>
@@ -31,7 +31,7 @@
 			</Target>
 			<Target title="Simulator - Release">
 				<Option output="build/Mobiflight_CBP_sim.exe" prefix_auto="1" extension_auto="0" />
-				<Option object_output="obj/Release/" />
+				<Option object_output="build/sim" />
 				<Option type="1" />
 				<Option compiler="GCC" />
 				<Compiler>
@@ -690,6 +690,7 @@
 		<Compiler>
 			<Add option="-Wl,--gc-sections  -Wno-unused-parameter" />
 			<Add option="-DARDUINO_ARCH_AVR" />
+			<Add option="-DARDUINO=185" />
 			<Add directory="." />
 			<Add directory="libraries" />
 			<Add directory="libraries/AccelStepper" />
@@ -838,20 +839,6 @@
 		</Unit>
 		<Unit filename="libraries/MF_Modules/MFButtonT.cpp" />
 		<Unit filename="libraries/MF_Modules/MFButtonT.h" />
-		<Unit filename="libraries/MF_Modules/MFCore.cpp">
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-			<Option target="Arduino Mega 2560 STD_IDE" />
-		</Unit>
-		<Unit filename="libraries/MF_Modules/MFCore.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-			<Option target="Arduino Mega 2560 STD_IDE" />
-		</Unit>
 		<Unit filename="libraries/MF_Modules/MFEncoder.cpp">
 			<Option target="Simulator - Debug" />
 			<Option target="Simulator - Release" />
@@ -971,61 +958,13 @@
 		<Unit filename="libraries/SlowSoftI2CMaster/SlowSoftI2CMaster.h" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.cpp" />
 		<Unit filename="libraries/TicksPerSecond/TicksPerSecond.h" />
-		<Unit filename="mobiflight_mega/MF_registration.inc">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Uno" />
-			<Option target="Arduino Leonardo" />
-			<Option target="Arduino Esplora" />
-			<Option target="Arduino Micro" />
-			<Option target="Arduino Duemilanove (328)" />
-			<Option target="Arduino Duemilanove (168)" />
-			<Option target="Arduino Nano (328)" />
-			<Option target="Arduino Nano (168)" />
-			<Option target="Arduino Mini (328)" />
-			<Option target="Arduino Mini (168)" />
-			<Option target="Arduino Pro Mini (328)" />
-			<Option target="Arduino Pro Mini (168)" />
-			<Option target="Arduino Mega 2560/ADK" />
-			<Option target="Arduino Mega 1280" />
-			<Option target="Arduino Mega 8" />
-			<Option target="Microduino Core+ (644P)" />
-		</Unit>
-		<Unit filename="mobiflight_mega/mobiflight.h">
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Uno" />
-			<Option target="Arduino Leonardo" />
-			<Option target="Arduino Esplora" />
-			<Option target="Arduino Micro" />
-			<Option target="Arduino Duemilanove (328)" />
-			<Option target="Arduino Duemilanove (168)" />
-			<Option target="Arduino Nano (328)" />
-			<Option target="Arduino Nano (168)" />
-			<Option target="Arduino Mini (328)" />
-			<Option target="Arduino Mini (168)" />
-			<Option target="Arduino Pro Mini (328)" />
-			<Option target="Arduino Pro Mini (168)" />
-			<Option target="Arduino Mega 2560/ADK" />
-			<Option target="Arduino Mega 1280" />
-			<Option target="Arduino Mega 8" />
-			<Option target="Microduino Core+ (644P)" />
-		</Unit>
-		<Unit filename="mobiflight_mega/mobiflight_mega.ino">
-			<Option compile="1" />
-			<Option link="1" />
-			<Option target="Simulator - Debug" />
-			<Option target="Simulator - Release" />
-			<Option target="Arduino Mega 2560/ADK" />
-		</Unit>
 		<Unit filename="mobiflight_v2/MF_registration.cpp">
 			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
-		<Unit filename="mobiflight_v2/mobiflight.h">
-			<Option compile="1" />
+		<Unit filename="mobiflight_v2/mobiflight.cpp">
 			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
-		<Unit filename="mobiflight_v2/mobiflight_v2.cpp">
+		<Unit filename="mobiflight_v2/mobiflight.h">
 			<Option target="Arduino Mega 2560 STD_IDE" />
 		</Unit>
 		<Unit filename="mobiflight_v2/mobiflight_v2_mega.ino">
