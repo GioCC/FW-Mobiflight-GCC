@@ -147,6 +147,8 @@ extern bitStore<byte>  pinsRegIn;
 extern bitStore<byte>  pinsRegOut;
 extern bitStore<byte>  pinsRegSharable;
 
+// modify above to "pinRegister  pinReg;" (see .cpp)
+
 extern
 const unsigned long    POWER_SAVING_TIME;
 
@@ -200,7 +202,8 @@ enum E_ptypes
   kTypeInputMPX,      // 16
 };
 
-// This is the list of recognized commands. These can be commands that can either be sent or received.
+// This is the list of recognized commands.
+// These are commands that can either be sent or received.
 // In order to receive, attach a callback function to these events
 enum E_cmds
 {

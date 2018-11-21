@@ -87,26 +87,13 @@ boolean         configActivated = false;
 
 bool            powerSavingMode = false;
 
-//byte            pinRegBuf[roundUp(MAX_LINES)];
-//bitStore<byte>  pinsRegistered(pinRegBuf,roundUp(MAX_LINES));
-
-// For pin overlay:
-// a flag in <pinsRegIn> marks that the pin is registered as INPUT
-// a flag in <pinsRegOut> marks that the pin is registered as OUTPUT
-// a flag in <pinsRegInShared> (implies reg in <pinsRegIn>) marks that the input pin
-//   can be additionally claimed by another client trying to register a sharable input pin
-// a flag in <pinsRegOutShared> (implies reg in <pinsRegOut>) marks that the output pin
-//   can be additionally claimed by another client trying to register a sharable output pin
-// Currently, only Onboard pins can be shared; this is meant to allow for sharing of HW driving lines
-// for certain interfaces (e.g. software I2C).
-// Conceptually, Virtual pins could also be shared, but it must be defined exactly how,
-// what for and to what extent.
-byte            pBufIn  [roundUp(MAX_LINES)];
-byte            pBufOut [roundUp(MAX_LINES)];
-byte            pBufShd [NUM_ONB_PINS];         // Only onboard pins can (currently) be shared
-bitStore<byte>  pinsRegIn (pBufIn, sizeof(pBufIn));
-bitStore<byte>  pinsRegOut(pBufOut,sizeof(pBufOut));
-bitStore<byte>  pinsRegSharable(pBufShd, sizeof(pBufShd));
+// Following 6 lines superseded by class pinRegistry in MF_registration.h
+//byte            pBufIn  [roundUp(MAX_LINES)];
+//byte            pBufOut [roundUp(MAX_LINES)];
+//byte            pBufShd [NUM_ONB_PINS];         // Only onboard pins can (currently) be shared
+//bitStore<byte>  pinsRegIn (pBufIn, sizeof(pBufIn));
+//bitStore<byte>  pinsRegOut(pBufOut,sizeof(pBufOut));
+//bitStore<byte>  pinsRegSharable(pBufShd, sizeof(pBufShd));
 
 const
 unsigned long   POWER_SAVING_TIME = 60*15; // in seconds
@@ -559,9 +546,9 @@ void readButtons()
   long now = millis();
   if (now-lastButtonUpdate > 10) {
     lastButtonUpdate = now;
-  for(int i=0; i!=buttonsRegistered; i++) {
-    buttons[i].update();
-  }
+    for(int i=0; i!=buttonsRegistered; i++) {
+      buttons[i].update();
+    }
   }
 }
 

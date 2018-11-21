@@ -14,24 +14,30 @@
 *
 ********************************************************************/
 
-#include <Arduino.h>
-#include <avr/pgmspace.h>
-#include "mobiflight.h"
+#include "MF_registration.h"
+
+/// Data structures
+
+byte _prbuf[sizeof(pinRegistry)];
+
+pinRegistry  pinReg = new (_prbuf) pinRegistry;     // Use placement new
+
+/// Functions
 
 inline
 byte isPinRegdAsIn(byte pin)
 {
-    return (pin < MAX_LINES ? pinsRegIn.get(pin) : true);
+    return (pin < MAX_LINES ? pinRegs.Ins.get(pin) : true);
 }
 inline
 byte isPinRegdAsOut(byte pin)
 {
-    return (pin < MAX_LINES ? pinsRegOut.get(pin) : true);
+    return (pin < MAX_LINES ? pinRegs.Outs.get(pin) : true);
 }
 inline
 byte isPinSharable(byte pin)
 {
-    return (pin < NUM_ONB_PINS ? pinsRegSharable.get(pin) : false);
+    return (pin < NUM_ONB_PINS ? pinRegs.Sharable.get(pin) : false);
 }
 
 inline
@@ -61,19 +67,19 @@ byte registerPin(byte pin, byte isInput, byte sharable, byte checkonly)
   // and the already assigned one(s) is (are) sharable
   //
   // Note: isPinSharable()=true indicates that that pin no. supports sharing (ie: onboard pins),
-  // while pinsRegSharable()=true indicates that another client has claimed that pin, but it can be shared.
+  // while pinRegs.Sharable()=true indicates that another client has claimed that pin, but it can be shared.
   if(pin >= MAX_LINES) return 0;
-  if(sharable && !isPinSharable(pin)) return 0;
+  if(sharable && !isPinSharable(pin)) return 0;     // Declaring as sharable what can't be such
   if(isInput) {
-    if(pinsRegOut.get(pin)) return 0;
-    if(pinsRegIn.get(pin)&&(!sharable || !pinsRegSharable.get(pin))) return 0;
-    if(!checkonly) pinsRegIn.set(pin);
+    if(pinRegs.Outs.get(pin)) return 0;               // Declaring as input what is already declared as output
+    if(pinRegs.Ins.get(pin)&&(!sharable || !pinRegs.Sharable.get(pin))) return 0; // Declaring a non-sharable input over an existing one, or a sharable input over a non-sharable one
+    if(!checkonly) pinRegs.Ins.set(pin);
   } else {
-    if(pinsRegIn.get(pin)) return 0;
-    if(pinsRegOut.get(pin)&&(!sharable || !pinsRegSharable.get(pin))) return 0;
-    if(!checkonly) pinsRegOut.set(pin);
+    if(pinRegs.Ins.get(pin)) return 0;                // Declaring as output what is already declared as input
+    if(pinRegs.Outs.get(pin)&&(!sharable || !pinRegs.Sharable.get(pin))) return 0; // Declaring a non-sharable output over an existing one, or a sharable output over a non-sharable one
+    if(!checkonly) pinRegs.Outs.set(pin);
   }
-  if(!checkonly && sharable) pinsRegSharable.set(pin);
+  if(!checkonly && sharable) pinRegs.Sharable.set(pin);
   return 1;
 }
 
@@ -84,9 +90,9 @@ byte registerPin(byte pin, byte isInput, byte sharable, byte checkonly)
 void clearRegisteredPins(void)
 {
     //pinsRegistered.clr();
-    pinsRegIn.clr();
-    pinsRegOut.clr();
-    pinsRegSharable.clr();
+    pinRegs.Ins.clr();
+    pinRegs.Outs.clr();
+    pinRegs.Sharable.clr();
 }
 
 
@@ -118,10 +124,10 @@ void clearRegisteredPins(byte type)
 
   switch(type) {
     case kTypeButton:
-        for(byte i=0; i<buttonsRegistered; i++) pinsRegIn.clr(buttons[i].getPin());
+        for(byte i=0; i<buttonsRegistered; i++) pinRegs.Ins.clr(buttons[i].getPin());
         break;
     case kTypeOutput:
-        for(byte i=0; i<outputsRegistered; i++) pinsRegOut.clr(outputs[i].getPin());
+        for(byte i=0; i<outputsRegistered; i++) pinRegs.Outs.clr(outputs[i].getPin());
         break;
     case kTypeEncoder:
         ne = encodersRegistered;
@@ -168,10 +174,10 @@ void clearRegisteredPins(byte type)
       }
       for(byte k=0; k<np; k++) {
         // Don't know which one is set, clears both anyway
-        pinsRegOut.clr(p[k]);
-        pinsRegIn.clr(p[k]);
+        pinRegs.Outs.clr(p[k]);
+        pinRegs.Ins.clr(p[k]);
         // Also clean sharable flag
-        pinsRegSharable.clr(p[k]);
+        pinRegs.Sharable.clr(p[k]);
       }
   }
 }
