@@ -22,7 +22,7 @@
 #include <TicksPerSecond.h>
 
 
-// The array holds the values –1 for the entries where a position was decremented,
+// The array holds the values -1 for the entries where a position was decremented,
 // a 1 for the entries where the position was incremented
 // and 0 in all the other (no change or not valid) cases.
 
@@ -107,7 +107,7 @@ void RotaryEncoderShd::tick(void)
 {
     _tps.update(_id, false);
 
-    byte curState = _state;//sig1 | (sig2 << 1);
+    //byte curState = _state;
     byte newState;
     newState = (digitalRead(_pin1)==LOW ? 0x01 : 0);
     newState |= (digitalRead(_pin2)==LOW ? 0x02 : 0);

@@ -29,9 +29,14 @@
 //#define MODULETYPE MTYPE_MICRO
 //#define MODULETYPE MTYPE_UNO
 
+#define MF_SEGMENT_SUPPORT  1
+#define MF_LCD_SUPPORT      1
+#define MF_STEPPER_SUPPORT  1
+#define MF_SERVO_SUPPORT    1
+
 // Fixed definitions
 #if (MODULETYPE == MTYPE_MEGA)
-#define MODULE_MAX_PINS     58
+#define MODULE_MAX_PINS     69
 #endif
 
 #if (MODULETYPE == MTYPE_UNO)
@@ -39,21 +44,21 @@
 #endif
 
 #if (MODULETYPE == MTYPE_MICRO)
-#define MODULE_MAX_PINS     20
+#define MODULE_MAX_PINS     21
 #endif
 
 #define STEPS 64
-#define STEPPER_SPEED 600 // 300 already worked, 467, too?
-#define STEPPER_ACCEL 900
+#define STEPPER_SPEED 400 // 300 already worked, 467, too?
+#define STEPPER_ACCEL 800
 
 // Custom (parametric) definitions
 #if MODULETYPE == MTYPE_MICRO
-#define MAX_OUTPUTS     10 // ? Find correct value
-#define MAX_BUTTONS     10 // ? Find correct value
+#define MAX_OUTPUTS     10
+#define MAX_BUTTONS     16
 #define MAX_LEDSEGMENTS 1
 #define MAX_ENCODERS    4
-#define MAX_STEPPERS    4
-#define MAX_MFSERVOS    4
+#define MAX_STEPPERS    2
+#define MAX_MFSERVOS    2
 #define MAX_MFLCD_I2C   2
 #define MAX_IOBLOCKS    4 // ? Find correct value
 // Standard I2C pins
@@ -77,10 +82,10 @@
 #endif
 
 #if MODULETYPE == MTYPE_MEGA
-#define MAX_OUTPUTS     40 //80
-#define MAX_BUTTONS     50 //80
+#define MAX_OUTPUTS     40
+#define MAX_BUTTONS     68
 #define MAX_LEDSEGMENTS 4
-#define MAX_ENCODERS    10 //20
+#define MAX_ENCODERS    20
 #define MAX_STEPPERS    10
 #define MAX_MFSERVOS    10
 #define MAX_MFLCD_I2C   2
@@ -101,21 +106,36 @@
 #include <TicksPerSecond.h>
 #include <Wire.h>
 
-#include <MFButtonT.h>        //#include <MFButton.h>
+//#include <MFButton.h>             // original lib, superseded
+//#include <Button.h>               // original lib, superseded
+#include <MFButtonT.h>
 #include <MFOutput.h>
 #include <Multiplexer.h>
-//#include <Button.h>
-//#include <RotaryEncoder.h>
-//#include <RotaryEncoderShd.h>
+//#include <RotaryEncoder.h>        // included by MFEncoder, superseded by RotaryEncoderShd
+//#include <RotaryEncoderShd.h>     // included by MFEncoder
 #include <MFEncoder.h>
-//#include <LedControl.h>     //  need the library
-#include <MFSegments.h>       //  need the library
-//#include <Servo.h>
+
+#if MF_SEGMENT_SUPPORT == 1
+//#include <LedControl.h>           // included by MFSegments, superseded by MF_LedControl
+//#include <MF_LedControl.h>        // included by MFSegments
+#include <MFSegments.h>
+#endif
+
+#if MF_SERVO_SUPPORT == 1
+//#include <Servo.h>                // included by MFServo
 #include <MFServo.h>
-//#include <AccelStepper.h>
+#endif
+
+#if MF_STEPPER_SUPPORT == 1
+//#include <AccelStepper.h>         // included by AccelStepper
 #include <MFStepper.h>
-//#include <LiquidCrystal_I2C.h>
+#endif
+
+#if MF_LCD_SUPPORT == 1
+//#include <LiquidCrystal_I2C.h>    // included by MF
 #include <MFLCDDisplay.h>
+#endif
+
 #include <MFInputMtx.h>
 #include <MFInputMPX.h>
 #include <MFInput165.h>
@@ -124,6 +144,8 @@
 //#include <MFOutLED5940.h>
 #include <MFIO_MCPS.h>
 #include <MFIO_MCP0.h>
+
+#include "MF_registration.h"
 
 extern const byte MEM_OFFSET_NAME;
 extern const byte MEM_LEN_NAME;
@@ -272,45 +294,8 @@ void readButtons(void);
 void readEncoder(void);
 void setup(void);
 void loop(void);
-//bool isPinRegisteredForType(byte pin, byte type);
-//void registerPin(byte pin, byte type);
-byte isPinRegdAsIn(byte pin);
-byte isPinRegdAsOut(byte pin);
-byte isPinSharable(byte pin);
-byte isPinRegistered(byte pin);
-void registerPin(byte pin);
-byte registerPin(byte pin, byte isInput, byte sharable, byte checkonly=0);
-void clearRegisteredPins(void);
-void clearRegisteredPins(byte type);
-void unregIOBlocks(void);
-template<class T> byte registerPeripherals(T *vec[], byte &n, byte nMax, byte *argList, byte nPins, char *Name);
-template<class T> void unregPeripherals(T *vec[], byte &n);
-template<class T> byte registerIOB(byte *argList, byte nPins, byte base, byte nBlocks, char *Name);
-void unregIOBlocks(void);
-void AddOutput(byte pin = 1);
-void ClearOutputs(void);
-void AddButton(byte pin = 1);
-void ClearButtons(void);
-void AddEncoder(byte pin1 = 1, byte pin2 = 2, byte type = 0, const char *name = "Encoder");
-void ClearEncoders(void);
-void AddLedSegment(byte dataPin, byte csPin, byte clkPin, byte numDevices, byte brightness);
-void ClearLedSegments(void);
-void powerSaveLedSegment(bool state);
-void AddStepper(byte pin1, byte pin2, byte pin3, byte pin4, byte btnPin1);
-void ClearSteppers(void);
-void AddServo(byte pin);
-void ClearServos(void);
-void AddLcdDisplay (byte address = 0x24, byte cols = 16, byte lines = 2, const char *name = "LCD");
-void ClearLcdDisplays(void);
 
-void ClearIOBlocks(void);
-void AddInputMtx(byte Row0, byte NRows, byte Col0, byte NCols, byte base);
-void AddInputMPX(byte inPin, byte firstSelPin, byte base);
-void AddInput165(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
-void AddOutput595(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
-void AddOutLEDDM13(byte dataPin, byte csPin, byte clkPin, byte base, byte numDevices);
-void AddIOMCP0(byte SDAPin, byte SCLPin, byte addr, byte IOdir1, byte IOdir2, byte base);
-void AddIOMCPS(byte MOSIPin, byte MISOPin, byte csPin, byte clkPin, byte addr, byte IOdir1, byte IOdir2, byte base);
+void powerSaveLedSegment(bool state);
 
 void handlerOnButton(byte eventId, byte pin, const char *); //String name);
 void handlerOnEncoder(byte eventId, byte pin, const char *); //String name);

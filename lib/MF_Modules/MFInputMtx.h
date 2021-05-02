@@ -29,9 +29,6 @@
 // Calibrate pulse delay for stability
 #define DELAYMTX_US   10
 
-// Disable to prevent use of class bitStore:
-#define USE_BITSTORE
-
 #include <MFPeripheral.h>
 #include <MFIOBlock.h>
 
@@ -71,11 +68,11 @@ public:
     bool changed;
 
     // Allow public access to inputs - if too permissive, make it private
-#ifndef USE_BITSTORE
-    byte    inputs[8];       // Validated inputs (each array element is a column)
-#else
+// #ifndef USE_BITSTORE
+    // byte    inputs[8];       // Validated inputs (each array element is a column)
+// #else
     byte    *inputs;
-#endif
+// #endif
 
 protected:
     byte    _row0;

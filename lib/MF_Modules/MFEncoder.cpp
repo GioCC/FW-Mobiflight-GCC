@@ -25,7 +25,7 @@ void MFEncoder::attach(byte pin1, byte pin2, byte encoder_type, byte encno) //, 
   fast_itoa(ns, encno);   // encno is trusted to be <100!
   _name[0] = ns[1];
   _name[1] = ns[2];
-  _encoderType = encoderType;
+  _encoderType = encoder_type;
 
   _encoder.initialize(pin1, pin2, encoder_type);
   _encoder.setMinMax(MF_ENC_MIN,MF_ENC_MAX);

@@ -38,10 +38,9 @@ void MFInput165::detach()
 void MFInput165::update(byte *dest)
 {
     if(!initialized()) return;
-#ifdef USE_BITSTORE
-    //if(!dest && _store) dest = _store->bank(_base);
-    if(!dest && _storeNew) dest = _storeNew->bank(_base);
-#endif
+// #ifdef USE_BITSTORE
+    if(!dest && _storeNew) dest = startNew();;
+// #endif
     if(!dest) {
         register byte dtin;
         //Evaluate what additional delay value is more suited for stability

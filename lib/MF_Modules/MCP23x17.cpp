@@ -46,12 +46,10 @@ refresh(byte *ins, byte *outs, byte unit)
     byte          idx = 0;
     unsigned int  d   = 0;
     unsigned int  nd  = 0;
-#ifdef USE_BITSTORE
-    //if(ins==0)  ins  = _storeNew;
-    //if(outs==0) outs = _storeVal;
-    if(ins==0)  ins  = _storeNew;
-    if(outs==0) { outs = _storeVal; newouts = _storeNew; }
-#endif
+// #ifdef USE_BITSTORE
+    if(ins==0)  { ins  = startVal(); }
+    if(outs==0) { outs = startVal(); newouts = startNew(); }
+// #endif
     for(byte u=0; u<_moduleCount; u++)
     {
         if(unit!=0xFF && u!=unit) continue;

@@ -14,9 +14,6 @@
 // Calibrate pulse delay for stability
 #define DELAYDM13_US   10
 
-// Disable to prevent use of class bitStore:
-#define USE_BITSTORE
-
 #include <MFPeripheral.h>
 #include <MFIOBlock.h>
 

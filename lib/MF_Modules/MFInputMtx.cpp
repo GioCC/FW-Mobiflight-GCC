@@ -35,7 +35,6 @@ byte MFInputMtx::pins(byte n)
 
 void MFInputMtx::init(void)
 {
-    uint16_t msk = 0;
     if(initialized()) {
         for(byte i=_row0; i<_nrows; i++) { pinMode(i, INPUT_PULLUP); }
         for(byte i=_col0; i<_ncols; i++) {
@@ -89,10 +88,9 @@ void MFInputMtx::scanNext(byte init, byte *dst)
     byte ivec = 0;
 
     if(!initialized()) return;
-#ifdef USE_BITSTORE
-    //inputs = _store->bank(_base);
-    inputs = _storeNew->bank(_base);
-#endif
+// #ifdef USE_BITSTORE
+    inputs = startNew();
+// #endif
     if(!inputs && !dst)return;
 
     if(init) { _currCol = 0;}

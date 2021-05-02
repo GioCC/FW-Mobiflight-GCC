@@ -71,10 +71,9 @@ MFInputMPX::scan(byte *dst)
     byte iidx;
 
     if(!initialized())  return;
-#ifdef USE_BITSTORE
-    //inputs = _store->bank(_base);
-    inputs = (_storeNew ? _storeNew->bank(_base) : NULL);
-#endif
+// #ifdef USE_BITSTORE
+    inputs = (_storeNew ? startNew() : NULL);
+// #endif
     if(!inputs && !dst) return;
 
     for(byte s=16; s>0; s--) {

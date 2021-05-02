@@ -18,11 +18,6 @@
 #define BITSTORE_H
 #include <Arduino.h>
 
-#define roundUp(n)     (((n)+7)>>3)
-#define idxB(n)        ((n)>>3)
-#define idxP(n)        ((n)&0x07)
-#define idxM(n)        (1<<idxP(n))
-
 template<typename Tadr, Tadr BITSIZE> class bitStore;
 
 template<typename Tadr, Tadr BITSIZE>

@@ -14,7 +14,7 @@
 #include <Arduino.h>
 
 #include "../AccelStepper/AccelStepper.h"
-//#include "MFButton.h"
+#include "MFButtonT.h"
 #include <MFPeripheral.h>
 
 /////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ class MFStepper
 : public MFPeripheral
 {
 public:
-    MFStepper(uint8_t pin1 = 1, uint8_t pin2 = 2, uint8_t pin3 = 3, uint8_t pin4 = 4 /*, uint8_t btnPin1 = 5 */);
+    MFStepper(uint8_t pin1 = 1, uint8_t pin2 = 2, uint8_t pin3 = 3, uint8_t pin4 = 4, uint8_t btnPin1 = 0);
     void update(void);
     ///TODO Currently, attach(....) does nothing - the constructor compels to pass the pin numbers
     /// because this is required by base-class AccelStepper, which also has no method for changing
@@ -40,7 +40,7 @@ public:
     void setAcceleration(float acceleration);
     void setZeroInReset();
     void setZero();
-    //MFButton* getButton();
+    MFButtonT *getButton();
 
 
 protected:
@@ -49,7 +49,7 @@ protected:
 private:
     bool          _resetting;
     AccelStepper  _stepper;
-    //MFButton      _button;
+    MFButtonT     _button;
     long          _targetPos;
     byte          _pin[4];
 };

@@ -36,7 +36,7 @@ void MFLCDDisplay::attach(byte address, byte cols, byte lines)
 void MFLCDDisplay::detach()
 {
   if (!initialized()) return;
-  delete _lcdDisplay;
+  //delete _lcdDisplay;
   initialize(false);
 }
 

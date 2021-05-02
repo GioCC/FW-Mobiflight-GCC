@@ -20,6 +20,12 @@
 
 //byte _prbuf[sizeof(pinRegistry)];
 //pinRegistry  pinRegs = new (_prbuf) pinRegistry;     // Use placement new
+
+byte    pinRegistry::prBufI[BUFSZ];
+byte    pinRegistry::prBufO[BUFSZ];
+byte    pinRegistry::prBufR[NUM_ONB_PINS];
+
+
 pinRegistry  pinRegs;
 
 /// Functions
@@ -39,7 +45,6 @@ byte isPinSharable(byte pin)
 {
     return (pin < NUM_ONB_PINS ? pinRegs.Sharable.get(pin) : false);
 }
-
 inline
 byte isPinRegistered(byte pin)
 {
@@ -260,7 +265,7 @@ byte registerPeripheral(T *vec[], byte &nElem, byte nMax, byte *argList, byte nP
 // their reservations are NOT released here.
 // Driver pins must be previously released through ClearXXXX() functions.
 template<class T>
-void unregPeripherals(T *vec[], byte &n)
+void unregPeripheral(T *vec[], byte &n)
 {
     for (byte j=0; j<n; j++) {
         vec[j]->detach();
@@ -437,7 +442,7 @@ void ClearButtons(void)
 ///==========///
 /// ENCODERS ///
 ///==========///
-void AddEncoder(byte pin1, byte pin2, byte type, char *Name)
+void AddEncoder(byte pin1, byte pin2, byte type, const char *Name)
 {
   byte errReg = kErrNone;
   // Pin validation
@@ -452,7 +457,7 @@ void AddEncoder(byte pin1, byte pin2, byte type, char *Name)
     argList[1] = pin2;
     argList[2] = type;
     argList[3] = encodersRegistered+1;
-    errReg = registerPeripheral<MFEncoder>(encoders, encodersRegistered, MAX_ENCODERS, argList, 2, Name);
+    errReg = registerPeripheral<MFEncoder>(encoders, encodersRegistered, MAX_ENCODERS, argList, 2, (char *)Name);
 
   #ifdef DEBUG
       if(errReg==kErrFull)      cmdMessenger.sendCmd(kStatus,PSTR("Encoder limit exceeded"));
@@ -481,7 +486,7 @@ void AddEncoder(byte pin1, byte pin2, byte type, char *Name)
 void ClearEncoders()
 {
   clearRegisteredPins(kTypeEncoder);
-  unregPeripherals(encoders, encodersRegistered);
+  unregPeripheral(encoders, encodersRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Cleared encoders"));
 #endif
@@ -529,7 +534,7 @@ void AddLedSegment(byte dataPin, byte csPin, byte clkPin, byte numDevices, byte 
 void ClearLedSegments()
 {
   clearRegisteredPins(kTypeLedSegment);
-  unregPeripherals(ledSegments, ledSegmentsRegistered);
+  unregPeripheral(ledSegments, ledSegmentsRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus, PSTR("Cleared segments"));
 #endif
@@ -582,7 +587,7 @@ void AddStepper(byte pin1, byte pin2, byte pin3, byte pin4, byte btnPin1)
 void ClearSteppers()
 {
   clearRegisteredPins(kTypeStepper);
-  unregPeripherals(steppers, steppersRegistered);
+  unregPeripheral(steppers, steppersRegistered);
 #ifdef DEBUG
   cmdMessenger.sendCmd(kStatus,PSTR("Cleared steppers"));
 #endif
@@ -628,9 +633,10 @@ void ClearServos()
 ///=============///
 /// LCD Display ///
 ///=============///
-void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, char *name)
+void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, const char *name)
 {
   byte errReg = kErrNone;
+
   if (lcd_i2cRegistered == MAX_MFLCD_I2C) return;
   // Pin validation (using fixed HW I2C)
   if(!checkPinReg(SDA, 0, true) ||
@@ -646,6 +652,8 @@ void AddLcdDisplay (uint8_t address, uint8_t cols, uint8_t lines, char *name)
 #ifdef DEBUG
   if(errReg==kErrConflict)   cmdMessenger.sendCmd(kStatus,PSTR("LCD pin conflict"));
   if(!errReg) cmdMessenger.sendCmd(kStatus,PSTR("Added LCD Display"));
+#else
+  (void)errReg; // prevent compiler from complaining
 #endif
 }
 

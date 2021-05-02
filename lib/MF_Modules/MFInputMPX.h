@@ -18,9 +18,6 @@
 // Calibrate pulse delay for stability
 #define DELAYMPX_US   10
 
-// Disable to prevent use of class bitStore:
-#define USE_BITSTORE
-
 #include <MFPeripheral.h>
 #include <MFIOBlock.h>
 
@@ -58,11 +55,11 @@ public:
     void init(void);
 
     // Allow public access to inputs - if too permissive, make it private
-#ifndef USE_BITSTORE
-    byte    inputs[2];       // Validated inputs
-#else
+// #ifndef USE_BITSTORE
+    // byte    inputs[2];       // Validated inputs
+// #else
     byte    *inputs;
-#endif
+// #endif
 
 protected:
     byte    _inPin;

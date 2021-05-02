@@ -1,6 +1,6 @@
 // MFSegments.h
 //
-/// \mainpage MF Button module for MobiFlight Framework
+/// \mainpage MF Display module for MobiFlight Framework
 /// \par Revision History
 /// \version 1.0 Initial release
 /// \author  Sebastian Moebius (mobiflight@moebiuz.de) DO NOT CONTACT THE AUTHOR DIRECTLY: USE THE LISTS

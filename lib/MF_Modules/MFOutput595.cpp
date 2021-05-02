@@ -40,13 +40,12 @@ void MFOutput595::send(byte *pattern)
 {
     if(!initialized()) return;
     byte *newpattern = pattern;
-#ifdef USE_BITSTORE
-    //if(!pattern && _store) pattern = _store->bank(_base);
+// #ifdef USE_BITSTORE
     if(!pattern && _storeVal) {
-        pattern    = _storeVal->bank(_base);
-        newpattern = _storeNew->bank(_base);
+        pattern    = startVal();
+        newpattern = startNew();
     }
-#endif
+// #endif
     if(pattern && newpattern) {
         register byte dto;
         for(byte i=_moduleCount; i;){

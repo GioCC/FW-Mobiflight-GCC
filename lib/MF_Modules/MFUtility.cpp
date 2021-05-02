@@ -55,7 +55,9 @@ uint8_t fast_atoi(char *src)
     uint8_t a = 0;
     uint8_t d = 0;
     uint8_t res = 0;
-    if(*t) t++; if(*t) t++; if(*t) t++;
+    if(*t) t++; 
+    if(*t) t++; 
+    if(*t) t++;
     if(t==src) return 0;
     // Units
     res = (*(--t))-'0';
