@@ -1,0 +1,33 @@
+Mobiflight - Use of MPX boards ("ArdSimX-style")
+
+MPX boards (based on 74HC4067) can be used to extend the number of connected peripherals.
+Here a few points and notes about their usage, with reference to the architecture used in ArdSimX.
+
+- On the multiple end of an MPX, any of these can be found:
+  1a. Single DI lines
+  1b. Single AI lines
+  2.  Input lines from DI block peripherals (eg. HC165)
+  3a. Driver (outward) lines to DO block peripherals (eg. HC595, DM13A)
+  3b. Driver (outward) lines to display  peripherals (eg. MAX7219, TM1637)
+  3c. Driver (outward) lines to PWM/Servo controller peripherals (eg. TLC5947)
+  3d. Driver (outward) lines to stepper controller peripherals (eg. VID6606, VID6608)
+  For obvious reasons, single DO lines cannot (in practice) be multiplexed.
+
+  Here are comments for above points in regard to ArdSimX:
+  1a. Common, standard use
+  1b. Common, standard use
+  2.  Apparently not used (probably because it's easier to use option 1a anyway)
+  3a. Apparently not used; DM13A LED drivers, for instance, are not used under mpx (probably because there is abundance of direct pins)
+  3b. Standard display connection. 
+      Up to 16 displays on an MPX block.
+      Unit types can be mixed (MAX7219, TM1637, HC595, DM13A supported).
+      HC595's or DM13A's, if connected here, are managed as display units.
+      See further below for notes on connections.
+  3c. Common, standard use
+  3d. Common, standard use
+  
+  ALL MPXs share common address lines (4 outs from Arduino). At any given moment, all mpxs are switched on the same channel.
+  The common lines of single line MPXs (1a, 1b) go each to its own direct pin.
+  Output blocks (#3b..3d) only have one driver line MPX'd; they share remaining lines on common (reserved) output lines.
+  
+  

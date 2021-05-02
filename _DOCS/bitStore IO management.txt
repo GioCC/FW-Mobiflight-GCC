@@ -1,7 +1,7 @@
-bitStores:
+bitStores used:
 
-bsLines
-bsValLines ('Validated')
+> bsLines    (new values)
+> bsValLines ('Validated')
 
 Inputs:
 - new values (IOBlocks/digitalRead) read in bsLines (MASKED FOR DDR)
