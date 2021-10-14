@@ -51,13 +51,13 @@ public:
     void update(void);
     void attach(byte pin1, byte pin2, byte encoder_type, byte encno); //String name = "Encoder");
 
-    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2], pm[3]); } //name); }
-    void detach(void) {};
-    void update(byte *send, byte *get)  { update(); }
-    byte getPins(byte *dst)             { dst[0] = _encoder.pin(1); dst[1] = _encoder.pin(2); return npins(); }
+    void attach(byte *pm, char *name) override   { attach(pm[0], pm[1], pm[2], pm[3]); } //name); }
+    void detach(void) override {};
+    void update(byte *send, byte *get) override  { update(); }
+    byte getPins(byte *dst) override             { dst[0] = _encoder.pin(1); dst[1] = _encoder.pin(2); return npins(); }
 
 protected:
-    byte    pins(byte n) { return _encoder.pin(n+1); }  // implements MFPeripheral.pins(n)
+    byte    pins(byte n) override { return _encoder.pin(n+1); }  // implements MFPeripheral.pins(n)
 
 private:
     static encoderEvent       _handler; //[4];

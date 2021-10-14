@@ -47,10 +47,10 @@ private:
     byte          _readb(void);       // for slaved use, does not touch _cs
 
     // Virtuals from MCP23x17
-    byte          readB(byte adr, byte reg);
-    unsigned int  readW(byte adr, byte reg);
-    void          writeB(byte adr, byte reg, byte val);
-    void          writeW(byte adr, byte reg, unsigned int val);
+    byte          readB(byte adr, byte reg) override;
+    unsigned int  readW(byte adr, byte reg) override;
+    void          writeB(byte adr, byte reg, byte val) override;
+    void          writeW(byte adr, byte reg, unsigned int val) override;
 
 public:
     MFIO_MCPS(void);
@@ -61,8 +61,8 @@ public:
                    byte IOdir1, byte IOdir2);
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6]); }    // name unused
-    void    detach();
+    void    attach(byte *pm, char *name) override { attach(pm[0], pm[1], pm[2], pm[3], pm[4], pm[5], pm[6]); }    // name unused
+    void    detach() override;
 
     // Virtuals from MCP23x17::MFIOBlock
     byte    getInputMap(byte bank) { return MCP23x17::getIMap(bank); };

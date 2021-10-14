@@ -32,10 +32,10 @@ public:
     void attach(int dataPin, int csPin, int clkPin, int moduleCount);
     void send(byte *pattern = NULL);
 
-    void attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
-    void detach(void);
-    void update(byte *snd, byte *get) { send(snd); }
-    void test(void);
+    void attach(byte *pm, char *name) override { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
+    void detach(void) override;
+    void update(byte *snd, byte *get) override { send(snd); }
+    void test(void) override;
     void powerSavingMode(bool state) {}   // Not currently implemented
 
     byte getBaseSize(void)      { return 1; }   // # of 8-bit banks per base unit
@@ -44,7 +44,7 @@ public:
     byte getOutputMap(byte bank){ return 0xFF; };
 
 protected:
-    byte pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
+    byte pins(byte n) override    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
     byte        _pin[3];

@@ -31,8 +31,8 @@ public:
     /// A modification to AccelStepper would be required in order to have a working MFStepper::attach(....).
     void attach(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) {};
 
-    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
-    void update(byte *send, byte *get)  { update(); }
+    void attach(byte *pm, char *name) override   { attach(pm[0], pm[1], pm[2], pm[3]); }    // name unused
+    void update(byte *send, byte *get) override  { update(); }
 
     void reset();
     void moveTo(long absolute);
@@ -44,7 +44,7 @@ public:
 
 
 protected:
-    byte pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }
+    byte pins(byte n) override    { return (n<4 ? _pin[n] : 0xFF); }
 
 private:
     bool          _resetting;

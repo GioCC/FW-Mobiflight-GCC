@@ -18,7 +18,7 @@
 class MFPeripheral
 {
 public:
-    MFPeripheral(uint8_t npins) : _npins(npins&0x7F) { };
+    explicit MFPeripheral(uint8_t npins) : _npins(npins&0x7F) { };
     // Virtual destructor required: this is meant as a (polymorphic) base class, and derived-class objects
     // may possibly be destroyed through a "base class *" rather than a "derived class *".
     virtual ~MFPeripheral(void) {}

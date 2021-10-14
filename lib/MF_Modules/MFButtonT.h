@@ -39,7 +39,7 @@ public:
     uint8_t       _pin;
     //String        _name;
 
-    MFButtonT(void) {}
+    MFButtonT(void): _pin(0xFF) {}
     void attach(uint8_t pin = 1);
     byte getPin(void)                { return _pin; }
     void trigger(void);

@@ -55,6 +55,6 @@ public:
     static void CallbackFunction();
 
 private:
-    bool          _state;
+    //bool          _state;
 };
 #endif

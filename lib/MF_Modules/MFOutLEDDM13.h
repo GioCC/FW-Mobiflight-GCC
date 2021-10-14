@@ -33,9 +33,9 @@ public:
     void attach(int dataPin, int csPin, int clkPin, int oenPin, int moduleCount);
     void send(byte *pattern = NULL);
 
-    void attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
-    void detach(void);
-    void update(byte *snd, byte *get) { send(snd); }
+    void attach(byte *pm, char *name) override { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
+    void detach(void) override;
+    void update(byte *snd, byte *get) override { send(snd); }
 
     void test(void);
     void powerSavingMode(bool state) { if(OENDM13!=0xFF) digitalWrite(OENDM13, state); }
@@ -46,7 +46,7 @@ public:
     byte getOutputMap(byte bank){ return 0xFF; };
 
 protected:
-    byte pins(byte n)    { return (n<4 ? _pin[n] : 0xFF); }
+    byte pins(byte n) override    { return (n<4 ? _pin[n] : 0xFF); }
 
 private:
     byte _pin[4];

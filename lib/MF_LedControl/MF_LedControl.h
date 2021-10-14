@@ -96,7 +96,7 @@ class MF_LedControl {
      * Neutral constructor - used for preallocation, will be setup by init()
      */
     MF_LedControl(void)
-    :numDevices(0) {};
+    :digits(NULL), numDevices(0) {};
 
     /*
      * Create a new controller

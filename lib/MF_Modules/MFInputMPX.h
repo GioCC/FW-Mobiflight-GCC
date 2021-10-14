@@ -31,17 +31,17 @@ class MFInputMPX
 {
 public:
     MFInputMPX(void);
-    MFInputMPX(t_selector_fn);
+    explicit MFInputMPX(t_selector_fn);
 
     void attach(int inPin);
     void setSelector(t_selector_fn sel);
     void scan(byte *dst);
 
     // MFPeripheral virtuals:
-    void attach(byte *pm, char *name)   { attach(pm[0]); }
-    void detach(void);
-    void update(byte *send, byte *get)  { scan(get); }
-    byte getPins(byte *dst);
+    void attach(byte *pm, char *name) override   { attach(pm[0]); }
+    void detach(void) override;
+    void update(byte *send, byte *get) override  { scan(get); }
+    byte getPins(byte *dst) override;
 
     // MFIOBlock virtuals:
     byte getBaseSize(void)  { return 2; }                   // # of 8-bit banks per base unit
@@ -64,7 +64,7 @@ public:
 protected:
     byte    _inPin;
 
-    byte    pins(byte n);   // MFPeripheral virtual
+    byte    pins(byte n) override;   // MFPeripheral virtual
 
 private:
     byte    _inPrev[2];     // Previous raw input status

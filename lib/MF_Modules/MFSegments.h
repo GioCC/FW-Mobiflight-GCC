@@ -25,17 +25,17 @@ public:
     void attach(byte dataPin, byte csPin, byte clkPin, byte moduleCount, byte brightness);
     void display(byte module, char *string, byte points, byte mask, bool convertPoints = false);
 
-    void attach(byte *pm, char *name)  { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
-    void detach(void);
-    void update(byte *send, byte *get) {}
+    void attach(byte *pm, char *name) override  { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
+    void detach(void) override;
+    void update(byte *send, byte *get) override {}
 
-    void test(void);
+    void test(void) override;
     void powerSavingMode(bool state);
 
     void setBrightness(byte module, byte value);
 
 protected:
-    byte pins(byte n)    { return (n<3 ? _pin[n] : 0xFF); }
+    byte pins(byte n) override    { return (n<3 ? _pin[n] : 0xFF); }
 
 private:
     byte          *_digitBuf;

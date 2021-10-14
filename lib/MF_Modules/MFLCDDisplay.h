@@ -26,10 +26,10 @@ public:
     void display(char *string);
     void attach(byte address, byte cols, byte lines);
 
-    void attach(byte *pm, char *name)   { attach(pm[0], pm[1], pm[2]); }    // name unused
-    void detach(void);
-    void update(byte *send, byte *get)  {}
-    byte getPins(byte *dst)             { /* copy pin nos into dst */ return npins(); }   ///TODO Should return the I2C pins for consistency
+    void attach(byte *pm, char *name) override   { attach(pm[0], pm[1], pm[2]); }    // name unused
+    void detach(void) override;
+    void update(byte *send, byte *get) override  {}
+    byte getPins(byte *dst) override             { /* copy pin nos into dst */ return npins(); }   ///TODO Should return the I2C pins for consistency
 
     void test(void);
     void powerSavingMode(bool state);

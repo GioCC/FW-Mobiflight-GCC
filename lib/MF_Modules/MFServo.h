@@ -21,22 +21,22 @@ class MFServo
 {
 public:
     MFServo(void);
-    MFServo(uint8_t pin, bool enable = true);
+    explicit MFServo(uint8_t pin, bool enable = true);
     void attach(uint8_t pin = 1, bool enable = true);
     void update(void);
 
-    void attach(byte *pm, char *name)  { attach(pm[0], pm[1]); }    // name unused
-    void detach(void);
-    void update(byte *send, byte *get) { update(); }
+    void attach(byte *pm, char *name) override  { attach(pm[0], pm[1]); }    // name unused
+    void detach(void) override;
+    void update(byte *send, byte *get) override { update(); }
 
-    byte getPins(byte *dst) { if(dst){dst[0] = _pin;} return npins(); }
+    byte getPins(byte *dst) override { if(dst){dst[0] = _pin;} return npins(); }
 
     void setExternalRange(int min, int max);
     void setInternalRange(int min, int max);
     void moveTo(int absolute);
 
 protected:
-    byte    pins(byte n)    { return (n==0 ? _pin : 0xFF); }
+    byte    pins(byte n) override    { return (n==0 ? _pin : 0xFF); }
 
 private:
     uint8_t _pin;

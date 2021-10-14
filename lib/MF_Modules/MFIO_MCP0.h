@@ -46,10 +46,10 @@ private:
     SlowSoftI2CMaster   *SWI2C;
 
     // Virtuals from MCP23x17
-    byte          readB(byte adr, byte reg);
-    unsigned int  readW(byte adr, byte reg);
-    void          writeB(byte adr, byte reg, byte val);
-    void          writeW(byte adr, byte reg, unsigned int val);
+    byte          readB(byte adr, byte reg) override;
+    unsigned int  readW(byte adr, byte reg) override;
+    void          writeB(byte adr, byte reg, byte val) override;
+    void          writeW(byte adr, byte reg, unsigned int val) override;
 
 public:
 
@@ -59,8 +59,8 @@ public:
     void    attach(byte addr, byte SDAPin, byte SCLPin, byte IOdir1, byte IOdir2); // Any pin =0xFF means we are using HW I2C
 
     // Virtuals from MCP23x17::MFPeripheral
-    void    attach(byte *pm, char *name) { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
-    void    detach(void);
+    void    attach(byte *pm, char *name) override { attach(pm[0], pm[1], pm[2], pm[3], pm[4]); }    // name unused
+    void    detach(void) override;
 
     // Virtuals from MCP23x17::MFIOBlock
     byte    getInputMap(byte bank) { return MCP23x17::getIMap(bank); };
